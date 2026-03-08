@@ -57,7 +57,7 @@ const TESTIMONIALS = [
     rating: 5
   },
   {
-    name: 'Carlos Eduardo',
+    name: 'Nino santos',
     text: 'Fizemos a volta à ilha e foi espetacular. O guia nos contou histórias locais e nos levou a restaurantes incríveis em Cova da Onça.',
     rating: 5
   },
