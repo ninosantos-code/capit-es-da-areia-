@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Bot, SendHorizontal } from 'lucide-react';
+import { GoogleGenAI } from "@google/genai";
 
 const TOURS = [
   {
@@ -57,7 +58,7 @@ const TESTIMONIALS = [
     rating: 5
   },
   {
-    name: 'Nino santos',
+    name: 'Carlos Eduardo',
     text: 'Fizemos a volta à ilha e foi espetacular. O guia nos contou histórias locais e nos levou a restaurantes incríveis em Cova da Onça.',
     rating: 5
   },
@@ -68,12 +69,44 @@ const TESTIMONIALS = [
   }
 ];
 
+type ChatRole = 'user' | 'assistant';
+
+type ChatMessage = {
+  id: number;
+  role: ChatRole;
+  text: string;
+};
+
+const AI_WELCOME_MESSAGE = 'Oi! 👋 Sou o Assistente Moreré. Posso te ajudar a escolher o passeio ideal, entender duração/preço e até preparar sua reserva.';
+
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
   const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+
+  const [isAiOpen, setIsAiOpen] = useState(false);
+  const [aiInput, setAiInput] = useState('');
+  const [isAiLoading, setIsAiLoading] = useState(false);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: 1, role: 'assistant', text: AI_WELCOME_MESSAGE }
+  ]);
+  const chatRef = useRef<any>(null);
+
+  useEffect(() => {
+    try {
+      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      chatRef.current = ai.chats.create({
+        model: "gemini-3-flash-preview",
+        config: {
+          systemInstruction: "Você é o Assistente Moreré, um atendente virtual amigável da agência de turismo Capitães da Areia, localizada na Ilha de Boipeba, Bahia. Você ajuda os clientes a escolher passeios (Piscinas Naturais de Moreré, Volta à Ilha de Lancha, Passeio de Canoa no Mangue, Bioluminescência de Caiaque, Vivência Nativa), informa preços, durações e tira dúvidas. Use emojis tropicais e seja muito educado. Quando o cliente quiser reservar, oriente-o a clicar no botão 'Reservar' no site para preencher o formulário que será enviado para o WhatsApp da agência. Nunca invente passeios que não existem. Os passeios são: Piscinas Naturais (R$ 100, 2-3h), Volta à Ilha (R$ 250, 9h-16h), Canoa no Mangue (R$ 80, 2h), Bioluminescência (R$ 120, 1.5h), Vivência Nativa (Valor a combinar, meio dia).",
+        },
+      });
+    } catch (e) {
+      console.error("Failed to initialize AI", e);
+    }
+  }, []);
 
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [reservationForm, setReservationForm] = useState({
@@ -86,8 +119,11 @@ export default function App() {
     problemasSaude: '',
     fobias: '',
     medicamentos: '',
+    restricoesAlimentares: '',
+    nivelExperiencia: 'Iniciante',
     observacoes: ''
   });
+  const [aceitaTermos, setAceitaTermos] = useState(false);
 
   const openReservationModal = (tourTitle = 'Ainda não decidi') => {
     setReservationForm(prev => ({ ...prev, passeioDesejado: tourTitle }));
@@ -99,10 +135,15 @@ export default function App() {
     setIsReservationModalOpen(false);
   };
 
-  const handleReservationSubmit = (e: React.FormEvent) => {
+  const handleReservationSubmit = (e: FormEvent) => {
     e.preventDefault();
     
-    const { nome, idade, quantidadePessoas, temCrianca, dataChegada, passeioDesejado, problemasSaude, fobias, medicamentos, observacoes } = reservationForm;
+    if (!aceitaTermos) {
+      alert("Por favor, aceite o Termo de Isenção de Responsabilidade para continuar.");
+      return;
+    }
+    
+    const { nome, idade, quantidadePessoas, temCrianca, dataChegada, passeioDesejado, problemasSaude, fobias, medicamentos, restricoesAlimentares, nivelExperiencia, observacoes } = reservationForm;
     
     const message = `Olá! Gostaria de fazer uma reserva/orçamento.
 
@@ -112,12 +153,16 @@ export default function App() {
 *Tem crianças?:* ${temCrianca}
 *Data de chegada na ilha:* ${dataChegada}
 *Passeio de interesse:* ${passeioDesejado}
+*Nível de experiência (Atividades ao ar livre):* ${nivelExperiencia}
 
-*--- Saúde e Segurança ---*
+*--- Saúde, Segurança e Alimentação ---*
 *Problemas de saúde/alergias:* ${problemasSaude || 'Nenhum'}
 *Fobias:* ${fobias || 'Nenhuma'}
 *Medicamentos em uso:* ${medicamentos || 'Nenhum'}
-${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
+*Restrições alimentares:* ${restricoesAlimentares || 'Nenhuma'}
+${observacoes ? `\n*Observações:* ${observacoes}` : ''}
+
+*✅ Aceitou o Termo de Isenção de Responsabilidade.*`;
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/5575999999999?text=${encodedMessage}`, '_blank');
@@ -159,13 +204,56 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
     setIsMobileMenuOpen(false);
   };
 
-  const handleCommentSubmit = (e: React.FormEvent) => {
+  const handleCommentSubmit = (e: FormEvent) => {
     e.preventDefault();
     // Em um cenário real, isso enviaria os dados para um banco de dados para aprovação
     setIsCommentSubmitted(true);
     setCommentForm({ name: '', text: '', rating: 5 });
     
     setTimeout(() => setIsCommentSubmitted(false), 5000);
+  };
+
+  const sendAiMessage = async (e: FormEvent) => {
+    e.preventDefault();
+    const cleanInput = aiInput.trim();
+
+    if (!cleanInput || isAiLoading) {
+      return;
+    }
+
+    const userMessage: ChatMessage = {
+      id: Date.now(),
+      role: 'user',
+      text: cleanInput
+    };
+
+    setChatMessages((prev) => [...prev, userMessage]);
+    setAiInput('');
+    setIsAiLoading(true);
+
+    try {
+      if (chatRef.current) {
+        const response = await chatRef.current.sendMessage({ message: cleanInput });
+        const assistantMessage: ChatMessage = {
+          id: Date.now() + 1,
+          role: 'assistant',
+          text: response.text || 'Desculpe, não consegui entender. Poderia reformular?'
+        };
+        setChatMessages((prev) => [...prev, assistantMessage]);
+      } else {
+        throw new Error("Chat not initialized");
+      }
+    } catch (error) {
+      console.error("AI Error:", error);
+      const errorMessage: ChatMessage = {
+        id: Date.now() + 1,
+        role: 'assistant',
+        text: 'Desculpe, estou com problemas técnicos no momento. Por favor, tente novamente ou clique em "Reservar" para falar conosco no WhatsApp.'
+      };
+      setChatMessages((prev) => [...prev, errorMessage]);
+    } finally {
+      setIsAiLoading(false);
+    }
   };
 
   return (
@@ -609,6 +697,72 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
         </div>
       </footer>
 
+      {/* AI Assistant */}
+      <button
+        onClick={() => setIsAiOpen((prev) => !prev)}
+        className="fixed bottom-6 right-6 z-[110] bg-ocean-600 hover:bg-ocean-700 text-white rounded-full px-5 py-3 shadow-xl flex items-center gap-2 transition-colors"
+        aria-label="Abrir assistente de IA"
+      >
+        <Bot className="w-5 h-5" />
+        Assistente IA
+      </button>
+
+      {isAiOpen && (
+        <div className="fixed bottom-24 right-6 w-[calc(100%-3rem)] max-w-sm z-[110] bg-white rounded-2xl shadow-2xl border border-sand-200 overflow-hidden">
+          <div className="bg-sand-900 text-white px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bot className="w-4 h-4" />
+              <p className="text-sm font-medium">Assistente Moreré</p>
+            </div>
+            <button
+              onClick={() => setIsAiOpen(false)}
+              className="text-sand-300 hover:text-white transition-colors"
+              aria-label="Fechar assistente"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="h-80 overflow-y-auto px-4 py-3 space-y-3 bg-sand-50">
+            {chatMessages.map((message) => (
+              <div
+                key={message.id}
+                className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${
+                  message.role === 'assistant'
+                    ? 'bg-white border border-sand-200 text-sand-800'
+                    : 'ml-auto bg-ocean-600 text-white'
+                }`}
+              >
+                {message.text}
+              </div>
+            ))}
+            {isAiLoading && (
+              <div className="max-w-[90%] rounded-2xl px-3 py-2 text-sm bg-white border border-sand-200 text-sand-800 flex items-center gap-2 w-fit">
+                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" />
+                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
+                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={sendAiMessage} className="p-3 border-t border-sand-200 flex gap-2">
+            <input
+              value={aiInput}
+              onChange={(e) => setAiInput(e.target.value)}
+              placeholder="Pergunte sobre passeios, preços..."
+              className="flex-1 px-3 py-2 rounded-xl border border-sand-300 focus:outline-none focus:ring-2 focus:ring-ocean-500 text-sm"
+            />
+            <button
+              type="submit"
+              className="bg-ocean-600 hover:bg-ocean-700 text-white rounded-xl px-3 transition-colors"
+              aria-label="Enviar mensagem"
+            >
+              <SendHorizontal className="w-4 h-4" />
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Reservation Modal */}
       {isReservationModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
@@ -740,11 +894,34 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
                         placeholder="Ex: Aspirina, remédio para pressão, etc."
                       />
                     </div>
+
+                    <div>
+                      <label htmlFor="res-alimentacao" className="block text-sm font-medium text-sand-800 mb-1">Restrições Alimentares?</label>
+                      <textarea 
+                        id="res-alimentacao" rows={2}
+                        value={reservationForm.restricoesAlimentares}
+                        onChange={(e) => setReservationForm({...reservationForm, restricoesAlimentares: e.target.value})}
+                        className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none text-sm"
+                        placeholder="Ex: Intolerância à lactose, vegano, alergia a camarão."
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-sand-200">
-                  <label htmlFor="res-obs" className="block text-sm font-medium text-sand-800 mb-1">Observações (Opcional)</label>
+                  <label htmlFor="res-experiencia" className="block text-sm font-medium text-sand-800 mb-1">Nível de Experiência em Atividades ao Ar Livre</label>
+                  <select 
+                    id="res-experiencia" required
+                    value={reservationForm.nivelExperiencia}
+                    onChange={(e) => setReservationForm({...reservationForm, nivelExperiencia: e.target.value})}
+                    className="w-full px-4 py-3 mb-4 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
+                  >
+                    <option value="Iniciante">Iniciante (Pouca ou nenhuma experiência)</option>
+                    <option value="Intermediário">Intermediário (Pratica atividades ocasionalmente)</option>
+                    <option value="Avançado">Avançado (Pratica frequentemente, bom preparo físico)</option>
+                  </select>
+
+                  <label htmlFor="res-obs" className="block text-sm font-medium text-sand-800 mb-1">Observações Gerais (Opcional)</label>
                   <textarea 
                     id="res-obs" rows={2}
                     value={reservationForm.observacoes}
@@ -752,6 +929,26 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
                     className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none"
                     placeholder="Alguma dúvida ou pedido especial?"
                   />
+                </div>
+
+                <div className="pt-4 border-t border-sand-200">
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <div className="relative flex items-center justify-center mt-1">
+                      <input 
+                        type="checkbox" 
+                        required
+                        checked={aceitaTermos}
+                        onChange={(e) => setAceitaTermos(e.target.checked)}
+                        className="peer appearance-none w-5 h-5 border-2 border-sand-300 rounded-md checked:bg-ocean-600 checked:border-ocean-600 transition-colors cursor-pointer"
+                      />
+                      <svg className="absolute w-3 h-3 text-white opacity-0 peer-checked:opacity-100 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <span className="text-xs text-sand-700 leading-relaxed">
+                      <strong>Termo de Isenção de Responsabilidade:</strong> Declaro estar ciente de que as atividades de ecoturismo envolvem riscos inerentes. Ao prosseguir, assumo total responsabilidade por minha segurança, isentando a agência Capitães da Areia de qualquer responsabilidade civil ou criminal em caso de acidentes ou lesões durante os passeios.
+                    </span>
+                  </label>
                 </div>
 
                 <button 
