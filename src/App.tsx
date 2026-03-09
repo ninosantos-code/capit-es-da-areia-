@@ -691,8 +691,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </p>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light">
+        <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light space-y-2">
           <p>&copy; {new Date().getFullYear()} Capitães da Areia. Todos os direitos reservados.</p>
+          <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
         </div>
       </footer>
 
