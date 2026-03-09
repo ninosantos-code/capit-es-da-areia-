@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Bot, SendHorizontal } from 'lucide-react';
+import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
 
 const TOURS = [
   {
@@ -68,65 +68,12 @@ const TESTIMONIALS = [
   }
 ];
 
-type ChatRole = 'user' | 'assistant';
-
-type ChatMessage = {
-  id: number;
-  role: ChatRole;
-  text: string;
-};
-
-const AI_WELCOME_MESSAGE = 'Oi! 👋 Sou o Assistente Moreré. Posso te ajudar a escolher o passeio ideal, entender duração/preço e até preparar sua reserva.';
-
-const findBestTour = (text: string) => {
-  const normalized = text.toLowerCase();
-  return TOURS.find((tour) => {
-    const words = tour.title.toLowerCase().split(' ');
-    return words.some((word) => word.length > 3 && normalized.includes(word));
-  });
-};
-
-const buildAiResponse = (prompt: string) => {
-  const message = prompt.toLowerCase();
-  const matchedTour = findBestTour(prompt);
-
-  if (matchedTour) {
-    return `Ótima escolha! 🌊\n\n**${matchedTour.title}**\n• Duração: ${matchedTour.duration}\n• Valor: ${matchedTour.price}\n\n${matchedTour.description}\n\nSe quiser, posso te orientar para clicar em "Reservar" e já enviar os dados no WhatsApp.`;
-  }
-
-  if (message.includes('preço') || message.includes('valor') || message.includes('quanto custa')) {
-    const tourPrices = TOURS.map((tour) => `• ${tour.title}: ${tour.price}`).join('\n');
-    return `Claro! Aqui vai uma faixa de valores atuais:\n\n${tourPrices}\n\nPara orçamento final (quantidade de pessoas e data), clique em "Reservar".`;
-  }
-
-  if (message.includes('duração') || message.includes('tempo') || message.includes('horas')) {
-    const durations = TOURS.map((tour) => `• ${tour.title}: ${tour.duration}`).join('\n');
-    return `Essas são as durações médias dos passeios:\n\n${durations}`;
-  }
-
-  if (message.includes('criança') || message.includes('famil') || message.includes('família')) {
-    return 'Temos opções para famílias com crianças, principalmente Piscinas Naturais e Canoa no Mangue. Recomendamos informar idade das crianças na reserva para prepararmos a logística com segurança. 👨‍👩‍👧‍👦';
-  }
-
-  if (message.includes('reserva') || message.includes('whatsapp') || message.includes('contato')) {
-    return 'Perfeito! Para reservar, clique no botão "Reservar" (menu, cards ou seção final). Você preencherá um formulário rápido e nós abriremos o WhatsApp com tudo pronto para envio. ✅';
-  }
-
-  return 'Posso te ajudar com: preços, duração, melhor passeio para família/casal, e como reservar no WhatsApp. Se quiser, me diga o tipo de experiência que você procura (aventura, contemplação, dia inteiro, noturno etc.).';
-};
-
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
   const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
-
-  const [isAiOpen, setIsAiOpen] = useState(false);
-  const [aiInput, setAiInput] = useState('');
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { id: 1, role: 'assistant', text: AI_WELCOME_MESSAGE }
-  ]);
 
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [reservationForm, setReservationForm] = useState({
@@ -219,30 +166,6 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
     setCommentForm({ name: '', text: '', rating: 5 });
     
     setTimeout(() => setIsCommentSubmitted(false), 5000);
-  };
-
-  const sendAiMessage = (e: FormEvent) => {
-    e.preventDefault();
-    const cleanInput = aiInput.trim();
-
-    if (!cleanInput) {
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      id: Date.now(),
-      role: 'user',
-      text: cleanInput
-    };
-
-    const assistantMessage: ChatMessage = {
-      id: Date.now() + 1,
-      role: 'assistant',
-      text: buildAiResponse(cleanInput)
-    };
-
-    setChatMessages((prev) => [...prev, userMessage, assistantMessage]);
-    setAiInput('');
   };
 
   return (
@@ -683,71 +606,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
         </div>
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light space-y-2">
           <p>&copy; {new Date().getFullYear()} Capitães da Areia. Todos os direitos reservados.</p>
-          <p className="text-xs text-sand-500">
-            Apresentação: Nino, Joemersson, Diogo e Felipe.
-          </p>
+          <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
         </div>
       </footer>
-
-
-      {/* AI Assistant */}
-      <button
-        onClick={() => setIsAiOpen((prev) => !prev)}
-        className="fixed bottom-6 right-6 z-[110] bg-ocean-600 hover:bg-ocean-700 text-white rounded-full px-5 py-3 shadow-xl flex items-center gap-2 transition-colors"
-        aria-label="Abrir assistente de IA"
-      >
-        <Bot className="w-5 h-5" />
-        Assistente IA
-      </button>
-
-      {isAiOpen && (
-        <div className="fixed bottom-24 right-6 w-[calc(100%-3rem)] max-w-sm z-[110] bg-white rounded-2xl shadow-2xl border border-sand-200 overflow-hidden">
-          <div className="bg-sand-900 text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              <p className="text-sm font-medium">Assistente Moreré</p>
-            </div>
-            <button
-              onClick={() => setIsAiOpen(false)}
-              className="text-sand-300 hover:text-white transition-colors"
-              aria-label="Fechar assistente"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="h-80 overflow-y-auto px-4 py-3 space-y-3 bg-sand-50">
-            {chatMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${
-                  message.role === 'assistant'
-                    ? 'bg-white border border-sand-200 text-sand-800'
-                    : 'ml-auto bg-ocean-600 text-white'
-                }`}
-              >
-                {message.text}
-              </div>
-            ))}
-          </div>
-
-          <form onSubmit={sendAiMessage} className="p-3 border-t border-sand-200 flex gap-2">
-            <input
-              value={aiInput}
-              onChange={(e) => setAiInput(e.target.value)}
-              placeholder="Pergunte sobre passeios, preços..."
-              className="flex-1 px-3 py-2 rounded-xl border border-sand-300 focus:outline-none focus:ring-2 focus:ring-ocean-500 text-sm"
-            />
-            <button
-              type="submit"
-              className="bg-ocean-600 hover:bg-ocean-700 text-white rounded-xl px-3 transition-colors"
-              aria-label="Enviar mensagem"
-            >
-              <SendHorizontal className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
-      )}
 
       {/* Reservation Modal */}
       {isReservationModalOpen && (
