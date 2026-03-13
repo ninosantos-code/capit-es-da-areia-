@@ -226,7 +226,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://images.unsplash.com/photo-1506929562872-bb421503ef21?auto=format&fit=crop&q=80&w=1920" 
+            src="public/galeria/image_1.jpg" 
             alt="Praia de Moreré" 
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
@@ -282,7 +282,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
           >
             <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
               <img 
-                src="https://images.unsplash.com/photo-1596888605861-1c5862e36411?auto=format&fit=crop&q=80&w=800" 
+                src="public/galeria/image_10.jpg" 
                 alt="Barco em Moreré" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -290,7 +290,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
               <img 
-                src="https://images.unsplash.com/photo-1506477331477-33d5d8b3dc85?auto=format&fit=crop&q=80&w=600" 
+                src="public/galeria/image_11.jpg" 
                 alt="Coqueiros" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -428,7 +428,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
               </h2>
             </div>
             <a 
-              href="https://instagram.com" 
+              href="https://instagram.com/capitaesdaareiamorere/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sand-300 hover:text-white transition-colors pb-2 border-b border-sand-300/30 hover:border-white"
@@ -439,10 +439,10 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=600" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&q=80&w=600" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1534008897995-27a23e859048?auto=format&fit=crop&q=80&w=600" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="public/galeria/image_12.jpg" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="public/galeria/image_13.jpg" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="public/galeria/image_14.jpg" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="public/galeria/image_2.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
           </div>
         </div>
       </section>
@@ -591,7 +591,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
             <a href="https://wa.me/5575999999999" className="hover:text-white transition-colors font-light flex items-center gap-2">
               <MessageCircle className="w-4 h-4" /> (75) 99999-9999
             </a>
-            <a href="https://instagram.com" className="hover:text-white transition-colors font-light flex items-center gap-2">
+            <a href="https://instagram.com/capitaesdaareiamorere/" className="hover:text-white transition-colors font-light flex items-center gap-2">
               <Instagram className="w-4 h-4" /> @capitaesdaareia
             </a>
           </div>
@@ -600,7 +600,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}`;
             <p className="font-light text-sm">
               Praia de Moreré, s/n<br />
               Ilha de Boipeba, Cairu - BA<br />
-              CEP 41234-000
+              CEP 45420-000
             </p>
           </div>
         </div>
