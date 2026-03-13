@@ -96,7 +96,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: process.env.gen-lang-client-0842077200 });
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
@@ -377,7 +377,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
               <img 
-                src="https://i.postimg.cc/qM9vCBQx/05ac67e8-e539-4f65-8823-f956c4de6934.jpg" 
+                src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
                 alt="Coqueiros" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -530,6 +530,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             <img src="https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
             <img src="https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
             <img src="https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/xTtTty0X/ninodrip.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
           </div>
         </div>
       </section>
