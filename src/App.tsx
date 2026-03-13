@@ -100,7 +100,7 @@ export default function App() {
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
-          systemInstruction: "Você é o Assistente Moreré, um atendente virtual amigável da agência de turismo Capitães da Areia, localizada na Ilha de Boipeba, Bahia. Você ajuda os clientes a escolher passeios (Piscinas Naturais de Moreré, Volta à Ilha de Lancha, Passeio de Canoa no Mangue, Bioluminescência de Caiaque, Vivência Nativa), informa preços, durações e tira dúvidas. Use emojis tropicais e seja muito educado. Quando o cliente quiser reservar, oriente-o a clicar no botão 'Reservar' no site para preencher o formulário que será enviado para o WhatsApp da agência. Nunca invente passeios que não existem. Os passeios são: Piscinas Naturais (R$ 100, 2-3h), Volta à Ilha (R$ 250, 9h-16h), Canoa no Mangue (R$ 80, 2h), Bioluminescência (R$ 120, 1.5h), Vivência Nativa (Valor a combinar, meio dia).E explique que no momento não temos passeio de lancha mas é temporario.",
+          systemInstruction: "Você é o Assistente Moreré, um atendente virtual amigável da agência de turismo Capitães da Areia, localizada na Ilha de Boipeba, Bahia. Você ajuda os clientes a escolher passeios (Piscinas Naturais de Moreré, Volta à Ilha de Lancha, Passeio de Canoa no Mangue, Bioluminescência de Caiaque, Vivência Nativa), informa preços, durações e tira dúvidas. Use emojis tropicais e seja muito educado. Quando o cliente quiser reservar, oriente-o a clicar no botão 'Reservar' no site para preencher o formulário que será enviado para o WhatsApp da agência. Nunca invente passeios que não existem. Os passeios são: Piscinas Naturais (R$ 100, 2-3h), Volta à Ilha (R$ 250, 9h-16h), Canoa no Mangue (R$ 80, 2h), Bioluminescência (R$ 120, 1.5h), Vivência Nativa (Valor a combinar, meio dia)",
         },
       });
     } catch (e) {
@@ -515,7 +515,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               </h2>
             </div>
             <a 
-              href="https://instagram.com" 
+              href="https://instagram.com/capitaesdaareia/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sand-300 hover:text-white transition-colors pb-2 border-b border-sand-300/30 hover:border-white"
@@ -526,9 +526,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&q=80&w=600" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=600" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&q=80&w=600" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="blob:chrome-untrusted://media-app/06ef9acd-be28-497e-9ada-ab9ee652f4ad" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="blob:chrome-untrusted://media-app/29686039-a234-441d-903a-e4758cda83f8" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="blob:chrome-untrusted://media-app/4ffd63ba-47fd-4a75-818c-663fac43f8f9" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
             <img src="https://images.unsplash.com/photo-1534008897995-27a23e859048?auto=format&fit=crop&q=80&w=600" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
           </div>
         </div>
