@@ -46,7 +46,7 @@ const TOURS = [
     description: 'Sinta-se um verdadeiro morador da ilha. Participe da pesca artesanal com os nativos e aprenda a preparar o seu próprio peixe fresco à moda baiana.',
     duration: 'Um dia inteiro',
     price: 'Valor a combinar',
-    image: 'https://images.unsplash.com/photo-1520116468816-95b69f847357?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
     icon: <Anchor className="w-6 h-6 text-ocean-600" />
   }
 ];
