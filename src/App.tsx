@@ -369,7 +369,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           >
             <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
               <img 
-                src="https://images.unsplash.com/photo-1596888605861-1c5862e36411?auto=format&fit=crop&q=80&w=800" 
+                src="https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"
                 alt="Barco em Moreré" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -377,7 +377,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
               <img 
-                src="https://ibb.co/mCbn9sWs" 
+                src="https://i.postimg.cc/qM9vCBQx/05ac67e8-e539-4f65-8823-f956c4de6934.jpg" 
                 alt="Coqueiros" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -526,10 +526,10 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <img src="https://ibb.co/mCbn9sWs" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="blob:chrome-untrusted://media-app/29686039-a234-441d-903a-e4758cda83f8" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="blob:chrome-untrusted://media-app/4ffd63ba-47fd-4a75-818c-663fac43f8f9" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://images.unsplash.com/photo-1534008897995-27a23e859048?auto=format&fit=crop&q=80&w=600" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
           </div>
         </div>
       </section>
@@ -678,7 +678,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             <a href="https://wa.me/5575999999999" className="hover:text-white transition-colors font-light flex items-center gap-2">
               <MessageCircle className="w-4 h-4" /> (75) 99999-9999
             </a>
-            <a href="https://instagram.com" className="hover:text-white transition-colors font-light flex items-center gap-2">
+            <a href="https://instagram.com/capitaesdaareiamorere" className="hover:text-white transition-colors font-light flex items-center gap-2">
               <Instagram className="w-4 h-4" /> @capitaesdaareia
             </a>
           </div>
