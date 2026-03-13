@@ -515,7 +515,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               </h2>
             </div>
             <a 
-              href="https://instagram.com/capitaesdaareia/" 
+              href="https://instagram.com/capitaesdaareiamorere/" 
               target="_blank" 
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sand-300 hover:text-white transition-colors pb-2 border-b border-sand-300/30 hover:border-white"
