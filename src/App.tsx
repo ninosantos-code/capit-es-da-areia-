@@ -96,7 +96,7 @@ export default function App() {
 
   useEffect(() => {
     try {
-      const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+      const ai = new GoogleGenAI({ apiKey: "AIzaSyA949we4tZjtTDmCqj-khyDr5ETo6pjIes" });
       chatRef.current = ai.chats.create({
         model: "gemini-3-flash-preview",
         config: {
