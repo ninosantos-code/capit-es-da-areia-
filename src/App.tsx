@@ -377,7 +377,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
               <img 
-                src="https://images.unsplash.com/photo-1506477331477-33d5d8b3dc85?auto=format&fit=crop&q=80&w=600" 
+                src="https://ibb.co/mCbn9sWs" 
                 alt="Coqueiros" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
@@ -526,7 +526,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           </div>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <img src="blob:chrome-untrusted://media-app/06ef9acd-be28-497e-9ada-ab9ee652f4ad" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
+            <img src="https://ibb.co/mCbn9sWs" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
             <img src="blob:chrome-untrusted://media-app/29686039-a234-441d-903a-e4758cda83f8" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
             <img src="blob:chrome-untrusted://media-app/4ffd63ba-47fd-4a75-818c-663fac43f8f9" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
             <img src="https://images.unsplash.com/photo-1534008897995-27a23e859048?auto=format&fit=crop&q=80&w=600" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
