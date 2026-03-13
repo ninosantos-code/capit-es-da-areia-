@@ -313,7 +313,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src="https://i.postimg.cc/GhZms3zs/d6286f02-5470-4948-ae28-aa7ac110c1e2.jpg" 
+            src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
             alt="Praia de Moreré" 
             className="w-full h-full object-cover"
             referrerPolicy="no-referrer"
