@@ -52,23 +52,7 @@ const TOURS = [
   }
 ];
 
-const TESTIMONIALS = [
-  {
-    name: 'Mariana Silva',
-    text: 'O passeio para as piscinas naturais foi o ponto alto da nossa viagem! A equipe é super atenciosa e conhecem os melhores horários para fugir da multidão.',
-    rating: 5
-  },
-  {
-    name: 'Carlos Eduardo',
-    text: 'Fizemos a volta à ilha e foi espetacular. O guia nos contou histórias locais e nos levou a restaurantes incríveis em Cova da Onça.',
-    rating: 5
-  },
-  {
-    name: 'Ana Paula',
-    text: 'Moreré é um paraíso e conhecer o mangue de canoa no fim do dia trouxe uma paz indescritível. Recomendo de olhos fechados!',
-    rating: 5
-  }
-];
+const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
 
 
 
@@ -517,26 +501,35 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 mb-20">
-            {TESTIMONIALS.map((testimonial, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                className="bg-white p-8 rounded-2xl shadow-sm"
-              >
-                <div className="flex gap-1 text-yellow-400 mb-6">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-current" />
-                  ))}
-                </div>
-                <p className="text-sand-800 font-light italic mb-6 leading-relaxed">"{testimonial.text}"</p>
-                <p className="font-medium text-sand-900 uppercase tracking-wide text-sm">{testimonial.name}</p>
-              </motion.div>
-            ))}
-          </div>
+          {TESTIMONIALS.length > 0 ? (
+            <div className="grid md:grid-cols-3 gap-8 mb-20">
+              {TESTIMONIALS.map((testimonial, idx) => (
+                <motion.div 
+                  key={idx}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  className="bg-white p-8 rounded-2xl shadow-sm"
+                >
+                  <div className="flex gap-1 text-yellow-400 mb-6">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-current" />
+                    ))}
+                  </div>
+                  <p className="text-sand-800 font-light italic mb-6 leading-relaxed">"{testimonial.text}"</p>
+                  <p className="font-medium text-sand-900 uppercase tracking-wide text-sm">{testimonial.name}</p>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center mb-20 bg-white/50 p-12 rounded-3xl border border-dashed border-sand-300">
+              <Star className="w-12 h-12 text-sand-300 mx-auto mb-4 opacity-50" />
+              <p className="text-sand-600 font-light italic text-lg">
+                Seja o primeiro a compartilhar sua experiência conosco!
+              </p>
+            </div>
+          )}
 
           {/* Comment Form */}
           <div className="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-sand-100">
