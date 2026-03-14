@@ -663,8 +663,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <div className="md:text-right">
             <p className="font-light text-sm">
               Praia de Moreré, s/n<br />
-              Ilha de Boipeba, Cairu - BA<br />
-              CEP 41234-000
+              Ilha de Boipeba, Cairu - BA
             </p>
           </div>
         </div>

@@ -45,7 +45,7 @@ export default function LazyImage({ src, alt, className = '', eager = false, ref
   }
 
   return (
-    <div ref={imgRef} className={`${className} relative overflow-hidden`}>
+    <div ref={imgRef} data-testid="lazy-image-wrapper" className={`${className} relative overflow-hidden`}>
       {/* Shimmer placeholder */}
       {!isLoaded && (
         <div className="absolute inset-0 shimmer bg-sand-200" />
