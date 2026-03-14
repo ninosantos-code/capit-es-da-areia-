@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
 import LazyImage from './components/LazyImage';
 import ConnectionStatus from './components/ConnectionStatus';
 
@@ -21,7 +21,7 @@ const TOURS = [
     duration: 'Dia inteiro (9h às 16h)',
     price: 'A partir de R$ 250',
     image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-    icon: <Anchor className="w-6 h-6 text-ocean-600" />
+    icon: <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />
   },
   {
     id: 3,
@@ -48,7 +48,7 @@ const TOURS = [
     duration: 'Um dia inteiro',
     price: 'Valor a combinar',
     image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
-    icon: <Anchor className="w-6 h-6 text-ocean-600" />
+    icon: <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />
   }
 ];
 
@@ -118,13 +118,16 @@ export default function App() {
     }
     
     const { nome, idade, quantidadePessoas, temCrianca, dataChegada, passeioDesejado, problemasSaude, fobias, medicamentos, restricoesAlimentares, nivelExperiencia, observacoes } = reservationForm;
+    const [ano, mes, dia] = dataChegada.split('-');
+    const dataFormatada = dataChegada ? `${dia}/${mes}/${ano}` : 'Não informada';
+
     // formuláro
     const message = `Olá! Gostaria de fazer uma reserva/orçamento.
 *Nome:* ${nome}
 *Idade:* ${idade}
 *Quantidade de pessoas:* ${quantidadePessoas}
 *Tem crianças?:* ${temCrianca}
-*Data de chegada na ilha:* ${dataChegada}
+*Data de chegada na ilha:* ${dataFormatada}
 *Passeio de interesse:* ${passeioDesejado}
 *Nível de experiência (Atividades ao ar livre):* ${nivelExperiencia}
 
@@ -202,7 +205,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('home')}>
-            <Anchor className={`w-8 h-8 ${isScrolled ? 'text-ocean-600' : 'text-white'}`} />
+            <img src="/images/logo-novo.png" alt="Logo" className="w-8 h-8 object-contain rounded-full shadow-sm" />
             <span className={`font-serif text-2xl font-semibold tracking-wide ${isScrolled ? 'text-sand-900' : 'text-white'}`}>
               Capitães <span className="italic font-light">da Areia</span>
             </span>
@@ -634,7 +637,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         <div className="max-w-7xl mx-auto grid md:grid-cols-3 gap-8 items-center">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Anchor className="w-6 h-6 text-ocean-500" />
+              <img src="/images/logo-novo.png" alt="Logo" className="w-8 h-8 object-contain rounded-full" />
               <span className="font-serif text-2xl font-semibold tracking-wide text-white">
                 Capitães <span className="italic font-light">da Areia</span>
               </span>
