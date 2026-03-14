@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Capitães da Areia — Offline</title>
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap');
+
+      body {
+        font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        background: linear-gradient(135deg, #FFFCF5 0%, #E0F7FA 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        color: #3E2723;
+      }
+
+      .container {
+        text-align: center;
+        max-width: 480px;
+      }
+
+      .wave-icon {
+        font-size: 64px;
+        margin-bottom: 24px;
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-10px); }
+      }
+
+      h1 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.5rem;
+        margin-bottom: 8px;
+        color: #3E2723;
+      }
+
+      h1 span {
+        font-style: italic;
+        font-weight: 300;
+        color: #00838F;
+      }
+
+      .subtitle {
+        font-size: 1.1rem;
+        color: #5D4037;
+        font-weight: 300;
+        line-height: 1.6;
+        margin-bottom: 32px;
+      }
+
+      .info-card {
+        background: white;
+        border-radius: 20px;
+        padding: 28px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        margin-bottom: 24px;
+        border: 1px solid #FFE0B2;
+      }
+
+      .info-card h3 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.3rem;
+        margin-bottom: 16px;
+        color: #00838F;
+      }
+
+      .contact-item {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px 0;
+        color: #5D4037;
+        font-size: 0.95rem;
+      }
+
+      .contact-item + .contact-item {
+        border-top: 1px solid #FFF3E0;
+      }
+
+      .retry-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 14px 28px;
+        background: #00ACC1;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+        text-decoration: none;
+      }
+
+      .retry-btn:hover {
+        background: #00838F;
+      }
+
+      .footer-text {
+        margin-top: 32px;
+        font-size: 0.8rem;
+        color: #FFCC80;
+        font-weight: 300;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="wave-icon">🏝️</div>
+      <h1>Capitães <span>da Areia</span></h1>
+      <p class="subtitle">
+        Parece que você está sem conexão no momento.<br/>
+        Não se preocupe — na ilha, a natureza é o melhor sinal! 🌊
+      </p>
+
+      <div class="info-card">
+        <h3>📞 Contato Direto</h3>
+        <div class="contact-item">
+          <span>📱</span>
+          <span>WhatsApp: (75) 9921-1235 / (21) 98864-3166</span>
+        </div>
+        <div class="contact-item">
+          <span>📷</span>
+          <span>@capitaesdaareia</span>
+        </div>
+        <div class="contact-item">
+          <span>📍</span>
+          <span>Praia de Moreré, Ilha de Boipeba - BA</span>
+        </div>
+      </div>
+
+      <a href="/" class="retry-btn" onclick="location.reload(); return false;">
+        🔄 Tentar novamente
+      </a>
+
+      <p class="footer-text">
+        © 2025 Capitães da Areia. Moreré, Boipeba.
+      </p>
+    </div>
+  </body>
+</html>

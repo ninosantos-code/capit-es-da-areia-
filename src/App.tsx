@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Bot, SendHorizontal } from 'lucide-react';
-import { GoogleGenAI } from "@google/genai";
+import { MapPin, Anchor, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import LazyImage from './components/LazyImage';
+import ConnectionStatus from './components/ConnectionStatus';
 
 const TOURS = [
   {
@@ -10,7 +11,7 @@ const TOURS = [
     description: 'Mergulhe em águas cristalinas e nade com peixes coloridos no cartão postal da Ilha de Boipeba. Um passeio imperdível na maré baixa.',
     duration: '2-3 horas',
     price: 'A partir de R$ 100',
-    image: 'Gemini_Generated_Image_dtjgc6dtjgc6dtjg.png',
+    image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
     icon: <Sun className="w-6 h-6 text-ocean-600" />
   },
   {
@@ -19,7 +20,7 @@ const TOURS = [
     description: 'Conheça as praias de Bainema, Ponta dos Castelhanos, Cova da Onça e navegue pelo Rio do Inferno com paradas para banho e almoço.',
     duration: 'Dia inteiro (9h às 16h)',
     price: 'A partir de R$ 250',
-    image: 'https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
     icon: <Anchor className="w-6 h-6 text-ocean-600" />
   },
   {
@@ -28,7 +29,7 @@ const TOURS = [
     description: 'Uma experiência contemplativa pelos túneis do manguezal. Silêncio, natureza intocada e um pôr do sol inesquecível nas águas calmas.',
     duration: '2 horas',
     price: 'A partir de R$ 80',
-    image: 'https://images.unsplash.com/photo-1621274220348-41eeebf5e253?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
     icon: <Camera className="w-6 h-6 text-ocean-600" />
   },
   {
@@ -37,7 +38,7 @@ const TOURS = [
     description: 'Uma experiência mágica noturna. Reme pelas águas escuras e veja o mar brilhar a cada movimento com o fenômeno da bioluminescência.',
     duration: '1.5 horas (Noturno)',
     price: 'A partir de R$ 120',
-    image: 'https://images.unsplash.com/photo-1518182170546-076616fdca44?auto=format&fit=crop&q=80&w=800',
+    image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
     icon: <Star className="w-6 h-6 text-ocean-600" />
   },
   {
@@ -69,15 +70,7 @@ const TESTIMONIALS = [
   }
 ];
 
-type ChatRole = 'user' | 'assistant';
 
-type ChatMessage = {
-  id: number;
-  role: ChatRole;
-  text: string;
-};
-
-const AI_WELCOME_MESSAGE = 'Oi! 👋 Sou o Assistente Moreré. Posso te ajudar a escolher o passeio ideal, entender duração/preço e até preparar sua reserva.';
 
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -85,28 +78,9 @@ export default function App() {
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
   const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
+  const galleryRef = useRef<HTMLDivElement>(null);
 
-  const [isAiOpen, setIsAiOpen] = useState(false);
-  const [aiInput, setAiInput] = useState('');
-  const [isAiLoading, setIsAiLoading] = useState(false);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
-    { id: 1, role: 'assistant', text: AI_WELCOME_MESSAGE }
-  ]);
-  const chatRef = useRef<any>(null);
 
-  useEffect(() => {
-    try {
-      const ai = new GoogleGenAI({ apiKey: "AIzaSyA949we4tZjtTDmCqj-khyDr5ETo6pjIes" });
-      chatRef.current = ai.chats.create({
-        model: "gemini-3-flash-preview",
-        config: {
-          systemInstruction: "Você é o Assistente Moreré, um atendente virtual amigável da agência de turismo Capitães da Areia, localizada na Ilha de Boipeba, Bahia. Você ajuda os clientes a escolher passeios (Piscinas Naturais de Moreré, Volta à Ilha de Lancha, Passeio de Canoa no Mangue, Bioluminescência de Caiaque, Vivência Nativa), informa preços, durações e tira dúvidas. Use emojis tropicais e seja muito educado. Quando o cliente quiser reservar, oriente-o a clicar no botão 'Reservar' no site para preencher o formulário que será enviado para o WhatsApp da agência. Nunca invente passeios que não existem. Os passeios são: Piscinas Naturais (R$ 100, 2-3h), Volta à Ilha (R$ 250, 9h-16h), Canoa no Mangue (R$ 80, 2h), Bioluminescência (R$ 120, 1.5h), Vivência Nativa (Valor a combinar, meio dia)",
-        },
-      });
-    } catch (e) {
-      console.error("Failed to initialize AI", e);
-    }
-  }, []);
 
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [reservationForm, setReservationForm] = useState({
@@ -164,7 +138,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 *✅ Aceitou o Termo de Isenção de Responsabilidade.*`;
 
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/5575999999999?text=${encodedMessage}`, '_blank');
+    window.open(`https://wa.me/557599211235?text=${encodedMessage}`, '_blank');
     closeReservationModal();
   };
 
@@ -172,6 +146,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     if (carouselRef.current) {
       const scrollAmount = direction === 'left' ? -400 : 400;
       carouselRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
+
+  const scrollGallery = (direction: 'left' | 'right') => {
+    if (galleryRef.current) {
+      const scrollAmount = direction === 'left' ? -400 : 400;
+      galleryRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
   };
 
@@ -212,51 +193,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     setTimeout(() => setIsCommentSubmitted(false), 5000);
   };
 
-  const sendAiMessage = async (e: FormEvent) => {
-    e.preventDefault();
-    const cleanInput = aiInput.trim();
 
-    if (!cleanInput || isAiLoading) {
-      return;
-    }
-
-    const userMessage: ChatMessage = {
-      id: Date.now(),
-      role: 'user',
-      text: cleanInput
-    };
-
-    setChatMessages((prev) => [...prev, userMessage]);
-    setAiInput('');
-    setIsAiLoading(true);
-
-    try {
-      if (chatRef.current) {
-        const response = await chatRef.current.sendMessage({ message: cleanInput });
-        const assistantMessage: ChatMessage = {
-          id: Date.now() + 1,
-          role: 'assistant',
-          text: response.text || 'Desculpe, não consegui entender. Poderia reformular?'
-        };
-        setChatMessages((prev) => [...prev, assistantMessage]);
-      } else {
-        throw new Error("Chat not initialized");
-      }
-    } catch (error) {
-      console.error("AI Error:", error);
-      const errorMessage: ChatMessage = {
-        id: Date.now() + 1,
-        role: 'assistant',
-        text: 'Desculpe, estou com problemas técnicos no momento. Por favor, tente novamente ou clique em "Reservar" para falar conosco no WhatsApp.'
-      };
-      setChatMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-sand-50 text-sand-900 font-sans selection:bg-ocean-200 selection:text-ocean-900">
+      <ConnectionStatus />
       {/* Navigation */}
       <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
@@ -312,11 +253,12 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       {/* Hero Section */}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
+          <LazyImage 
             src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
             alt="Praia de Moreré" 
-            className="w-full h-full object-cover"
+            className="w-full h-full"
             referrerPolicy="no-referrer"
+            eager
           />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-transparent to-transparent" />
@@ -368,18 +310,18 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             className="relative"
           >
             <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
-              <img 
+              <LazyImage 
                 src="https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"
                 alt="Barco em Moreré" 
-                className="w-full h-full object-cover"
+                className="w-full h-full"
                 referrerPolicy="no-referrer"
               />
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
-              <img 
+              <LazyImage 
                 src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
                 alt="Coqueiros" 
-                className="w-full h-full object-cover"
+                className="w-full h-full"
                 referrerPolicy="no-referrer"
               />
             </div>
@@ -464,10 +406,10 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   className="min-w-[85vw] md:min-w-[350px] lg:min-w-[400px] snap-center group rounded-2xl overflow-hidden bg-sand-50 border border-sand-100 hover:shadow-xl transition-all duration-300 flex flex-col"
                 >
                   <div className="relative aspect-[4/3] overflow-hidden">
-                    <img 
+                    <LazyImage 
                       src={tour.image} 
                       alt={tour.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      className="w-full h-full group-hover:scale-105 transition-transform duration-700"
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
@@ -525,13 +467,40 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </a>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <img src="https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg" alt="Galeria 1" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg" alt="Galeria 2" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg" alt="Galeria 3" className="w-full h-64 md:h-80 object-cover rounded-xl" referrerPolicy="no-referrer" />
-            <img src="https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
-            <img src="https://i.postimg.cc/xTtTty0X/ninodrip.jpg" alt="Galeria 4" className="w-full h-64 md:h-80 object-cover rounded-xl md:translate-y-8" referrerPolicy="no-referrer" />
+          <div className="relative">
+            {/* Carousel Controls */}
+            <button 
+              onClick={() => scrollGallery('left')}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-900 border border-sand-700 shadow-lg rounded-full p-3 text-sand-300 hover:text-white hover:bg-sand-800 transition-colors hidden md:block"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={() => scrollGallery('right')}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-900 border border-sand-700 shadow-lg rounded-full p-3 text-sand-300 hover:text-white hover:bg-sand-800 transition-colors hidden md:block"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+
+            {/* Carousel Container */}
+            <div 
+              ref={galleryRef}
+              className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory hide-scrollbar"
+              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+            >
+              {[
+                { src: "https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg", alt: "Galeria 1" },
+                { src: "https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg", alt: "Galeria 2" },
+                { src: "https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg", alt: "Galeria 3" },
+                { src: "https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg", alt: "Galeria 4" },
+                { src: "https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg", alt: "Galeria 5" },
+                { src: "https://i.postimg.cc/xTtTty0X/ninodrip.jpg", alt: "Galeria 6" }
+              ].map((img, idx) => (
+                <div key={idx} className="min-w-[85vw] md:min-w-[350px] lg:min-w-[300px] snap-center shrink-0">
+                  <LazyImage src={img.src} alt={img.alt} className="w-full h-64 md:h-80 rounded-2xl shadow-xl border border-sand-800/50" referrerPolicy="no-referrer" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
@@ -677,8 +646,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           
           <div className="flex flex-col gap-2 md:items-center">
             <h4 className="text-white font-medium uppercase tracking-widest text-sm mb-2">Contato</h4>
-            <a href="https://wa.me/5575999999999" className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> (75) 99999-9999
+            <a href="https://wa.me/557599211235" className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> (75) 9921-1235
+            </a>
+            <a href="https://wa.me/5521988643166" className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> (21) 98864-3166
             </a>
             <a href="https://instagram.com/capitaesdaareiamorere" className="hover:text-white transition-colors font-light flex items-center gap-2">
               <Instagram className="w-4 h-4" /> @capitaesdaareia
@@ -699,71 +671,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
       </footer>
 
-      {/* AI Assistant */}
-      <button
-        onClick={() => setIsAiOpen((prev) => !prev)}
-        className="fixed bottom-6 right-6 z-[110] bg-ocean-600 hover:bg-ocean-700 text-white rounded-full px-5 py-3 shadow-xl flex items-center gap-2 transition-colors"
-        aria-label="Abrir assistente de IA"
-      >
-        <Bot className="w-5 h-5" />
-        Assistente IA
-      </button>
 
-      {isAiOpen && (
-        <div className="fixed bottom-24 right-6 w-[calc(100%-3rem)] max-w-sm z-[110] bg-white rounded-2xl shadow-2xl border border-sand-200 overflow-hidden">
-          <div className="bg-sand-900 text-white px-4 py-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Bot className="w-4 h-4" />
-              <p className="text-sm font-medium">Assistente Moreré</p>
-            </div>
-            <button
-              onClick={() => setIsAiOpen(false)}
-              className="text-sand-300 hover:text-white transition-colors"
-              aria-label="Fechar assistente"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="h-80 overflow-y-auto px-4 py-3 space-y-3 bg-sand-50">
-            {chatMessages.map((message) => (
-              <div
-                key={message.id}
-                className={`max-w-[90%] rounded-2xl px-3 py-2 text-sm whitespace-pre-line ${
-                  message.role === 'assistant'
-                    ? 'bg-white border border-sand-200 text-sand-800'
-                    : 'ml-auto bg-ocean-600 text-white'
-                }`}
-              >
-                {message.text}
-              </div>
-            ))}
-            {isAiLoading && (
-              <div className="max-w-[90%] rounded-2xl px-3 py-2 text-sm bg-white border border-sand-200 text-sand-800 flex items-center gap-2 w-fit">
-                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" />
-                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }} />
-                <div className="w-2 h-2 bg-ocean-500 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }} />
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={sendAiMessage} className="p-3 border-t border-sand-200 flex gap-2">
-            <input
-              value={aiInput}
-              onChange={(e) => setAiInput(e.target.value)}
-              placeholder="Pergunte sobre passeios, preços..."
-              className="flex-1 px-3 py-2 rounded-xl border border-sand-300 focus:outline-none focus:ring-2 focus:ring-ocean-500 text-sm"
-            />
-            <button
-              type="submit"
-              className="bg-ocean-600 hover:bg-ocean-700 text-white rounded-xl px-3 transition-colors"
-              aria-label="Enviar mensagem"
-            >
-              <SendHorizontal className="w-4 h-4" />
-            </button>
-          </form>
-        </div>
-      )}
 
       {/* Reservation Modal */}
       {isReservationModalOpen && (
