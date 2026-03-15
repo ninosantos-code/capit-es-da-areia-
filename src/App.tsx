@@ -10,56 +10,235 @@ import { adminService, Tour } from './lib/adminService';
 
 const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
 
-const INITIAL_TOURS: Tour[] = [
-  {
-    title: 'Piscinas Naturais de Moreré',
-    description: 'Mergulhe em águas cristalinas e nade com peixes coloridos no cartão postal da Ilha de Boipeba. Um passeio imperdível na maré baixa.',
-    duration: '2-3 horas',
-    price: 'A partir de R$ 100',
-    image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
-    iconType: 'sun'
+const INITIAL_TOURS: Record<string, Tour[]> = {
+  pt: [
+    {
+      title: 'Piscinas Naturais de Moreré',
+      description: 'Mergulhe em águas cristalinas e nade com peixes coloridos no cartão postal da Ilha de Boipeba. Um passeio imperdível na maré baixa.',
+      duration: '2-3 horas',
+      price: 'A partir de R$ 100',
+      image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
+      iconType: 'sun'
+    },
+    {
+      title: 'Volta à Ilha de Lancha',
+      description: 'Conheça as praias de Bainema, Ponta dos Castelhanos, Cova da Onça e navegue pelo Rio do Inferno com paradas para banho e almoço.',
+      duration: 'Dia inteiro (9h às 16h)',
+      price: 'A partir de R$ 250',
+      image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
+      iconType: 'logo'
+    },
+    {
+      title: 'Passeio de Canoa no Mangue',
+      description: 'Uma experiência contemplativa pelos túneis do manguezal. Silêncio, natureza intocada e um pôr do sol inesquecível nas águas calmas.',
+      duration: '2 horas',
+      price: 'A partir de R$ 80',
+      image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
+      iconType: 'camera'
+    },
+    {
+      title: 'Bioluminescência de Caiaque',
+      description: 'Uma experiência mágica noturna. Reme pelas águas escuras e veja o mar brilhar a cada movimento com o fenômeno da bioluminescência.',
+      duration: '1.5 horas (Noturno)',
+      price: 'A partir de R$ 120',
+      image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
+      iconType: 'star'
+    },
+    {
+      title: 'Vivência Nativa: Pesca e Preparo',
+      description: 'Sinta-se um verdadeiro morador da ilha. Participe da pesca artesanal com os nativos e aprenda a preparar o seu próprio peixe fresco à moda baiana.',
+      duration: 'Um dia inteiro',
+      price: 'Valor a combinar',
+      image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
+      iconType: 'logo'
+    },
+    {
+      title: 'Hospedagem Pé na Areia',
+      description: 'Aproveite a melhor localização de Moreré. Nossa hospedagem oferece o privilégio de acordar com o pé na areia e o som das ondas.',
+      duration: 'Diárias a combinar',
+      price: 'Consulte disponibilidade',
+      image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
+      iconType: 'house'
+    }
+  ],
+  en: [
+    {
+      title: 'Moreré Natural Pools',
+      description: 'Dive into crystal clear waters and swim with colorful fish in Boipeba Island\'s postcard boat tour. An unmissable trip at low tide.',
+      duration: '2-3 hours',
+      price: 'From R$ 100',
+      image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
+      iconType: 'sun'
+    },
+    {
+      title: 'Full Island Speedboat Tour',
+      description: 'Discover the beaches of Bainema, Ponta dos Castelhanos, Cova da Onça and navigate the Inferno River with stops for bathing and lunch.',
+      duration: 'Full Day (9am to 4pm)',
+      price: 'From R$ 250',
+      image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
+      iconType: 'logo'
+    },
+    {
+      title: 'Canoe Trip in the Mangrove',
+      description: 'A contemplative experience through the mangrove tunnels. Silence, untouched nature and an unforgettable sunset in the calm waters.',
+      duration: '2 hours',
+      price: 'From R$ 80',
+      image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
+      iconType: 'camera'
+    },
+    {
+      title: 'Kayak Bioluminescence',
+      description: 'A magical nocturnal experience. Row through dark waters and see the sea shine with every movement with the phenomenon of bioluminescence.',
+      duration: '1.5 hours (Night)',
+      price: 'From R$ 120',
+      image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
+      iconType: 'star'
+    },
+    {
+      title: 'Native Experience: Fishing',
+      description: 'Feel like a true island resident. Participate in artisanal fishing with the locals and learn how to prepare your own fresh fish Bahian style.',
+      duration: 'Full Day',
+      price: 'Price to be discussed',
+      image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
+      iconType: 'logo'
+    },
+    {
+      title: 'Beachfront Accommodation',
+      description: 'Enjoy the best location in Moreré. Our accommodation offers the privilege of waking up with your feet in the sand and the sound of the waves.',
+      duration: 'Daily rates on request',
+      price: 'Check availability',
+      image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
+      iconType: 'house'
+    }
+  ]
+};
+
+const TRANSLATIONS: Record<string, Record<string, string>> = {
+  pt: {
+    'nav.about': 'Sobre Moreré',
+    'nav.tours': 'Nossos Passeios',
+    'nav.gallery': 'Galeria',
+    'nav.testimonials': 'Depoimentos',
+    'nav.reservation': 'Reservar Agora',
+    'hero.title': 'Capitães da Areia',
+    'hero.subtitle': 'Experiências autênticas nas águas cristalinas de Moreré.',
+    'hero.cta': 'Descobrir Experiências',
+    'tours.label': 'Nossos Roteiros',
+    'tours.title': 'Escolha sua próxima aventura',
+    'tours.subtitle': 'Passeios privativos ou em pequenos grupos para garantir a melhor experiência nas águas de Boipeba.',
+    'tours.duration': 'Duração',
+    'tours.price': 'Valor',
+    'tours.consult': 'Consultar Disponibilidade',
+    'gallery.title': 'Momentos que contam histórias',
+    'gallery.follow': 'Seguir no Instagram',
+    'gallery.view': 'Ver no Instagram',
+    'about.label': 'Nosso Paraíso',
+    'about.title1': 'Muito mais que um destino,',
+    'about.title2': 'uma experiência.',
+    'about.p1': 'Moreré é um pequeno vilarejo de pescadores na Ilha de Boipeba, conhecido por suas águas calmas, piscinas naturais repletas de vida marinha e um ritmo de vida que nos convida a desacelerar.',
+    'about.p2': 'Nossa missão é proporcionar a você os melhores passeios da região, com segurança, conforto e o caloroso acolhimento baiano. Conhecemos cada canto dessa ilha e queremos compartilhar seus segredos com você.',
+    'about.exp_label': 'Anos de Experiência',
+    'about.clients_label': 'Clientes Satisfeitos',
+    'testimonials.title': 'O que dizem nossos clientes',
+    'booking.title': 'Solicitar Reserva',
+    'booking.subtitle': 'Preencha os detalhes e entraremos em contato via WhatsApp.',
+    'booking.personal': 'Informações Pessoais',
+    'booking.name': 'Seu Nome Completo',
+    'booking.age': 'Idade',
+    'booking.people': 'Quantas pessoas?',
+    'booking.kids': 'Tem crianças?',
+    'booking.yes': 'Sim',
+    'booking.no': 'Não',
+    'booking.arrival': 'Previsão de Chegada na Ilha',
+    'booking.tour': 'Passeio Preferencial',
+    'booking.decide': 'Ainda não decidi',
+    'booking.safety': 'Saúde e Segurança',
+    'booking.safety_desc': 'Para garantirmos a melhor experiência, por favor, nos informe:',
+    'booking.health': 'Problemas de Saúde ou Alergias?',
+    'booking.health_ph': 'Ex: Asma, alergia a frutos do mar, problemas cardíacos. (Especifique)',
+    'booking.phobias': 'Possui alguma fobia?',
+    'booking.phobias_ph': 'Ex: Medo de mar aberto, insetos, lugares fechados.',
+    'booking.meds': 'Toma algum medicamento?',
+    'booking.meds_ph': 'Ex: Aspirina, remédio para pressão, etc.',
+    'booking.food': 'Restrições Alimentares?',
+    'booking.food_ph': 'Ex: Intolerância à lactose, vegano, alergia a camarão.',
+    'booking.exp': 'Nível de Experiência em Atividades ao Ar Livre',
+    'booking.exp_1': 'Iniciante (Pouca ou nenhuma experiência)',
+    'booking.exp_2': 'Intermediário (Pratica atividades ocasionalmente)',
+    'booking.exp_3': 'Avançado (Pratica frequentemente, bom preparo físico)',
+    'booking.obs': 'Observações Gerais (Opcional)',
+    'booking.obs_ph': 'Alguma dúvida ou pedido especial?',
+    'booking.disclaimer': 'Termo de Isenção de Responsabilidade',
+    'booking.disclaimer_text': 'Declaro estar ciente de que as atividades de ecoturismo envolvem riscos inerentes. Ao prosseguir, assumo total responsabilidade por minha segurança.',
+    'booking.submit': 'Enviar para o WhatsApp',
+    'footer.description': 'Experiências autênticas no mar de Moreré. Passeios de lancha, canoa e vivências únicas na Ilha de Boipeba.',
+    'footer.links': 'Links Rápidos',
+    'footer.contact': 'Contato',
+    'footer.rights': 'Todos os direitos reservados.'
   },
-  {
-    title: 'Volta à Ilha de Lancha',
-    description: 'Conheça as praias de Bainema, Ponta dos Castelhanos, Cova da Onça e navegue pelo Rio do Inferno com paradas para banho e almoço.',
-    duration: 'Dia inteiro (9h às 16h)',
-    price: 'A partir de R$ 250',
-    image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-    iconType: 'logo'
-  },
-  {
-    title: 'Passeio de Canoa no Mangue',
-    description: 'Uma experiência contemplativa pelos túneis do manguezal. Silêncio, natureza intocada e um pôr do sol inesquecível nas águas calmas.',
-    duration: '2 horas',
-    price: 'A partir de R$ 80',
-    image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
-    iconType: 'camera'
-  },
-  {
-    title: 'Bioluminescência de Caiaque',
-    description: 'Uma experiência mágica noturna. Reme pelas águas escuras e veja o mar brilhar a cada movimento com o fenômeno da bioluminescência.',
-    duration: '1.5 horas (Noturno)',
-    price: 'A partir de R$ 120',
-    image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
-    iconType: 'star'
-  },
-  {
-    title: 'Vivência Nativa: Pesca e Preparo',
-    description: 'Sinta-se um verdadeiro morador da ilha. Participe da pesca artesanal com os nativos e aprenda a preparar o seu próprio peixe fresco à moda baiana.',
-    duration: 'Um dia inteiro',
-    price: 'Valor a combinar',
-    image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
-    iconType: 'logo'
-  },
-  {
-    title: 'Hospedagem Pé na Areia',
-    description: 'Aproveite a melhor localização de Moreré. Nossa hospedagem oferece o privilégio de acordar com o pé na areia e o som das ondas.',
-    duration: 'Diárias a combinar',
-    price: 'Consulte disponibilidade',
-    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
-    iconType: 'house'
+  en: {
+    'nav.about': 'About Moreré',
+    'nav.tours': 'Our Tours',
+    'nav.gallery': 'Gallery',
+    'nav.testimonials': 'Reviews',
+    'nav.reservation': 'Book Now',
+    'hero.title': 'Sand Captains',
+    'hero.subtitle': 'Authentic experiences in the crystal clear waters of Moreré.',
+    'hero.cta': 'Discover Experiences',
+    'tours.label': 'Our Routes',
+    'tours.title': 'Choose your next adventure',
+    'tours.subtitle': 'Private or small group tours to ensure the best experience in Boipeba waters.',
+    'tours.duration': 'Duration',
+    'tours.price': 'Price',
+    'tours.consult': 'Check Availability',
+    'gallery.title': 'Moments that tell stories',
+    'gallery.follow': 'Follow on Instagram',
+    'gallery.view': 'View on Instagram',
+    'about.label': 'Our Paradise',
+    'about.title1': 'More than a destination,',
+    'about.title2': 'an experience.',
+    'about.p1': 'Moreré is a small fishing village on Boipeba Island, known for its calm waters, natural pools full of marine life and a pace of life that invites us to slow down.',
+    'about.p2': 'Our mission is to provide you with the best tours in the region, with safety, comfort and the warm Bahian welcome. We know every corner of this island and want to share its secrets with you.',
+    'about.exp_label': 'Years of Experience',
+    'about.clients_label': 'Happy Clients',
+    'testimonials.title': 'What our customers say',
+    'booking.title': 'Request Booking',
+    'booking.subtitle': 'Fill in the details and we will contact you via WhatsApp.',
+    'booking.personal': 'Personal Information',
+    'booking.name': 'Your Full Name',
+    'booking.age': 'Age',
+    'booking.people': 'How many people?',
+    'booking.kids': 'Any children?',
+    'booking.yes': 'Yes',
+    'booking.no': 'No',
+    'booking.arrival': 'Island Arrival Date',
+    'booking.tour': 'Preferred Tour',
+    'booking.decide': 'I haven\'t decided yet',
+    'booking.safety': 'Health and Safety',
+    'booking.safety_desc': 'To ensure the best experience, please let us know:',
+    'booking.health': 'Health Problems or Allergies?',
+    'booking.health_ph': 'Ex: Asthma, seafood allergy, heart problems. (Specify)',
+    'booking.phobias': 'Any phobias?',
+    'booking.phobias_ph': 'Ex: Fear of open sea, insects, enclosed places.',
+    'booking.meds': 'Taking any medication?',
+    'booking.meds_ph': 'Ex: Aspirin, blood pressure medicine, etc.',
+    'booking.food': 'Dietary Restrictions?',
+    'booking.food_ph': 'Ex: Lactose intolerance, vegan, shrimp allergy.',
+    'booking.exp': 'Outdoor Activity Experience Level',
+    'booking.exp_1': 'Beginner (Little or no experience)',
+    'booking.exp_2': 'Intermediate (Practices occasionally)',
+    'booking.exp_3': 'Advanced (Practices frequently, good fitness)',
+    'booking.obs': 'General Observations (Optional)',
+    'booking.obs_ph': 'Any questions or special requests?',
+    'booking.disclaimer': 'Disclaimer Terminal',
+    'booking.disclaimer_text': 'I declare to be aware that ecotourism activities involve inherent risks. By proceeding, I assume full responsibility for my safety.',
+    'booking.submit': 'Send to WhatsApp',
+    'footer.description': 'Authentic sea experiences in Moreré. Speedboat tours, canoe trips and unique experiences in Boipeba Island.',
+    'footer.links': 'Quick Links',
+    'footer.contact': 'Contact',
+    'footer.rights': 'All rights reserved.'
   }
-];
+};
 
 function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -89,6 +268,10 @@ export default function App() {
   const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
+  const [language, setLanguage] = useState<'pt' | 'en'>('pt');
+  
+  const t = (key: string) => TRANSLATIONS[language][key] || key;
+  
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
@@ -122,7 +305,7 @@ export default function App() {
           adminService.getSettings()
         ]);
         
-        if (fetchedTours.length === 0) setTours(INITIAL_TOURS);
+        if (fetchedTours.length === 0) setTours(INITIAL_TOURS[language]);
         else setTours(fetchedTours);
         
         setSettings(fetchedSettings);
@@ -142,11 +325,11 @@ export default function App() {
           setGallery(fetchedGallery);
         }
       } catch (err) {
-        setTours(INITIAL_TOURS);
+        setTours(INITIAL_TOURS[language]);
       }
     };
     loadData();
-  }, [isAdminOpen]); // Refresh data when closing admin
+  }, [isAdminOpen, language]); // Refresh data when closing admin or changing language
 
   const getIcon = (type: string) => {
     switch(type) {
@@ -185,7 +368,26 @@ export default function App() {
     const dataFormatada = dataChegada ? `${dia}/${mes}/${ano}` : 'Não informada';
 
     // formuláro
-    const message = `Olá! Gostaria de fazer uma reserva/orçamento.
+    const isEn = language === 'en';
+    const message = isEn 
+      ? `Hello! I'd like to make a reservation/quote.
+*Name:* ${nome}
+*Age:* ${idade}
+*Number of people:* ${quantidadePessoas}
+*Children?:* ${temCrianca}
+*Arrival date on the island:* ${dataFormatada}
+*Preferred tour:* ${passeioDesejado}
+*Experience level (Outdoor activities):* ${nivelExperiencia}
+
+*--- Health, Safety and Food ---*
+*Health issues/allergies:* ${problemasSaude || 'None'}
+*Phobias:* ${fobias || 'None'}
+*Current medications:* ${medicamentos || 'None'}
+*Dietary restrictions:* ${restricoesAlimentares || 'None'}
+${observacoes ? `\n*Comments:* ${observacoes}` : ''}
+
+*✅ Accepted the Liability Disclaimer Term.*`
+      : `Olá! Gostaria de fazer uma reserva/orçamento.
 *Nome:* ${nome}
 *Idade:* ${idade}
 *Quantidade de pessoas:* ${quantidadePessoas}
@@ -291,42 +493,65 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           
           {/* Desktop Menu */}
           <div className={`hidden md:flex items-center gap-8 text-sm font-medium tracking-wide uppercase ${isScrolled ? 'text-sand-800' : 'text-white/90'}`}>
-            <button onClick={() => scrollTo('sobre')} className="hover:text-ocean-500 transition-colors">Sobre</button>
-            <button onClick={() => scrollTo('passeios')} className="hover:text-ocean-500 transition-colors">Passeios</button>
-            <button onClick={() => scrollTo('galeria')} className="hover:text-ocean-500 transition-colors">Galeria</button>
-            <button onClick={() => scrollTo('depoimentos')} className="hover:text-ocean-500 transition-colors">Depoimentos</button>
+            <button onClick={() => scrollTo('sobre')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.about').split(' ')[0]}</button>
+            <button onClick={() => scrollTo('passeios')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.tours').split(' ')[1] || t('nav.tours')}</button>
+            <button onClick={() => scrollTo('galeria')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.gallery')}</button>
+            <button onClick={() => scrollTo('depoimentos')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.testimonials')}</button>
+            
+            {/* Language Switcher */}
+            <div className="flex items-center gap-2 border-l border-sand-300/30 pl-6 ml-2">
+              <button 
+                onClick={() => setLanguage('pt')} 
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${language === 'pt' ? 'bg-ocean-600 text-white' : 'hover:bg-sand-100/20'}`}
+              >
+                PT
+              </button>
+              <button 
+                onClick={() => setLanguage('en')} 
+                className={`w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${language === 'en' ? 'bg-ocean-600 text-white' : 'hover:bg-sand-100/20'}`}
+              >
+                EN
+              </button>
+            </div>
+
             <button 
               onClick={() => openReservationModal()}
               className={`px-5 py-2.5 rounded-full flex items-center gap-2 transition-all ${isScrolled ? 'bg-ocean-600 text-white hover:bg-ocean-700' : 'bg-white text-sand-900 hover:bg-sand-50'}`}
             >
               <MessageCircle className="w-4 h-4" />
-              Reservar
+              {t('nav.reservation')}
             </button>
           </div>
 
           {/* Mobile Menu Toggle */}
-          <button 
-            className={`md:hidden p-2 ${isScrolled ? 'text-sand-900' : 'text-white'}`}
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? <X /> : <Menu />}
-          </button>
+          <div className="md:hidden flex items-center gap-4">
+            <div className="flex items-center gap-2">
+              <button onClick={() => setLanguage('pt')} className={`text-[10px] font-bold px-2 py-1 rounded ${language === 'pt' ? 'bg-ocean-600 text-white' : 'text-sand-600'}`}>PT</button>
+              <button onClick={() => setLanguage('en')} className={`text-[10px] font-bold px-2 py-1 rounded ${language === 'en' ? 'bg-ocean-600 text-white' : 'text-sand-600'}`}>EN</button>
+            </div>
+            <button 
+              className={`p-2 ${isScrolled ? 'text-sand-900' : 'text-white'}`}
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X /> : <Menu />}
+            </button>
+          </div>
         </div>
       </nav>
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-sand-50 pt-24 px-6 flex flex-col gap-6 md:hidden">
-          <button onClick={() => scrollTo('sobre')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">Sobre Moreré</button>
-          <button onClick={() => scrollTo('passeios')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">Nossos Passeios</button>
-          <button onClick={() => scrollTo('galeria')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">Galeria</button>
-          <button onClick={() => scrollTo('depoimentos')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">Depoimentos</button>
+        <div className="fixed inset-0 z-40 bg-sand-50 pt-24 px-6 flex flex-col gap-6 md:hidden overflow-y-auto pb-12">
+          <button onClick={() => scrollTo('sobre')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.about')}</button>
+          <button onClick={() => scrollTo('passeios')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.tours')}</button>
+          <button onClick={() => scrollTo('galeria')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.gallery')}</button>
+          <button onClick={() => scrollTo('depoimentos')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.testimonials')}</button>
           <button 
             onClick={() => openReservationModal()}
             className="mt-4 bg-ocean-600 text-white py-4 rounded-xl flex justify-center items-center gap-2 text-lg font-medium"
           >
             <MessageCircle className="w-5 h-5" />
-            Reservar Passeio
+            {t('nav.reservation')}
           </button>
         </div>
       )}
@@ -355,11 +580,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               Ilha de Boipeba, Bahia
             </span>
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 leading-tight">
-              Descubra a magia <br className="hidden md:block" />
+              {t('hero.title')} <br className="hidden md:block" />
               <span className="italic font-light">de Moreré</span>
             </h1>
             <p className="text-lg md:text-xl text-sand-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              Passeios de lancha, mergulho nas piscinas naturais e experiências autênticas em um dos vilarejos mais charmosos do Brasil.
+              {t('hero.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <button 
@@ -367,13 +592,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                 className="w-full sm:w-auto px-8 py-4 bg-ocean-600 text-white rounded-full font-medium tracking-wide hover:bg-ocean-700 transition-colors flex items-center justify-center gap-2"
               >
                 <MessageCircle className="w-5 h-5" />
-                Agendar Passeio
+                {t('hero.cta')}
               </button>
               <button 
                 onClick={() => scrollTo('passeios')}
                 className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-medium tracking-wide hover:bg-white/20 transition-colors border border-white/30"
               >
-                Ver Roteiros
+                {t('tours.label')}
               </button>
             </div>
           </motion.div>
@@ -417,26 +642,26 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           >
             <div className="flex items-center gap-3 text-ocean-600 mb-6 uppercase tracking-widest text-sm font-semibold">
               <MapPin className="w-5 h-5" />
-              <span>Nosso Paraíso</span>
+              <span>{t('about.label')}</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-serif mb-6 text-sand-900 leading-tight">
-              Muito mais que um destino, <span className="italic text-ocean-800">uma experiência.</span>
+              {t('about.title1')} <span className="italic text-ocean-800">{t('about.title2')}</span>
             </h2>
             <p className="text-lg text-sand-800 mb-6 leading-relaxed font-light">
-              Moreré é um pequeno vilarejo de pescadores na Ilha de Boipeba, conhecido por suas águas calmas, piscinas naturais repletas de vida marinha e um ritmo de vida que nos convida a desacelerar.
+              {t('about.p1')}
             </p>
             <p className="text-lg text-sand-800 mb-10 leading-relaxed font-light">
-              Nossa missão é proporcionar a você os melhores passeios da região, com segurança, conforto e o caloroso acolhimento baiano. Conhecemos cada canto dessa ilha e queremos compartilhar seus segredos com você.
+              {t('about.p2')}
             </p>
             
             <div className="grid grid-cols-2 gap-8">
               <div>
                 <h4 className="text-3xl font-serif text-ocean-600 mb-2">10+</h4>
-                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">Anos de Experiência</p>
+                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.exp_label')}</p>
               </div>
               <div>
                 <h4 className="text-3xl font-serif text-ocean-600 mb-2">5k+</h4>
-                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">Clientes Satisfeitos</p>
+                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.clients_label')}</p>
               </div>
             </div>
           </motion.div>
@@ -447,12 +672,12 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <section id="passeios" className="py-24 px-6 md:px-12 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-ocean-600 uppercase tracking-widest text-sm font-semibold mb-4 block">Nossos Roteiros</span>
+            <span className="text-ocean-600 uppercase tracking-widest text-sm font-semibold mb-4 block">{t('tours.label')}</span>
             <h2 className="text-4xl md:text-5xl font-serif text-sand-900 mb-6">
-              Escolha sua <span className="italic">próxima aventura</span>
+              {t('tours.title').split(' ')[0]} {t('tours.title').split(' ')[1]} <span className="italic">{t('tours.title').split(' ').slice(2).join(' ')}</span>
             </h2>
             <p className="text-lg text-sand-800 font-light">
-              Passeios privativos ou em pequenos grupos para garantir a melhor experiência nas águas de Boipeba.
+              {t('tours.subtitle')}
             </p>
           </div>
 
@@ -504,11 +729,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                     
                     <div className="space-y-3 mb-8 pt-6 border-t border-sand-200">
                       <div className="flex justify-between text-sm">
-                        <span className="text-sand-600 uppercase tracking-wider font-medium">Duração</span>
+                        <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.duration')}</span>
                         <span className="text-sand-900 font-medium">{tour.duration}</span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-sand-600 uppercase tracking-wider font-medium">Valor</span>
+                        <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.price')}</span>
                         <span className="text-sand-900 font-medium">{tour.price}</span>
                       </div>
                     </div>
@@ -517,7 +742,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       onClick={() => openReservationModal(tour.title)}
                       className="w-full py-3.5 rounded-xl border border-ocean-600 text-ocean-600 font-medium text-center hover:bg-ocean-600 hover:text-white transition-colors flex items-center justify-center gap-2"
                     >
-                      Consultar Disponibilidade
+                      {t('tours.consult')}
                       <ChevronRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -542,8 +767,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                 <span className="text-sand-600 uppercase tracking-[0.2em] text-sm font-bold">@capitaesdaareiamorere</span>
               </div>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sand-900 leading-tight">
-                Momentos que <br />
-                <span className="italic text-ocean-600">contam histórias</span>
+                {t('gallery.title').split(' ').slice(0, -2).join(' ')} <br />
+                <span className="italic text-ocean-600">{t('gallery.title').split(' ').slice(-2).join(' ')}</span>
               </h2>
             </div>
             <a 
@@ -553,7 +778,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="group flex items-center gap-3 px-8 py-4 bg-sand-900 text-white rounded-full hover:bg-ocean-600 transition-all shadow-xl hover:shadow-ocean-200 hover:-translate-y-1"
             >
               <Instagram className="w-5 h-5 transition-transform group-hover:scale-110" />
-              <span className="font-medium">Seguir no Instagram</span>
+              <span className="font-medium">{t('gallery.follow')}</span>
             </a>
           </div>
 
@@ -753,9 +978,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <p className="text-xl text-ocean-100 font-light mb-10">
             Entre em contato agora mesmo e garanta sua vaga nos melhores passeios de Moreré.
           </p>
-          <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '557599211235'}`} className="inline-flex items-center gap-2 px-6 py-2.5 bg-ocean-600 text-white rounded-full font-medium hover:bg-ocean-700 transition-colors shadow-lg">
+          <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '5521988643166'}`} className="inline-flex items-center gap-2 px-6 py-2.5 bg-ocean-600 text-white rounded-full font-medium hover:bg-ocean-700 transition-colors shadow-lg">
             <MessageCircle className="w-5 h-5" />
-            Reservar
+            {t('nav.reservation')}
           </a>
         </div>
       </section>
@@ -771,20 +996,20 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               </span>
             </div>
             <p className="font-light text-sm max-w-xs">
-              Sua agência de turismo receptivo na Ilha de Boipeba. Experiências autênticas e inesquecíveis.
+              {t('footer.description')}
             </p>
           </div>
           
           <div className="flex flex-col gap-2 md:items-center">
-            <h4 className="text-white font-medium uppercase tracking-widest text-sm mb-2">Contato</h4>
-            <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '557599211235'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp1 || '(75) 9921-1235'}
+            <h4 className="text-white font-medium uppercase tracking-widest text-sm mb-2">{t('footer.contact')}</h4>
+            <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '5521988643166'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp1 || '(21) 98864-3166'}
             </a>
-            <a href={`https://wa.me/${settings?.contact?.whatsapp2Link || '5521988643166'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp2 || '(21) 98864-3166'}
+            <a href={`https://wa.me/${settings?.contact?.whatsapp2Link || '557599211235'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp2 || '(75) 9921-1235'}
             </a>
             <a href={`https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <Instagram className="w-4 h-4" /> {settings?.contact?.instagram || '@capitaesdaareia'}
+              <Instagram className="w-4 h-4" /> {settings?.contact?.instagram || '@capitaesdaareiamorere'}
             </a>
           </div>
           
@@ -795,13 +1020,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           </div>
         </div>
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light space-y-2">
-          <p>&copy; {new Date().getFullYear()} Capitães da Areia. Todos os direitos reservados.</p>
+          <p>&copy; {new Date().getFullYear()} Capitães da Areia. {t('footer.rights')}</p>
           <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
           <button 
             onClick={() => setIsAdminOpen(true)}
             className="text-[10px] text-sand-300 uppercase tracking-widest hover:text-ocean-400 transition-colors mt-8 opacity-50 hover:opacity-100"
           >
-            Acesso Restrito
+            {language === 'pt' ? 'Acesso Restrito' : 'Admin Access'}
           </button>
         </div>
       </footer>
@@ -821,41 +1046,41 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           >
             <div className="p-6 md:p-8 overflow-y-auto hide-scrollbar">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-2xl font-serif text-sand-900">Faça sua Reserva</h3>
+                <h3 className="text-2xl font-serif text-sand-900">{t('booking.title')}</h3>
                 <button onClick={closeReservationModal} className="p-2 text-sand-500 hover:text-sand-900 hover:bg-sand-50 rounded-full transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
               
               <p className="text-sand-600 font-light text-sm mb-6">
-                Preencha os dados abaixo. Você será redirecionado para o nosso WhatsApp com as informações prontas para agilizarmos seu atendimento!
+                {t('booking.subtitle')}
               </p>
 
               <form onSubmit={handleReservationSubmit} className="space-y-5">
                 <div>
-                  <label htmlFor="res-nome" className="block text-sm font-medium text-sand-800 mb-1">Nome Completo</label>
+                  <label htmlFor="res-nome" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.name')}</label>
                   <input 
                     type="text" id="res-nome" required
                     value={reservationForm.nome}
                     onChange={(e) => setReservationForm({...reservationForm, nome: e.target.value})}
                     className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
-                    placeholder="Seu nome"
+                    placeholder={t('booking.name')}
                   />
                 </div>
                 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="res-idade" className="block text-sm font-medium text-sand-800 mb-1">Idade</label>
+                    <label htmlFor="res-idade" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.age')}</label>
                     <input 
                       type="number" id="res-idade" required min="18"
                       value={reservationForm.idade}
                       onChange={(e) => setReservationForm({...reservationForm, idade: e.target.value})}
                       className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
-                      placeholder="Sua idade"
+                      placeholder={t('booking.age')}
                     />
                   </div>
                   <div>
-                    <label htmlFor="res-qtd" className="block text-sm font-medium text-sand-800 mb-1">Qtd. Pessoas</label>
+                    <label htmlFor="res-qtd" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.people')}</label>
                     <input 
                       type="number" id="res-qtd" required min="1"
                       value={reservationForm.quantidadePessoas}
@@ -867,19 +1092,19 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label htmlFor="res-crianca" className="block text-sm font-medium text-sand-800 mb-1">Tem Crianças?</label>
+                    <label htmlFor="res-crianca" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.kids')}</label>
                     <select 
                       id="res-crianca" required
                       value={reservationForm.temCrianca}
                       onChange={(e) => setReservationForm({...reservationForm, temCrianca: e.target.value})}
                       className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
                     >
-                      <option value="Não">Não</option>
-                      <option value="Sim">Sim</option>
+                      <option value={t('booking.no')}>{t('booking.no')}</option>
+                      <option value={t('booking.yes')}>{t('booking.yes')}</option>
                     </select>
                   </div>
                   <div>
-                    <label htmlFor="res-data" className="block text-sm font-medium text-sand-800 mb-1">Data de Chegada</label>
+                    <label htmlFor="res-data" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.arrival')}</label>
                     <input 
                       type="date" id="res-data" required
                       value={reservationForm.dataChegada}
@@ -890,14 +1115,14 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                 </div>
 
                 <div>
-                  <label htmlFor="res-passeio" className="block text-sm font-medium text-sand-800 mb-1">Passeio de Interesse</label>
+                  <label htmlFor="res-passeio" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.tour')}</label>
                   <select 
                     id="res-passeio" required
                     value={reservationForm.passeioDesejado}
                     onChange={(e) => setReservationForm({...reservationForm, passeioDesejado: e.target.value})}
                     className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
                   >
-                    <option value="Ainda não decidi">Ainda não decidi</option>
+                    <option value={t('booking.decide')}>{t('booking.decide')}</option>
                     {tours.map((t, idx) => (
                       <option key={t.id || idx} value={t.title}>{t.title}</option>
                     ))}
@@ -905,76 +1130,76 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                 </div>
 
                 <div className="pt-4 border-t border-sand-200">
-                  <h4 className="text-lg font-serif text-sand-900 mb-2">Saúde e Segurança</h4>
-                  <p className="text-xs text-sand-600 mb-4">Para garantirmos a melhor experiência, por favor, nos informe:</p>
+                  <h4 className="text-lg font-serif text-sand-900 mb-2">{t('booking.safety')}</h4>
+                  <p className="text-xs text-sand-600 mb-4">{t('booking.safety_desc')}</p>
                   
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="res-saude" className="block text-sm font-medium text-sand-800 mb-1">Problemas de Saúde ou Alergias?</label>
+                      <label htmlFor="res-saude" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.health')}</label>
                       <textarea 
                         id="res-saude" rows={2}
                         value={reservationForm.problemasSaude}
                         onChange={(e) => setReservationForm({...reservationForm, problemasSaude: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none text-sm"
-                        placeholder="Ex: Asma, alergia a frutos do mar, problemas cardíacos. (Especifique)"
+                        placeholder={t('booking.health_ph')}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="res-fobias" className="block text-sm font-medium text-sand-800 mb-1">Possui alguma fobia?</label>
+                      <label htmlFor="res-fobias" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.phobias')}</label>
                       <textarea 
                         id="res-fobias" rows={2}
                         value={reservationForm.fobias}
                         onChange={(e) => setReservationForm({...reservationForm, fobias: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none text-sm"
-                        placeholder="Ex: Medo de mar aberto, insetos, lugares fechados. (Avisaremos o que encontrará no caminho)"
+                        placeholder={t('booking.phobias_ph')}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="res-medicamentos" className="block text-sm font-medium text-sand-800 mb-1">Toma algum medicamento?</label>
+                      <label htmlFor="res-medicamentos" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.meds')}</label>
                       <textarea 
                         id="res-medicamentos" rows={2}
                         value={reservationForm.medicamentos}
                         onChange={(e) => setReservationForm({...reservationForm, medicamentos: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none text-sm"
-                        placeholder="Ex: Aspirina, remédio para pressão, etc."
+                        placeholder={t('booking.meds_ph')}
                       />
                     </div>
 
                     <div>
-                      <label htmlFor="res-alimentacao" className="block text-sm font-medium text-sand-800 mb-1">Restrições Alimentares?</label>
+                      <label htmlFor="res-alimentacao" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.food')}</label>
                       <textarea 
                         id="res-alimentacao" rows={2}
                         value={reservationForm.restricoesAlimentares}
                         onChange={(e) => setReservationForm({...reservationForm, restricoesAlimentares: e.target.value})}
                         className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none text-sm"
-                        placeholder="Ex: Intolerância à lactose, vegano, alergia a camarão."
+                        placeholder={t('booking.food_ph')}
                       />
                     </div>
                   </div>
                 </div>
 
                 <div className="pt-4 border-t border-sand-200">
-                  <label htmlFor="res-experiencia" className="block text-sm font-medium text-sand-800 mb-1">Nível de Experiência em Atividades ao Ar Livre</label>
+                  <label htmlFor="res-experiencia" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.exp')}</label>
                   <select 
                     id="res-experiencia" required
                     value={reservationForm.nivelExperiencia}
                     onChange={(e) => setReservationForm({...reservationForm, nivelExperiencia: e.target.value})}
                     className="w-full px-4 py-3 mb-4 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
                   >
-                    <option value="Iniciante">Iniciante (Pouca ou nenhuma experiência)</option>
-                    <option value="Intermediário">Intermediário (Pratica atividades ocasionalmente)</option>
-                    <option value="Avançado">Avançado (Pratica frequentemente, bom preparo físico)</option>
+                    <option value="Iniciante">{t('booking.exp_1')}</option>
+                    <option value="Intermediário">{t('booking.exp_2')}</option>
+                    <option value="Avançado">{t('booking.exp_3')}</option>
                   </select>
 
-                  <label htmlFor="res-obs" className="block text-sm font-medium text-sand-800 mb-1">Observações Gerais (Opcional)</label>
+                  <label htmlFor="res-obs" className="block text-sm font-medium text-sand-800 mb-1">{t('booking.obs')}</label>
                   <textarea 
                     id="res-obs" rows={2}
                     value={reservationForm.observacoes}
                     onChange={(e) => setReservationForm({...reservationForm, observacoes: e.target.value})}
                     className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50 resize-none"
-                    placeholder="Alguma dúvida ou pedido especial?"
+                    placeholder={t('booking.obs_ph')}
                   />
                 </div>
 
@@ -993,7 +1218,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       </svg>
                     </div>
                     <span className="text-xs text-sand-700 leading-relaxed">
-                      <strong>Termo de Isenção de Responsabilidade:</strong> Declaro estar ciente de que as atividades de ecoturismo envolvem riscos inerentes. Ao prosseguir, assumo total responsabilidade por minha segurança, isentando a agência Capitães da Areia de qualquer responsabilidade civil ou criminal em caso de acidentes ou lesões durante os passeios.
+                      <strong>{t('booking.disclaimer')}:</strong> {t('booking.disclaimer_text')}
                     </span>
                   </label>
                 </div>
@@ -1003,7 +1228,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   className="w-full py-4 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-colors flex justify-center items-center gap-2 mt-4"
                 >
                   <MessageCircle className="w-5 h-5" />
-                  Enviar para o WhatsApp
+                  {t('booking.submit')}
                 </button>
               </form>
             </div>
