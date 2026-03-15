@@ -330,18 +330,36 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                         />
                       </div>
                       
-                      <div className="pt-4 space-y-2">
-                        <label className="text-[10px] uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático (Behold.so)</label>
-                        <input 
-                          type="text"
-                          placeholder="Link da API do Behold (ex: https://feeds.behold.so/...)"
-                          defaultValue={settings?.instagram?.beholdUrl}
-                          onBlur={(e) => handleUpdateSettings('instagram', { beholdUrl: e.target.value })}
-                          className="w-full px-4 py-3 rounded-xl bg-ocean-50 border border-ocean-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm"
-                        />
-                        <p className="text-[10px] text-sand-500 italic">
-                          Cole aqui o link gerado no Behold.so para que o site puxe as fotos e vídeos automaticamente.
-                        </p>
+                      <div className="pt-4 space-y-3 bg-ocean-50/50 p-6 rounded-2xl border border-ocean-100">
+                        <div className="flex items-center gap-2 mb-1">
+                          <Instagram className="w-4 h-4 text-ocean-600" />
+                          <label className="text-xs uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático (Behold.so)</label>
+                        </div>
+                        <p className="text-xs text-ocean-800 font-light mb-2">Cole o link da "JSON URL" gerada no Behold para que o site se atualize sozinho.</p>
+                        <div className="flex gap-2">
+                          <input 
+                            type="text"
+                            placeholder="https://feeds.behold.so/v1/..."
+                            key={settings?.instagram?.beholdUrl || 'empty'}
+                            defaultValue={settings?.instagram?.beholdUrl}
+                            id="behold-url-input"
+                            className="flex-grow px-4 py-3 rounded-xl bg-white border border-ocean-200 outline-none focus:ring-2 focus:ring-ocean-500 text-sm shadow-sm"
+                          />
+                          <button 
+                            onClick={async (e) => {
+                              const btn = e.currentTarget;
+                              const input = document.getElementById('behold-url-input') as HTMLInputElement;
+                              btn.disabled = true;
+                              await handleUpdateSettings('instagram', { beholdUrl: input.value });
+                              btn.disabled = false;
+                              alert('Configuração do Instagram salva com sucesso!');
+                            }}
+                            className="px-6 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50"
+                          >
+                            <Save className="w-4 h-4" />
+                            Salvar
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

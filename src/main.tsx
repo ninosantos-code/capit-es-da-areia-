@@ -10,6 +10,7 @@ createRoot(document.getElementById('root')!).render(
 );
 
 // Register Service Worker for PWA / offline support
+/* 
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker
@@ -18,4 +19,5 @@ if ('serviceWorker' in navigator) {
       .catch((err) => console.warn('SW registration failed:', err));
   });
 }
+*/
 

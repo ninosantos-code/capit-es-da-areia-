@@ -4,6 +4,7 @@ import {
   getDocs, 
   doc, 
   updateDoc, 
+  setDoc,
   addDoc, 
   deleteDoc, 
   query, 
@@ -73,16 +74,19 @@ export const adminService = {
         whatsapp1Link: '557599211235',
         whatsapp2: '(21) 98864-3166',
         whatsapp2Link: '5521988643166',
-        instagram: '@capitaesdaareia',
+        instagram: '@capitaesdaareiamorere',
         instagramLink: 'capitaesdaareiamorere',
         address: 'Praia de Moreré, s/n\nIlha de Boipeba, Cairu - BA'
+      },
+      instagram: {
+        beholdUrl: 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo'
       }
     };
   },
 
   async updateSettings(id: string, data: any) {
     const docRef = doc(db, 'settings', id);
-    await updateDoc(docRef, data);
+    await setDoc(docRef, data, { merge: true });
   },
 
   // Gallery

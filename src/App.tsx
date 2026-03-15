@@ -95,14 +95,12 @@ export default function App() {
         
         setSettings(fetchedSettings);
 
-        // If Behold is configured, fetch dynamic feed
-        if (fetchedSettings?.instagram?.beholdUrl) {
-          const instaFeed = await adminService.getInstagramFeed(fetchedSettings.instagram.beholdUrl);
-          if (instaFeed.length > 0) {
-            setGallery(instaFeed);
-          } else {
-            setGallery(fetchedGallery);
-          }
+        // Use provided behold URL as base or fall back to DB
+        const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
+        
+        const instaFeed = await adminService.getInstagramFeed(beholdUrl);
+        if (instaFeed.length > 0) {
+          setGallery(instaFeed);
         } else {
           setGallery(fetchedGallery);
         }
