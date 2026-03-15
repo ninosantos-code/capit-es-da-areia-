@@ -70,10 +70,10 @@ export const adminService = {
     // Return a default if empty
     return Object.keys(settings).length > 0 ? settings : {
       contact: {
-        whatsapp1: '(75) 9921-1235',
-        whatsapp1Link: '557599211235',
-        whatsapp2: '(21) 98864-3166',
-        whatsapp2Link: '5521988643166',
+        whatsapp1: '(21) 98864-3166',
+        whatsapp1Link: '5521988643166',
+        whatsapp2: '(75) 9921-1235',
+        whatsapp2Link: '557599211235',
         instagram: '@capitaesdaareiamorere',
         instagramLink: 'capitaesdaareiamorere',
         address: 'Praia de Moreré, s/n\nIlha de Boipeba, Cairu - BA'

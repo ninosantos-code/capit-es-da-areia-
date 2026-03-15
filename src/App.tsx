@@ -204,7 +204,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 *✅ Aceitou o Termo de Isenção de Responsabilidade.*`;
 
     const encodedMessage = encodeURIComponent(message);
-    const waLink = settings?.contact?.whatsapp1Link || '557599211235';
+    const waLink = settings?.contact?.whatsapp1Link || '5521988643166';
     window.open(`https://wa.me/${waLink}?text=${encodedMessage}`, '_blank');
     
     if (analytics) {
