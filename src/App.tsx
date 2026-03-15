@@ -1,5 +1,14 @@
+import { useState, useEffect, useRef, type FormEvent } from 'react';
+import { motion } from 'motion/react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import { logEvent } from 'firebase/analytics';
+import { analytics } from './lib/firebase';
+import LazyImage from './components/LazyImage';
+import ConnectionStatus from './components/ConnectionStatus';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import { adminService, Tour } from './lib/adminService';
+
+const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
 
 const INITIAL_TOURS: Tour[] = [
   {
