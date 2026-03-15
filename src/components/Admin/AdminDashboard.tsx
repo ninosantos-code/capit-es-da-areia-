@@ -13,7 +13,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<string[]>([]);
+  const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'settings'>('tours');
@@ -82,6 +82,21 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       setGallery(updatedGallery);
     } catch (err) {
       alert('Erro ao adicionar à galeria');
+    }
+  };
+
+  const handleRemoveFromGallery = async (id: string) => {
+    if (id === '1' || id === '2' || id === '3' || id === '4' || id === '5' || id === '6' || id === '7') {
+      alert('Esta é uma foto padrão e não pode ser removida do banco de dados.');
+      return;
+    }
+    if (!confirm('Deseja realmente remover esta foto?')) return;
+    try {
+      await adminService.removeFromGallery(id);
+      const updatedGallery = await adminService.getGallery();
+      setGallery(updatedGallery);
+    } catch (err) {
+      alert('Erro ao remover foto');
     }
   };
 
@@ -234,11 +249,12 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   </div>
 
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {gallery.map((url, idx) => (
-                      <div key={idx} className="relative aspect-square rounded-2xl overflow-hidden bg-sand-100 group shadow-sm border border-sand-100">
-                        <img src={url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
+                    {gallery.map((item, idx) => (
+                      <div key={item.id || idx} className="relative aspect-square rounded-2xl overflow-hidden bg-sand-100 group shadow-sm border border-sand-100">
+                        <img src={item.url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button 
+                            onClick={() => handleRemoveFromGallery(item.id)}
                             className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110"
                             title="Remover foto"
                           >

@@ -55,7 +55,7 @@ const INITIAL_TOURS: Tour[] = [
 
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<string[]>([]);
+  const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -530,13 +530,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar group/carousel"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {gallery.map((img, index) => (
+              {gallery.map((item, index) => (
                 <div 
-                  key={index}
+                  key={item.id || index}
                   className="min-w-[80vw] md:min-w-[450px] snap-center rounded-[2rem] overflow-hidden aspect-[4/5] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
                 >
                   <LazyImage 
-                    src={img} 
+                    src={item.url} 
                     alt={`Galeria ${index + 1}`} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                     referrerPolicy="no-referrer"

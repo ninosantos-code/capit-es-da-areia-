@@ -86,19 +86,19 @@ export const adminService = {
   },
 
   // Gallery
-  async getGallery(): Promise<string[]> {
+  async getGallery(): Promise<{id: string, url: string}[]> {
     const q = query(collection(db, 'gallery'));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return [
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650098100_18059250272426181_2033458607713035493_n.jpg',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650837703_18059552462426181_6081456137423034486_n.webp',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/649555508_18059552474426181_1904247928205305178_n.webp',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651889840_18059251376426181_4552180899044557139_n.jpg',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650765726_18059249600426181_7400181766281724016_n.jpg',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651541813_18059552450426181_5374245162380237564_n.webp',
-      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651492047_18059552498426181_2297765212161143916_n.webp'
+      { id: '1', url: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg' },
+      { id: '2', url: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg' },
+      { id: '3', url: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg' },
+      { id: '4', url: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg' },
+      { id: '5', url: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg' },
+      { id: '6', url: 'https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg' },
+      { id: '7', url: 'https://i.postimg.cc/xTtTty0X/ninodrip.jpg' }
     ];
-    return snapshot.docs.map(doc => doc.data().url);
+    return snapshot.docs.map(doc => ({ id: doc.id, url: doc.data().url }));
   },
 
   async addToGallery(url: string) {
