@@ -327,9 +327,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <LazyImage 
-            src="https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?q=80&w=2070&auto=format&fit=crop" 
+            src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
             alt="Praia de Moreré" 
-            className="w-full h-full"
+            className="w-full h-full brightness-[0.9] contrast-[1.05] saturate-[1.1]"
             referrerPolicy="no-referrer"
             priority={true}
           />
