@@ -61,7 +61,6 @@ function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
       videoRef.current.play().catch(() => {});
     } else if (videoRef.current) {
       videoRef.current.pause();
-      videoRef.current.currentTime = 0;
     }
   }, [isActive]);
 
@@ -578,7 +577,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   rel="noopener noreferrer"
                   onMouseEnter={() => item.mediaType === 'VIDEO' && setHoveredVideoId(item.id)}
                   onMouseLeave={() => setHoveredVideoId(null)}
-                  className="min-w-[80vw] md:min-w-[450px] snap-center rounded-[2rem] overflow-hidden aspect-[4/5] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
+                  className="min-w-[80vw] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden aspect-[9/11] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
                 >
                   <LazyImage 
                     src={item.url} 
