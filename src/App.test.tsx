@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import App from './App';
+import { logEvent } from 'firebase/analytics';
 
 // Mocks to avoid external API calls during tests
 vi.mock('./components/LazyImage', () => ({
@@ -9,6 +10,15 @@ vi.mock('./components/LazyImage', () => ({
 
 vi.mock('./components/ConnectionStatus', () => ({
   default: () => <div data-testid="connection-status">Online</div>
+}));
+
+vi.mock('firebase/analytics', () => ({
+  logEvent: vi.fn(),
+  getAnalytics: vi.fn()
+}));
+
+vi.mock('./lib/firebase', () => ({
+  analytics: {} // Fake object to simulate initialized analytics
 }));
 
 describe('App Component', () => {
@@ -24,12 +34,16 @@ describe('App Component', () => {
     expect(screen.getByText('Volta à Ilha de Lancha')).toBeInTheDocument();
   });
 
-  it('should open the reservation modal when clicking Reservar', () => {
+  it('should open the reservation modal when clicking Reservar and send analytics event', () => {
     render(<App />);
     const buttons = screen.getAllByText('Reservar');
     fireEvent.click(buttons[0]); // Click the first Reservar button (navbar or mobile)
     
     expect(screen.getByText('Faça sua Reserva')).toBeInTheDocument();
+    
+    expect(logEvent).toHaveBeenCalledWith(expect.anything(), 'open_reservation_modal', {
+       tour: 'Ainda não decidi'
+    });
   });
 
   it('should close the reservation modal when clicking X', () => {
@@ -64,5 +78,32 @@ describe('App Component', () => {
 
     expect(alertMock).toHaveBeenCalledWith('Por favor, aceite o Termo de Isenção de Responsabilidade para continuar.');
     alertMock.mockRestore();
+  });
+
+  it('should send an analytics event when valid reservation is submitted', async () => {
+    const windowOpenMock = vi.spyOn(window, 'open').mockImplementation(() => null);
+    render(<App />);
+    
+    // Open modal
+    fireEvent.click(screen.getAllByText('Reservar')[0]);
+    
+    // Accept terms
+    const checkbox = screen.getByRole('checkbox');
+    fireEvent.click(checkbox);
+
+    // Submit form
+    const sendButton = screen.getByText(/Enviar para o WhatsApp/i);
+    fireEvent.submit(sendButton.closest('form')!);
+
+    await waitFor(() => {
+      expect(windowOpenMock).toHaveBeenCalled();
+      expect(logEvent).toHaveBeenCalledWith(expect.anything(), 'send_whatsapp_reservation', expect.objectContaining({
+        tour: 'Ainda não decidi',
+        qtd_pessoas: '1',
+        has_kids: 'Não'
+      }));
+    });
+
+    windowOpenMock.mockRestore();
   });
 });

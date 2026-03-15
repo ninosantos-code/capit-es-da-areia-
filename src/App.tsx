@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import { logEvent } from 'firebase/analytics';
+import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
 import ConnectionStatus from './components/ConnectionStatus';
 
@@ -87,6 +89,10 @@ export default function App() {
     setReservationForm(prev => ({ ...prev, passeioDesejado: tourTitle }));
     setIsReservationModalOpen(true);
     setIsMobileMenuOpen(false);
+    
+    if (analytics) {
+      logEvent(analytics, 'open_reservation_modal', { tour: tourTitle });
+    }
   };
 
   const closeReservationModal = () => {
@@ -126,6 +132,15 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
     const encodedMessage = encodeURIComponent(message);
     window.open(`https://wa.me/557599211235?text=${encodedMessage}`, '_blank');
+    
+    if (analytics) {
+      logEvent(analytics, 'send_whatsapp_reservation', {
+        tour: passeioDesejado,
+        qtd_pessoas: quantidadePessoas,
+        has_kids: temCrianca
+      });
+    }
+
     closeReservationModal();
   };
 
@@ -175,6 +190,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     e.preventDefault();
     // Em um cenário real, isso enviaria os dados para um banco de dados para aprovação
     setIsCommentSubmitted(true);
+    
+    if (analytics) {
+      logEvent(analytics, 'submit_testimonial', { rating: commentForm.rating });
+    }
+
     setCommentForm({ name: '', text: '', rating: 5 });
     
     setTimeout(() => setIsCommentSubmitted(false), 5000);
