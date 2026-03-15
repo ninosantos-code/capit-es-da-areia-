@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
@@ -50,6 +50,14 @@ const INITIAL_TOURS: Tour[] = [
     price: 'Valor a combinar',
     image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
     iconType: 'logo'
+  },
+  {
+    title: 'Hospedagem Pé na Areia',
+    description: 'Aproveite a melhor localização de Moreré. Nossa hospedagem oferece o privilégio de acordar com o pé na areia e o som das ondas.',
+    duration: 'Diárias a combinar',
+    price: 'Consulte disponibilidade',
+    image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
+    iconType: 'house'
   }
 ];
 
@@ -145,6 +153,7 @@ export default function App() {
       case 'sun': return <Sun className="w-6 h-6 text-ocean-600" />;
       case 'camera': return <Camera className="w-6 h-6 text-ocean-600" />;
       case 'star': return <Star className="w-6 h-6 text-ocean-600" />;
+      case 'house': return <Home className="w-6 h-6 text-ocean-600" />;
       default: return <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />;
     }
   };
