@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2 } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -258,7 +258,15 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                     {gallery.map((item, idx) => (
                       <div key={item.id || idx} className="relative aspect-square rounded-2xl overflow-hidden bg-sand-100 group shadow-sm border border-sand-100">
                         <img src={item.url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        
+                        {/* Video Indicator in Admin */}
+                        {item.mediaType === 'VIDEO' && (
+                          <div className="absolute top-2 right-2 w-6 h-6 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
+                            <Play className="w-3 h-3 fill-current" />
+                          </div>
+                        )}
+
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
                           <button 
                             onClick={() => handleRemoveFromGallery(item.id)}
                             className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110"
@@ -266,6 +274,17 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                           >
                             <Trash2 className="w-5 h-5" />
                           </button>
+                          {item.permalink && (
+                            <a 
+                              href={item.permalink}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-3 bg-ocean-600 text-white rounded-full hover:bg-ocean-700 transition-transform hover:scale-110"
+                              title="Ver no Instagram"
+                            >
+                              <Instagram className="w-5 h-5" />
+                            </a>
+                          )}
                         </div>
                       </div>
                     ))}

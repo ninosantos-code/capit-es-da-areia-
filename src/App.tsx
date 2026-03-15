@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
@@ -542,23 +542,41 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {gallery.map((item, index) => (
-                <div 
+                <a 
                   key={item.id || index}
+                  href={item.permalink || `https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="min-w-[80vw] md:min-w-[450px] snap-center rounded-[2rem] overflow-hidden aspect-[4/5] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
                 >
                   <LazyImage 
                     src={item.url} 
-                    alt={`Galeria ${index + 1}`} 
+                    alt={item.caption || `Galeria ${index + 1}`} 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8">
-                    <div className="text-white">
-                      <Instagram className="w-6 h-6 mb-2" />
-                      <p className="text-sm font-medium tracking-wide">@capitaesdaareiamorere</p>
+                  
+                  {/* Video Indicator */}
+                  {item.mediaType === 'VIDEO' && (
+                    <div className="absolute top-6 right-6 w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20">
+                      <Play className="w-6 h-6 fill-current" />
+                    </div>
+                  )}
+
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                    <div className="text-white w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Instagram className="w-5 h-5" />
+                        <span className="text-xs font-bold uppercase tracking-wider">Ver no Instagram</span>
+                      </div>
+                      {item.caption && (
+                        <p className="text-sm line-clamp-2 text-sand-200 font-light leading-relaxed">
+                          {item.caption}
+                        </p>
+                      )}
                     </div>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
           </div>
