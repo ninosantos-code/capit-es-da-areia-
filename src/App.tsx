@@ -480,24 +480,32 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
       </section>
 
-      {/* Gallery Section */}
-      <section id="galeria" className="py-24 px-6 md:px-12 bg-sand-900 text-sand-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-6">
+      <section id="galeria" className="py-24 px-6 md:px-12 bg-white relative overflow-hidden">
+        {/* Decorative element */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-ocean-50 rounded-full blur-3xl opacity-50 -mr-32 -mt-32" />
+        
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
             <div className="max-w-2xl">
-              <span className="text-ocean-400 uppercase tracking-widest text-sm font-semibold mb-4 block">Galeria</span>
-              <h2 className="text-4xl md:text-5xl font-serif mb-4">
-                Um vislumbre do <span className="italic text-sand-300">paraíso</span>
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                <div className="w-10 h-10 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] rounded-xl flex items-center justify-center text-white shadow-lg">
+                  <Instagram className="w-6 h-6" />
+                </div>
+                <span className="text-sand-600 uppercase tracking-[0.2em] text-sm font-bold">@capitaesdaareiamorere</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sand-900 leading-tight">
+                Momentos que <br />
+                <span className="italic text-ocean-600">contam histórias</span>
               </h2>
             </div>
             <a 
-              href="https://instagram.com/capitaesdaareiamorere/" 
+              href={`https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`} 
               target="_blank" 
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sand-300 hover:text-white transition-colors pb-2 border-b border-sand-300/30 hover:border-white"
+              className="group flex items-center gap-3 px-8 py-4 bg-sand-900 text-white rounded-full hover:bg-ocean-600 transition-all shadow-xl hover:shadow-ocean-200 hover:-translate-y-1"
             >
-              <Instagram className="w-5 h-5" />
-              <span>Siga no Instagram</span>
+              <Instagram className="w-5 h-5 transition-transform group-hover:scale-110" />
+              <span className="font-medium">Seguir no Instagram</span>
             </a>
           </div>
 
@@ -505,13 +513,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             {/* Carousel Controls */}
             <button 
               onClick={() => scrollGallery('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-900 border border-sand-700 shadow-lg rounded-full p-3 text-sand-300 hover:text-white hover:bg-sand-800 transition-colors hidden md:block"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-white border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button 
               onClick={() => scrollGallery('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-900 border border-sand-700 shadow-lg rounded-full p-3 text-sand-300 hover:text-white hover:bg-sand-800 transition-colors hidden md:block"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-white border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -519,20 +527,26 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             {/* Carousel Container */}
             <div 
               ref={galleryRef}
-              className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory hide-scrollbar"
+              className="flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar group/carousel"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
               {gallery.map((img, index) => (
                 <div 
                   key={index}
-                  className="min-w-[70vw] md:min-w-[400px] snap-center rounded-3xl overflow-hidden aspect-[4/5] bg-sand-100 shadow-sm"
+                  className="min-w-[80vw] md:min-w-[450px] snap-center rounded-[2rem] overflow-hidden aspect-[4/5] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
                 >
                   <LazyImage 
                     src={img} 
                     alt={`Galeria ${index + 1}`} 
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                     referrerPolicy="no-referrer"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                    <div className="text-white">
+                      <Instagram className="w-6 h-6 mb-2" />
+                      <p className="text-sm font-medium tracking-wide">@capitaesdaareiamorere</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>

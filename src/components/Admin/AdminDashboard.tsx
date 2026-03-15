@@ -126,7 +126,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                       onClick={() => setActiveTab(tab)}
                       className={`text-sm font-medium px-4 py-2 rounded-xl transition-all ${activeTab === tab ? 'bg-ocean-600 text-white shadow-md' : 'text-sand-600 hover:bg-sand-200'}`}
                     >
-                      {tab === 'tours' ? 'Passeios' : tab === 'gallery' ? 'Fotos' : 'Links e Contato'}
+                      {tab === 'tours' ? 'Passeios' : tab === 'gallery' ? 'Galeria / Instagram' : 'Links e Contato'}
                     </button>
                   ))}
                 </nav>

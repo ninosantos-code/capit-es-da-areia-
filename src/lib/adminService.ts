@@ -90,11 +90,13 @@ export const adminService = {
     const q = query(collection(db, 'gallery'));
     const snapshot = await getDocs(q);
     if (snapshot.empty) return [
-      'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
-      'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-      'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
-      'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
-      'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg'
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650098100_18059250272426181_2033458607713035493_n.jpg',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650837703_18059552462426181_6081456137423034486_n.webp',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/649555508_18059552474426181_1904247928205305178_n.webp',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651889840_18059251376426181_4552180899044557139_n.jpg',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/650765726_18059249600426181_7400181766281724016_n.jpg',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651541813_18059552450426181_5374245162380237564_n.webp',
+      'https://instagram.fval2-1.fna.fbcdn.net/v/t51.82787-15/651492047_18059552498426181_2297765212161143916_n.webp'
     ];
     return snapshot.docs.map(doc => doc.data().url);
   },
