@@ -5,17 +5,18 @@ type LazyImageProps = {
   alt: string;
   className?: string;
   eager?: boolean;
+  priority?: boolean;
   referrerPolicy?: React.HTMLAttributeReferrerPolicy;
 };
 
-export default function LazyImage({ src, alt, className = '', eager = false, referrerPolicy }: LazyImageProps) {
+export default function LazyImage({ src, alt, className = '', eager = false, priority = false, referrerPolicy }: LazyImageProps) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const [isInView, setIsInView] = useState(eager);
+  const [isInView, setIsInView] = useState(eager || priority);
   const [hasError, setHasError] = useState(false);
   const imgRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (eager || !imgRef.current) return;
+    if (priority || eager || !imgRef.current) return;
 
     const observer = new IntersectionObserver(
       ([entry]) => {

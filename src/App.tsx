@@ -126,6 +126,11 @@ export default function App() {
         const instaFeed = await adminService.getInstagramFeed(beholdUrl);
         if (instaFeed.length > 0) {
           setGallery(instaFeed);
+          // Prefetch Instagram images
+          instaFeed.slice(0, 6).forEach(item => {
+            const img = new Image();
+            img.src = item.url;
+          });
         } else {
           setGallery(fetchedGallery);
         }
@@ -322,11 +327,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <LazyImage 
-            src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
+            src="https://images.unsplash.com/photo-1590523741831-ab7e8b8f9c7f?q=80&w=2070&auto=format&fit=crop" 
             alt="Praia de Moreré" 
             className="w-full h-full"
             referrerPolicy="no-referrer"
-            eager
+            priority={true}
           />
           <div className="absolute inset-0 bg-black/40" />
           <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-transparent to-transparent" />
@@ -479,6 +484,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       alt={tour.title} 
                       className="w-full h-full group-hover:scale-105 transition-transform duration-700"
                       referrerPolicy="no-referrer"
+                      priority={index < 2}
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
                       {getIcon(tour.iconType)}
