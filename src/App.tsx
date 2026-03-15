@@ -1,73 +1,58 @@
-import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { motion } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X } from 'lucide-react';
-import { logEvent } from 'firebase/analytics';
-import { analytics } from './lib/firebase';
-import LazyImage from './components/LazyImage';
-import ConnectionStatus from './components/ConnectionStatus';
+import AdminDashboard from './components/Admin/AdminDashboard';
+import { adminService, Tour } from './lib/adminService';
 
-const TOURS = [
+const INITIAL_TOURS: Tour[] = [
   {
-    id: 1,
     title: 'Piscinas Naturais de Moreré',
     description: 'Mergulhe em águas cristalinas e nade com peixes coloridos no cartão postal da Ilha de Boipeba. Um passeio imperdível na maré baixa.',
     duration: '2-3 horas',
     price: 'A partir de R$ 100',
     image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
-    icon: <Sun className="w-6 h-6 text-ocean-600" />
+    iconType: 'sun'
   },
   {
-    id: 2,
     title: 'Volta à Ilha de Lancha',
     description: 'Conheça as praias de Bainema, Ponta dos Castelhanos, Cova da Onça e navegue pelo Rio do Inferno com paradas para banho e almoço.',
     duration: 'Dia inteiro (9h às 16h)',
     price: 'A partir de R$ 250',
     image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-    icon: <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />
+    iconType: 'logo'
   },
   {
-    id: 3,
     title: 'Passeio de Canoa no Mangue',
     description: 'Uma experiência contemplativa pelos túneis do manguezal. Silêncio, natureza intocada e um pôr do sol inesquecível nas águas calmas.',
     duration: '2 horas',
     price: 'A partir de R$ 80',
     image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
-    icon: <Camera className="w-6 h-6 text-ocean-600" />
+    iconType: 'camera'
   },
   {
-    id: 4,
     title: 'Bioluminescência de Caiaque',
     description: 'Uma experiência mágica noturna. Reme pelas águas escuras e veja o mar brilhar a cada movimento com o fenômeno da bioluminescência.',
     duration: '1.5 horas (Noturno)',
     price: 'A partir de R$ 120',
     image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
-    icon: <Star className="w-6 h-6 text-ocean-600" />
+    iconType: 'star'
   },
   {
-    id: 5,
     title: 'Vivência Nativa: Pesca e Preparo',
     description: 'Sinta-se um verdadeiro morador da ilha. Participe da pesca artesanal com os nativos e aprenda a preparar o seu próprio peixe fresco à moda baiana.',
     duration: 'Um dia inteiro',
     price: 'Valor a combinar',
     image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
-    icon: <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />
+    iconType: 'logo'
   }
 ];
 
-const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
-
-
-
 export default function App() {
+  const [tours, setTours] = useState<Tour[]>([]);
+  const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
   const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
-
-
-
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
   const [reservationForm, setReservationForm] = useState({
     nome: '',
@@ -84,6 +69,33 @@ export default function App() {
     observacoes: ''
   });
   const [aceitaTermos, setAceitaTermos] = useState(false);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const fetchedTours = await adminService.getTours();
+        if (fetchedTours.length === 0) {
+          // Fallback + Seed Initial Data (only for dev/first run)
+          setTours(INITIAL_TOURS);
+          console.log("Empty DB, showing initial tours.");
+        } else {
+          setTours(fetchedTours);
+        }
+      } catch (err) {
+        setTours(INITIAL_TOURS);
+      }
+    };
+    loadData();
+  }, [isAdminOpen]); // Refresh data when closing admin
+
+  const getIcon = (type: string) => {
+    switch(type) {
+      case 'sun': return <Sun className="w-6 h-6 text-ocean-600" />;
+      case 'camera': return <Camera className="w-6 h-6 text-ocean-600" />;
+      case 'star': return <Star className="w-6 h-6 text-ocean-600" />;
+      default: return <img src="/images/logo-novo.png" alt="Logo" className="w-6 h-6 object-contain" />;
+    }
+  };
 
   const openReservationModal = (tourTitle = 'Ainda não decidi') => {
     setReservationForm(prev => ({ ...prev, passeioDesejado: tourTitle }));
@@ -403,9 +415,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {TOURS.map((tour, index) => (
+              {tours.map((tour, index) => (
                 <motion.div 
-                  key={tour.id}
+                  key={tour.id || index}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
@@ -420,7 +432,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       referrerPolicy="no-referrer"
                     />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
-                      {tour.icon}
+                      {getIcon(tour.iconType)}
                     </div>
                   </div>
                   <div className="p-8 flex flex-col flex-grow">
@@ -683,8 +695,16 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light space-y-2">
           <p>&copy; {new Date().getFullYear()} Capitães da Areia. Todos os direitos reservados.</p>
           <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
+          <button 
+            onClick={() => setIsAdminOpen(true)}
+            className="text-[10px] text-sand-700 uppercase tracking-widest hover:text-ocean-500 transition-colors mt-4"
+          >
+            Acesso Restrito
+          </button>
         </div>
       </footer>
+
+      <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
 
 
 
@@ -776,8 +796,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                     className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 bg-sand-50"
                   >
                     <option value="Ainda não decidi">Ainda não decidi</option>
-                    {TOURS.map(t => (
-                      <option key={t.id} value={t.title}>{t.title}</option>
+                    {tours.map((t, idx) => (
+                      <option key={t.id || idx} value={t.title}>{t.title}</option>
                     ))}
                   </select>
                 </div>
