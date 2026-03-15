@@ -53,6 +53,30 @@ const INITIAL_TOURS: Tour[] = [
   }
 ];
 
+function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (isActive && videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    } else if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+  }, [isActive]);
+
+  return (
+    <video
+      ref={videoRef}
+      src={src}
+      muted
+      loop
+      playsInline
+      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 z-10 ${isActive ? 'opacity-100' : 'opacity-0'}`}
+    />
+  );
+}
+
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
@@ -65,6 +89,7 @@ export default function App() {
   const carouselRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
+  const [hoveredVideoId, setHoveredVideoId] = useState<string | null>(null);
   const [reservationForm, setReservationForm] = useState({
     nome: '',
     idade: '',
@@ -545,6 +570,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   href={item.permalink || `https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onMouseEnter={() => item.mediaType === 'VIDEO' && setHoveredVideoId(item.id)}
+                  onMouseLeave={() => setHoveredVideoId(null)}
                   className="min-w-[80vw] md:min-w-[450px] snap-center rounded-[2rem] overflow-hidden aspect-[4/5] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
                 >
                   <LazyImage 
@@ -554,14 +581,22 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                     referrerPolicy="no-referrer"
                   />
                   
+                  {/* Video Preview on Hover */}
+                  {(item as any).mediaType === 'VIDEO' && (item as any).mediaUrl && (
+                    <VideoPreview 
+                      src={(item as any).mediaUrl} 
+                      isActive={hoveredVideoId === item.id} 
+                    />
+                  )}
+                  
                   {/* Video Indicator */}
                   {item.mediaType === 'VIDEO' && (
-                    <div className="absolute top-6 right-6 w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20">
+                    <div className="absolute top-6 right-6 w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 z-20">
                       <Play className="w-6 h-6 fill-current" />
                     </div>
                   )}
 
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8">
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8 z-30">
                     <div className="text-white w-full">
                       <div className="flex items-center gap-2 mb-2">
                         <Instagram className="w-5 h-5" />
