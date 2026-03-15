@@ -706,7 +706,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
           <button 
             onClick={() => setIsAdminOpen(true)}
-            className="text-[10px] text-sand-700 uppercase tracking-widest hover:text-ocean-500 transition-colors mt-4"
+            className="text-[10px] text-sand-300 uppercase tracking-widest hover:text-ocean-400 transition-colors mt-8 opacity-50 hover:opacity-100"
           >
             Acesso Restrito
           </button>
