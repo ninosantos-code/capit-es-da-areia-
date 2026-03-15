@@ -654,14 +654,10 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               {t('about.p2')}
             </p>
             
-            <div className="grid grid-cols-2 gap-8">
+            <div className="flex gap-8">
               <div>
                 <h4 className="text-3xl font-serif text-ocean-600 mb-2">10+</h4>
                 <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.exp_label')}</p>
-              </div>
-              <div>
-                <h4 className="text-3xl font-serif text-ocean-600 mb-2">5k+</h4>
-                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.clients_label')}</p>
               </div>
             </div>
           </motion.div>
