@@ -55,6 +55,8 @@ const INITIAL_TOURS: Tour[] = [
 
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
+  const [gallery, setGallery] = useState<string[]>([]);
+  const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -82,14 +84,17 @@ export default function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const fetchedTours = await adminService.getTours();
-        if (fetchedTours.length === 0) {
-          // Fallback + Seed Initial Data (only for dev/first run)
-          setTours(INITIAL_TOURS);
-          console.log("Empty DB, showing initial tours.");
-        } else {
-          setTours(fetchedTours);
-        }
+        const [fetchedTours, fetchedGallery, fetchedSettings] = await Promise.all([
+          adminService.getTours(),
+          adminService.getGallery(),
+          adminService.getSettings()
+        ]);
+        
+        if (fetchedTours.length === 0) setTours(INITIAL_TOURS);
+        else setTours(fetchedTours);
+        
+        setGallery(fetchedGallery);
+        setSettings(fetchedSettings);
       } catch (err) {
         setTours(INITIAL_TOURS);
       }
@@ -152,7 +157,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 *✅ Aceitou o Termo de Isenção de Responsabilidade.*`;
 
     const encodedMessage = encodeURIComponent(message);
-    window.open(`https://wa.me/557599211235?text=${encodedMessage}`, '_blank');
+    const waLink = settings?.contact?.whatsapp1Link || '557599211235';
+    window.open(`https://wa.me/${waLink}?text=${encodedMessage}`, '_blank');
     
     if (analytics) {
       logEvent(analytics, 'send_whatsapp_reservation', {
@@ -516,16 +522,17 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="flex overflow-x-auto gap-4 pb-8 snap-x snap-mandatory hide-scrollbar"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {[
-                { src: "https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg", alt: "Galeria 1" },
-                { src: "https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg", alt: "Galeria 2" },
-                { src: "https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg", alt: "Galeria 3" },
-                { src: "https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg", alt: "Galeria 4" },
-                { src: "https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg", alt: "Galeria 5" },
-                { src: "https://i.postimg.cc/xTtTty0X/ninodrip.jpg", alt: "Galeria 6" }
-              ].map((img, idx) => (
-                <div key={idx} className="min-w-[85vw] md:min-w-[350px] lg:min-w-[300px] snap-center shrink-0">
-                  <LazyImage src={img.src} alt={img.alt} className="w-full h-64 md:h-80 rounded-2xl shadow-xl border border-sand-800/50" referrerPolicy="no-referrer" />
+              {gallery.map((img, index) => (
+                <div 
+                  key={index}
+                  className="min-w-[70vw] md:min-w-[400px] snap-center rounded-3xl overflow-hidden aspect-[4/5] bg-sand-100 shadow-sm"
+                >
+                  <LazyImage 
+                    src={img} 
+                    alt={`Galeria ${index + 1}`} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
               ))}
             </div>
@@ -656,13 +663,10 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <p className="text-xl text-ocean-100 font-light mb-10">
             Entre em contato agora mesmo e garanta sua vaga nos melhores passeios de Moreré.
           </p>
-          <button 
-            onClick={() => openReservationModal()}
-            className="inline-flex items-center gap-3 px-8 py-4 bg-white text-ocean-700 rounded-full font-medium text-lg hover:bg-sand-50 transition-colors shadow-lg hover:shadow-xl"
-          >
-            <MessageCircle className="w-6 h-6" />
-            Falar com a equipe
-          </button>
+          <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '557599211235'}`} className="inline-flex items-center gap-2 px-6 py-2.5 bg-ocean-600 text-white rounded-full font-medium hover:bg-ocean-700 transition-colors shadow-lg">
+            <MessageCircle className="w-5 h-5" />
+            Reservar
+          </a>
         </div>
       </section>
 
@@ -683,21 +687,20 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           
           <div className="flex flex-col gap-2 md:items-center">
             <h4 className="text-white font-medium uppercase tracking-widest text-sm mb-2">Contato</h4>
-            <a href="https://wa.me/557599211235" className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> (75) 9921-1235
+            <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '557599211235'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp1 || '(75) 9921-1235'}
             </a>
-            <a href="https://wa.me/5521988643166" className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <MessageCircle className="w-4 h-4" /> (21) 98864-3166
+            <a href={`https://wa.me/${settings?.contact?.whatsapp2Link || '5521988643166'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <MessageCircle className="w-4 h-4" /> {settings?.contact?.whatsapp2 || '(21) 98864-3166'}
             </a>
-            <a href="https://instagram.com/capitaesdaareiamorere" className="hover:text-white transition-colors font-light flex items-center gap-2">
-              <Instagram className="w-4 h-4" /> @capitaesdaareia
+            <a href={`https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}`} className="hover:text-white transition-colors font-light flex items-center gap-2">
+              <Instagram className="w-4 h-4" /> {settings?.contact?.instagram || '@capitaesdaareia'}
             </a>
           </div>
           
           <div className="md:text-right">
-            <p className="font-light text-sm">
-              Praia de Moreré, s/n<br />
-              Ilha de Boipeba, Cairu - BA
+            <p className="font-light text-sm whitespace-pre-wrap">
+              {settings?.contact?.address || 'Praia de Moreré, s/n\nIlha de Boipeba, Cairu - BA'}
             </p>
           </div>
         </div>
