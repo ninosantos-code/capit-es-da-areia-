@@ -93,8 +93,19 @@ export default function App() {
         if (fetchedTours.length === 0) setTours(INITIAL_TOURS);
         else setTours(fetchedTours);
         
-        setGallery(fetchedGallery);
         setSettings(fetchedSettings);
+
+        // If Behold is configured, fetch dynamic feed
+        if (fetchedSettings?.instagram?.beholdUrl) {
+          const instaFeed = await adminService.getInstagramFeed(fetchedSettings.instagram.beholdUrl);
+          if (instaFeed.length > 0) {
+            setGallery(instaFeed);
+          } else {
+            setGallery(fetchedGallery);
+          }
+        } else {
+          setGallery(fetchedGallery);
+        }
       } catch (err) {
         setTours(INITIAL_TOURS);
       }

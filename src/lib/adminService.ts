@@ -110,6 +110,25 @@ export const adminService = {
     await deleteDoc(docRef);
   },
 
+  // Instagram Feed (Behold.so)
+  async getInstagramFeed(beholdUrl: string): Promise<{id: string, url: string}[]> {
+    if (!beholdUrl) return [];
+    try {
+      const response = await fetch(beholdUrl);
+      const data = await response.json();
+      // Behold returns an array of media objects
+      return data.map((item: any) => ({
+        id: item.id,
+        url: item.mediaUrl || item.thumbnailUrl || item.permalink,
+        mediaType: item.mediaType, // IMAGE, VIDEO, CAROUSEL_ALBUM
+        permalink: item.permalink
+      }));
+    } catch (err) {
+      console.error('Erro ao buscar feed do Instagram:', err);
+      return [];
+    }
+  },
+
   // Auth (Simple Password for now as requested)
   verifyPassword(password: string): boolean {
     return password === 'Lagosta@7';

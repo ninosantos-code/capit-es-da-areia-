@@ -68,6 +68,12 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       await adminService.updateSettings(section, data);
       const updatedSettings = await adminService.getSettings();
       setSettings(updatedSettings);
+      
+      // If we update instagram settings, refresh the gallery feed
+      if (section === 'instagram' && data.beholdUrl) {
+        const instaFeed = await adminService.getInstagramFeed(data.beholdUrl);
+        if (instaFeed.length > 0) setGallery(instaFeed);
+      }
     } catch (err) {
       alert('Erro ao atualizar configurações');
     }
@@ -303,6 +309,20 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                           onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, instagramLink: e.target.value })}
                           className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
                         />
+                      </div>
+                      
+                      <div className="pt-4 space-y-2">
+                        <label className="text-[10px] uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático (Behold.so)</label>
+                        <input 
+                          type="text"
+                          placeholder="Link da API do Behold (ex: https://feeds.behold.so/...)"
+                          defaultValue={settings?.instagram?.beholdUrl}
+                          onBlur={(e) => handleUpdateSettings('instagram', { beholdUrl: e.target.value })}
+                          className="w-full px-4 py-3 rounded-xl bg-ocean-50 border border-ocean-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm"
+                        />
+                        <p className="text-[10px] text-sand-500 italic">
+                          Cole aqui o link gerado no Behold.so para que o site puxe as fotos e vídeos automaticamente.
+                        </p>
                       </div>
                     </div>
                   </div>
