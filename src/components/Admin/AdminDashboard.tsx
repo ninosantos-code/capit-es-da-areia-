@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type, Anchor, Home } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type, Anchor, Home, RefreshCcw, Database } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
   isOpen: boolean;
   onClose: () => void;
+  onDataUpdate?: () => void;
 }
 
-export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps) {
+export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminDashboardProps) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -60,6 +61,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       await adminService.updateTour(id, data);
       const updatedTours = await adminService.getTours();
       setTours(updatedTours);
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao atualizar passeio');
     }
@@ -82,6 +84,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       
       const updatedTours = await adminService.getTours();
       setTours(updatedTours);
+      if (onDataUpdate) onDataUpdate();
       alert('Passeio criado com sucesso! Ele aparecerá no topo da lista para edição.');
     } catch (err) {
       console.error('Erro detalhado ao adicionar passeio:', err);
@@ -98,6 +101,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       await adminService.deleteTour(id);
       const updatedTours = await adminService.getTours();
       setTours(updatedTours);
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao excluir passeio');
     } finally {
@@ -116,6 +120,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
         const instaFeed = await adminService.getInstagramFeed(data.beholdUrl);
         if (instaFeed.length > 0) setGallery(instaFeed);
       }
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao atualizar configurações');
     }
@@ -129,6 +134,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       setNewImageUrl('');
       const updatedGallery = await adminService.getGallery();
       setGallery(updatedGallery);
+      if (onDataUpdate) onDataUpdate();
       alert('Foto adicionada com sucesso!');
     } catch (err) {
       alert('Erro ao adicionar à galeria');
@@ -153,6 +159,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       await adminService.removeFromGallery(id);
       const updatedGallery = await adminService.getGallery();
       setGallery(updatedGallery);
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao remover foto');
     } finally {
@@ -170,6 +177,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       console.log('Depoimento aprovado com sucesso no Firebase');
       const updated = await adminService.getTestimonials();
       setTestimonials(updated);
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       console.error('Erro ao aprovar depoimento:', err);
       alert('Erro ao aprovar depoimento: ' + (err instanceof Error ? err.message : String(err)));
@@ -188,6 +196,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       console.log('Depoimento removido com sucesso no Firebase');
       const updated = await adminService.getTestimonials();
       setTestimonials(updated);
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       console.error('Erro ao remover depoimento:', err);
       alert('Erro ao remover depoimento: ' + (err instanceof Error ? err.message : String(err)));
@@ -199,6 +208,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       const updatedLangData = { ...translations[lang], [key]: value };
       await adminService.updateTranslation(lang, updatedLangData);
       setTranslations({ ...translations, [lang]: updatedLangData });
+      if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao atualizar tradução');
     }
@@ -273,6 +283,23 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                 </nav>
               </div>
               <div className="flex items-center gap-2">
+                <div className="flex bg-sand-200 p-1 rounded-xl mr-2">
+                  <button 
+                    onClick={fetchInitialData}
+                    disabled={loading}
+                    className="p-2 text-sand-600 hover:text-ocean-600 hover:bg-white rounded-lg transition-all disabled:opacity-50"
+                    title="Recarregar dados do banco"
+                  >
+                    <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                  </button>
+                  <button 
+                    onClick={handleSeedDatabase}
+                    className="p-2 text-sand-600 hover:text-ocean-600 hover:bg-white rounded-lg transition-all"
+                    title="Sincronizar base (Seed)"
+                  >
+                    <Database className="w-4 h-4" />
+                  </button>
+                </div>
                 <button onClick={() => setIsAuthenticated(false)} className="p-2 text-sand-400 hover:text-red-500 transition-colors" title="Sair">
                   <LogOut className="w-5 h-5" />
                 </button>

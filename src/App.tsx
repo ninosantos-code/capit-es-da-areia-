@@ -211,57 +211,75 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  useEffect(() => {
-    const loadData = async () => {
-      setIsLoadingData(true);
-      try {
-        const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = await Promise.all([
-          adminService.getTours(),
-          adminService.getGallery(),
-          adminService.getSettings(),
-          adminService.getTestimonials(),
-          adminService.getTranslations()
-        ]);
-        
-        setTours(fetchedTours);
-        setDynamicTranslations(fetchedTranslations);
-        
-        setSettings(fetchedSettings);
-        setTestimonials(fetchedTestimonials.filter(t => t.approved));
+  const loadData = async (showLoading = true) => {
+    if (showLoading) setIsLoadingData(true);
+    try {
+      const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = await Promise.all([
+        adminService.getTours(),
+        adminService.getGallery(),
+        adminService.getSettings(),
+        adminService.getTestimonials(),
+        adminService.getTranslations()
+      ]);
+      
+      setTours(fetchedTours);
+      setDynamicTranslations(fetchedTranslations);
+      setSettings(fetchedSettings);
+      setTestimonials(fetchedTestimonials.filter(t => t.approved));
 
-        // Use provided behold URL as base or fall back to DB
-        const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
-        
-        const instaFeed = await adminService.getInstagramFeed(beholdUrl);
-        
-        // Mesclar as fotos: Fotos do Firestore (manuais) primeiro, depois Instagram
-        // Filtrar fotos padrão se houver fotos no Instagram ou no Firestore
-        const manualPhotos = fetchedGallery.filter(item => item.source === 'firestore');
-        const defaultPhotos = fetchedGallery.filter(item => item.source === 'default');
-        
-        let finalGallery = [...manualPhotos];
-        
-        if (instaFeed.length > 0) {
-          finalGallery = [...finalGallery, ...instaFeed];
-        } else if (manualPhotos.length === 0) {
-          // Se não tem Instagram nem fotos manuais, usa as padrão
-          finalGallery = defaultPhotos;
-        }
-
-        setGallery(finalGallery);
-
-        // Prefetch images
-        finalGallery.slice(0, 8).forEach(item => {
-          const img = new Image();
-          img.src = item.url;
-        });
-      } catch (err) {
-        console.error('Erro ao carregar dados:', err);
-      } finally {
-        setIsLoadingData(false);
+      // Use provided behold URL as base or fall back to DB
+      const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
+      
+      const instaFeed = await adminService.getInstagramFeed(beholdUrl);
+      
+      // Mesclar as fotos: Fotos do Firestore (manuais) primeiro, depois Instagram
+      // Filtrar fotos padrão se houver fotos no Instagram ou no Firestore
+      const manualPhotos = fetchedGallery.filter(item => item.source === 'firestore');
+      const defaultPhotos = fetchedGallery.filter(item => item.source === 'default');
+      
+      let finalGallery = [...manualPhotos];
+      
+      if (instaFeed.length > 0) {
+        finalGallery = [...finalGallery, ...instaFeed];
+      } else if (manualPhotos.length === 0) {
+        // Se não tem Instagram nem fotos manuais, usa as padrão
+        finalGallery = defaultPhotos;
       }
-    };
+
+      setGallery(finalGallery);
+
+      // Prefetch images
+      finalGallery.slice(0, 8).forEach(item => {
+        const img = new Image();
+        img.src = item.url;
+      });
+    } catch (err) {
+      console.error('Erro ao carregar dados:', err);
+    } finally {
+      if (showLoading) setIsLoadingData(false);
+    }
+  };
+
+  useEffect(() => {
     loadData();
+  }, []);
+
+  useEffect(() => {
+    // This useEffect now only handles language changes for dynamic translations
+    // and re-fetches data if isAdminOpen changes (though onDataUpdate handles this better)
+    // The initial load is handled by the empty dependency array useEffect.
+    // We can keep this for language-specific re-renders if needed, or remove if dynamicTranslations update is sufficient.
+    // For now, let's keep it to ensure language changes trigger a re-render of content that relies on `t`
+    // and potentially re-fetch if admin changes something that affects language keys.
+    // However, the instruction implies removing the `isAdminOpen, language` dependency for `loadData`.
+    // The `loadData` function itself now handles the loading state.
+    // The `onDataUpdate` prop on `AdminDashboard` will call `loadData(false)` when admin closes.
+    // Language change will automatically update `t` function output.
+    // So, this useEffect can be simplified or removed if `dynamicTranslations` is enough.
+    // For now, let's remove the `loadData()` call from here as it's handled by the empty dependency array useEffect and onDataUpdate.
+    // The instruction implies removing the old useEffect completely and replacing it with the new structure.
+    // The original `useEffect` with `[isAdminOpen, language]` is replaced by the new `useEffect` with `[]` and `onDataUpdate`.
+    // The `language` dependency is implicitly handled by `t` using `dynamicTranslations`.
   }, [isAdminOpen, language]); // Refresh data when closing admin or changing language
 
   const getIcon = (type: string) => {
@@ -1000,7 +1018,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
       </footer>
 
-      <AdminDashboard isOpen={isAdminOpen} onClose={() => setIsAdminOpen(false)} />
+      <AdminDashboard 
+        isOpen={isAdminOpen} 
+        onClose={() => setIsAdminOpen(false)} 
+        onDataUpdate={() => loadData(false)}
+      />
 
 
 
