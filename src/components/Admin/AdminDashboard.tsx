@@ -142,6 +142,20 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   };
 
 
+  const handleSeedDatabase = async () => {
+    if (!confirm('Deseja inicializar o banco de dados com as informações padrão? Isso não apagará seus dados atuais, apenas preencherá o que estiver vazio.')) return;
+    setLoading(true);
+    try {
+      await adminService.seedDatabase();
+      await fetchInitialData();
+      alert('Banco de dados preenchido com sucesso!');
+    } catch (err) {
+      alert('Erro ao inicializar banco de dados');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -504,6 +518,20 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                     </div>
                     <div className="p-4 bg-ocean-50 rounded-2xl text-xs text-ocean-700 italic font-light">
                       Dica: Alterar os links aqui atualizará automaticamente todos os botões "Reservar" e o rodapé do site.
+                    </div>
+
+                    <div className="pt-8 border-t border-sand-100 flex flex-col gap-4">
+                      <h4 className="text-sm font-serif text-sand-900">Manutenção do Sistema</h4>
+                      <button 
+                        onClick={handleSeedDatabase}
+                        className="w-full py-4 border-2 border-dashed border-sand-200 rounded-2xl text-sand-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-2 font-medium"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                        Inicializar Banco de Dados com Padrões
+                      </button>
+                      <p className="text-[10px] text-sand-400 text-center italic">
+                        Use esta opção se o seu banco de dados estiver vazio para carregar as informações iniciais (Passeios, Fotos e Contatos).
+                      </p>
                     </div>
                   </div>
                 </div>

@@ -10,108 +10,6 @@ import { adminService, Tour } from './lib/adminService';
 
 const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
 
-const INITIAL_TOURS: Record<string, Tour[]> = {
-  pt: [
-    {
-      title: 'Piscinas Naturais de Moreré',
-      description: 'Mergulhe em águas cristalinas e nade com peixes coloridos no cartão postal da Ilha de Boipeba. Um passeio imperdível na maré baixa.',
-      duration: '2-3 horas',
-      price: 'A partir de R$ 100',
-      image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
-      iconType: 'sun'
-    },
-    {
-      title: 'Volta à Ilha de Lancha',
-      description: 'Conheça as praias de Bainema, Ponta dos Castelhanos, Cova da Onça e navegue pelo Rio do Inferno com paradas para banho e almoço.',
-      duration: 'Dia inteiro (9h às 16h)',
-      price: 'A partir de R$ 250',
-      image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-      iconType: 'logo'
-    },
-    {
-      title: 'Passeio de Canoa no Mangue',
-      description: 'Uma experiência contemplativa pelos túneis do manguezal. Silêncio, natureza intocada e um pôr do sol inesquecível nas águas calmas.',
-      duration: '2 horas',
-      price: 'A partir de R$ 80',
-      image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
-      iconType: 'camera'
-    },
-    {
-      title: 'Bioluminescência de Caiaque',
-      description: 'Uma experiência mágica noturna. Reme pelas águas escuras e veja o mar brilhar a cada movimento com o fenômeno da bioluminescência.',
-      duration: '1.5 horas (Noturno)',
-      price: 'A partir de R$ 120',
-      image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
-      iconType: 'star'
-    },
-    {
-      title: 'Vivência Nativa: Pesca e Preparo',
-      description: 'Sinta-se um verdadeiro morador da ilha. Participe da pesca artesanal com os nativos e aprenda a preparar o seu próprio peixe fresco à moda baiana.',
-      duration: 'Um dia inteiro',
-      price: 'Valor a combinar',
-      image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
-      iconType: 'logo'
-    },
-    {
-      title: 'Hospedagem Pé na Areia',
-      description: 'Aproveite a melhor localização de Moreré. Nossa hospedagem oferece o privilégio de acordar com o pé na areia e o som das ondas.',
-      duration: 'Diárias a combinar',
-      price: 'Consulte disponibilidade',
-      image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
-      iconType: 'house'
-    }
-  ],
-  en: [
-    {
-      title: 'Moreré Natural Pools',
-      description: 'Dive into crystal clear waters and swim with colorful fish in Boipeba Island\'s postcard boat tour. An unmissable trip at low tide.',
-      duration: '2-3 hours',
-      price: 'From R$ 100',
-      image: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg',
-      iconType: 'sun'
-    },
-    {
-      title: 'Full Island Speedboat Tour',
-      description: 'Discover the beaches of Bainema, Ponta dos Castelhanos, Cova da Onça and navigate the Inferno River with stops for bathing and lunch.',
-      duration: 'Full Day (9am to 4pm)',
-      price: 'From R$ 250',
-      image: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg',
-      iconType: 'logo'
-    },
-    {
-      title: 'Canoe Trip in the Mangrove',
-      description: 'A contemplative experience through the mangrove tunnels. Silence, untouched nature and an unforgettable sunset in the calm waters.',
-      duration: '2 hours',
-      price: 'From R$ 80',
-      image: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg',
-      iconType: 'camera'
-    },
-    {
-      title: 'Kayak Bioluminescence',
-      description: 'A magical nocturnal experience. Row through dark waters and see the sea shine with every movement with the phenomenon of bioluminescence.',
-      duration: '1.5 hours (Night)',
-      price: 'From R$ 120',
-      image: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg',
-      iconType: 'star'
-    },
-    {
-      title: 'Native Experience: Fishing',
-      description: 'Feel like a true island resident. Participate in artisanal fishing with the locals and learn how to prepare your own fresh fish Bahian style.',
-      duration: 'Full Day',
-      price: 'Price to be discussed',
-      image: 'https://i.postimg.cc/mZHqgbcN/diogoemumu.jpg',
-      iconType: 'logo'
-    },
-    {
-      title: 'Beachfront Accommodation',
-      description: 'Enjoy the best location in Moreré. Our accommodation offers the privilege of waking up with your feet in the sand and the sound of the waves.',
-      duration: 'Daily rates on request',
-      price: 'Check availability',
-      image: 'https://images.unsplash.com/photo-1540541338287-41700207dee6?q=80&w=2070&auto=format&fit=crop',
-      iconType: 'house'
-    }
-  ]
-};
 
 const TRANSLATIONS: Record<string, Record<string, string>> = {
   pt: {
@@ -307,8 +205,7 @@ export default function App() {
           adminService.getTestimonials()
         ]);
         
-        if (fetchedTours.length === 0) setTours(INITIAL_TOURS[language]);
-        else setTours(fetchedTours);
+        setTours(fetchedTours);
         
         setSettings(fetchedSettings);
         setTestimonials(fetchedTestimonials.filter(t => t.approved));
@@ -340,7 +237,7 @@ export default function App() {
           img.src = item.url;
         });
       } catch (err) {
-        setTours(INITIAL_TOURS[language]);
+        console.error('Erro ao carregar dados:', err);
       }
     };
     loadData();
