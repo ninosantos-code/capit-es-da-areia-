@@ -252,7 +252,10 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
             {/* Header */}
             <div className="p-6 border-b border-sand-100 flex justify-between items-center bg-sand-50">
               <div className="flex items-center gap-6">
-                <h2 className="text-2xl font-serif text-sand-900">Painel de Controle</h2>
+                <h2 className="text-2xl font-serif text-sand-900 flex items-center gap-2">
+                  Painel de Controle
+                  <span className="text-[10px] bg-ocean-100 text-ocean-600 px-2 py-0.5 rounded-full font-sans uppercase font-bold tracking-tighter">v2.1</span>
+                </h2>
                 <nav className="flex gap-2">
                   {(['tours', 'gallery', 'testimonials', 'settings', 'translations'] as const).map((tab) => (
                     <button 
