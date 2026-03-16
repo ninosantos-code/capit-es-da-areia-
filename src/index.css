@@ -29,6 +29,24 @@ body {
   font-family: var(--font-sans);
   background-color: var(--color-sand-50);
   color: var(--color-sand-900);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.dark body {
+  background-color: #050A0F;
+  color: #F8F9FA;
+}
+
+.dark {
+  --color-sand-50: #050A0F;
+  --color-sand-100: #0A141D;
+  --color-sand-200: #15202B;
+  --color-sand-300: #1E2732;
+  --color-sand-800: #E1E8ED;
+  --color-sand-900: #F8F9FA;
+  
+  --color-ocean-600: #4DD0E1;
+  --color-ocean-700: #80DEEA;
 }
 
 h1, h2, h3, h4, h5, h6, .font-serif {
@@ -50,6 +68,16 @@ h1, h2, h3, h4, h5, h6, .font-serif {
   );
   background-size: 200% 100%;
   animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.dark .shimmer {
+  background: linear-gradient(
+    90deg,
+    #1E2732 25%,
+    #253341 50%,
+    #1E2732 75%
+  );
+  background-size: 200% 100%;
 }
 
 /* Connection Status Banner */

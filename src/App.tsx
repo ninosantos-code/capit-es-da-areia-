@@ -1,12 +1,13 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
-import { motion } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
 import ConnectionStatus from './components/ConnectionStatus';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import { adminService, Tour } from './lib/adminService';
+import { TourSkeleton, GallerySkeleton, TestimonialSkeleton } from './components/Skeletons';
 
 const TESTIMONIALS: { name: string; text: string; rating: number }[] = [];
 
@@ -168,6 +169,11 @@ export default function App() {
   const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('theme');
+    return (saved as 'light' | 'dark') || 'light';
+  });
+  const [isLoadingData, setIsLoadingData] = useState(true);
   
   const t = (key: string) => TRANSLATIONS[language][key] || key;
   
@@ -197,7 +203,13 @@ export default function App() {
   const [aceitaTermos, setAceitaTermos] = useState(false);
 
   useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  useEffect(() => {
     const loadData = async () => {
+      setIsLoadingData(true);
       try {
         const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials] = await Promise.all([
           adminService.getTours(),
@@ -239,6 +251,8 @@ export default function App() {
         });
       } catch (err) {
         console.error('Erro ao carregar dados:', err);
+      } finally {
+        setIsLoadingData(false);
       }
     };
     loadData();
@@ -440,6 +454,14 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </div>
 
             <button 
+              onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
+              className={`p-2 rounded-full transition-all ${isScrolled ? 'hover:bg-sand-100 text-sand-900' : 'hover:bg-white/10 text-white'}`}
+              title={theme === 'light' ? 'Ativar Modo Escuro' : 'Ativar Modo Claro'}
+            >
+              {theme === 'light' ? <Moon className="w-5 h-5" /> : <Sun className="w-5 h-5" />}
+            </button>
+
+            <button 
               onClick={() => openReservationModal()}
               className={`px-5 py-2.5 rounded-full flex items-center gap-2 transition-all ${isScrolled ? 'bg-ocean-600 text-white hover:bg-ocean-700' : 'bg-white text-sand-900 hover:bg-sand-50'}`}
             >
@@ -623,7 +645,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {tours.map((tour, index) => (
+              {isLoadingData ? (
+                // Tours Skeleton
+                [...Array(3)].map((_, i) => <TourSkeleton key={i} />)
+              ) : (
+                tours.map((tour, index) => (
                 <motion.div 
                   key={tour.id || index}
                   initial={{ opacity: 0, y: 30 }}
@@ -658,7 +684,6 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                         <span className="text-sand-900 font-medium">{tour.price}</span>
                       </div>
                     </div>
-                    
                     <button 
                       onClick={() => openReservationModal(tour.title)}
                       className="w-full py-3.5 rounded-xl border border-ocean-600 text-ocean-600 font-medium text-center hover:bg-ocean-600 hover:text-white transition-colors flex items-center justify-center gap-2"
@@ -668,7 +693,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                     </button>
                   </div>
                 </motion.div>
-              ))}
+              ))
+              )}
             </div>
           </div>
         </div>
@@ -724,7 +750,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               className="flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar group/carousel"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-              {gallery.map((item, index) => (
+              {isLoadingData ? (
+                // Gallery Skeleton
+                [...Array(4)].map((_, i) => <GallerySkeleton key={i} />)
+              ) : (
+                gallery.map((item, index) => (
                 <a 
                   key={item.id || index}
                   href={item.permalink || `https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`}
@@ -755,7 +785,6 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       <Play className="w-6 h-6 fill-current" />
                     </div>
                   )}
-
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8 z-30">
                     <div className="text-white w-full">
                       <div className="flex items-center gap-2 mb-2">
@@ -770,7 +799,8 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                     </div>
                   </div>
                 </a>
-              ))}
+              ))
+              )}
             </div>
           </div>
         </div>
@@ -785,7 +815,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </h2>
           </div>
 
-          {testimonials.length > 0 ? (
+          {isLoadingData ? (
+            <div className="grid md:grid-cols-3 gap-8 mb-20">
+              {[...Array(3)].map((_, i) => <TestimonialSkeleton key={i} />)}
+            </div>
+          ) : testimonials.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8 mb-20">
               {testimonials.map((testimonial, idx) => (
                 <motion.div 
