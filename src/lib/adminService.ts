@@ -28,6 +28,7 @@ export interface Testimonial {
   text: string;
   rating: number;
   approved: boolean;
+  createdAt?: any;
 }
 
 export const adminService = {

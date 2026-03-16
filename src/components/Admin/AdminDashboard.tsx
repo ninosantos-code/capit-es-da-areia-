@@ -121,23 +121,37 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
     }
   };
   const handleApproveTestimonial = async (id: string) => {
+    console.log('Tentando aprovar depoimento:', id);
+    if (!id) {
+      alert('Erro: ID do depoimento não encontrado.');
+      return;
+    }
     try {
       await adminService.approveTestimonial(id);
+      console.log('Depoimento aprovado com sucesso no Firebase');
       const updated = await adminService.getTestimonials();
       setTestimonials(updated);
     } catch (err) {
-      alert('Erro ao aprovar depoimento');
+      console.error('Erro ao aprovar depoimento:', err);
+      alert('Erro ao aprovar depoimento: ' + (err instanceof Error ? err.message : String(err)));
     }
   };
 
   const handleDeleteTestimonial = async (id: string) => {
+    console.log('Tentando remover depoimento:', id);
+    if (!id) {
+      alert('Erro: ID do depoimento não encontrado.');
+      return;
+    }
     if (!confirm('Deseja realmente remover este depoimento?')) return;
     try {
       await adminService.deleteTestimonial(id);
+      console.log('Depoimento removido com sucesso no Firebase');
       const updated = await adminService.getTestimonials();
       setTestimonials(updated);
     } catch (err) {
-      alert('Erro ao remover depoimento');
+      console.error('Erro ao remover depoimento:', err);
+      alert('Erro ao remover depoimento: ' + (err instanceof Error ? err.message : String(err)));
     }
   };
 
