@@ -485,7 +485,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <LazyImage 
-            src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
+            src={settings?.media?.heroBg || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
             alt="Praia de Moreré" 
             className="w-full h-full brightness-[0.9] contrast-[1.05] saturate-[1.1]"
             referrerPolicy="no-referrer"
@@ -542,7 +542,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           >
             <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
               <LazyImage 
-                src="https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"
+                src={settings?.media?.aboutMain || "https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"}
                 alt="Barco em Moreré" 
                 className="w-full h-full"
                 referrerPolicy="no-referrer"
@@ -550,7 +550,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </div>
             <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
               <LazyImage 
-                src="https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg" 
+                src={settings?.media?.aboutSecondary || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
                 alt="Coqueiros" 
                 className="w-full h-full"
                 referrerPolicy="no-referrer"

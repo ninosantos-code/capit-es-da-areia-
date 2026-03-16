@@ -215,6 +215,11 @@ export const adminService = {
       await setDoc(doc(db, 'settings', 'instagram'), {
         beholdUrl: 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo'
       });
+      await setDoc(doc(db, 'settings', 'media'), {
+        heroBg: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg',
+        aboutMain: 'https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg',
+        aboutSecondary: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg'
+      });
     }
 
     // 3. Seed Gallery

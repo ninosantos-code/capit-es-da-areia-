@@ -430,9 +430,61 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   )}
                 </div>
               ) : (
-                <div className="grid md:grid-cols-2 gap-8">
-                  {/* WhatsApp Settings */}
-                  <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6">
+                <div className="space-y-8">
+                  {/* Site Media Settings */}
+                  <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm">
+                    <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4 mb-6">Imagens Principais do Site</h3>
+                    <div className="grid md:grid-cols-3 gap-6">
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Imagem de Fundo (Hero/Topo)</label>
+                        <input 
+                          id="hero-bg-input"
+                          defaultValue={settings?.media?.heroBg}
+                          placeholder="URL da imagem de fundo"
+                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Imagem Principal (Sobre)</label>
+                        <input 
+                          id="about-main-input"
+                          defaultValue={settings?.media?.aboutMain}
+                          placeholder="URL da imagem seção sobre"
+                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 text-sm"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Imagem Secundária (Sobre)</label>
+                        <input 
+                          id="about-secondary-input"
+                          defaultValue={settings?.media?.aboutSecondary}
+                          placeholder="URL da imagem secundária"
+                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 text-sm"
+                        />
+                      </div>
+                    </div>
+                    <button 
+                      onClick={async (e) => {
+                        const btn = e.currentTarget;
+                        btn.disabled = true;
+                        const heroBg = (document.getElementById('hero-bg-input') as HTMLInputElement).value;
+                        const aboutMain = (document.getElementById('about-main-input') as HTMLInputElement).value;
+                        const aboutSecondary = (document.getElementById('about-secondary-input') as HTMLInputElement).value;
+                        
+                        await handleUpdateSettings('media', { heroBg, aboutMain, aboutSecondary });
+                        btn.disabled = false;
+                        alert('Imagens do site atualizadas com sucesso!');
+                      }}
+                      className="mt-6 px-6 py-3 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      Salvar Imagens do Site
+                    </button>
+                  </div>
+
+                  <div className="grid md:grid-cols-2 gap-8">
+                    {/* WhatsApp Settings */}
+                    <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6">
                     <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">WhatsApp e Contatos</h3>
                     
                     <div className="space-y-4">
@@ -533,6 +585,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                         Use esta opção se o seu banco de dados estiver vazio para carregar as informações iniciais (Passeios, Fotos e Contatos).
                       </p>
                     </div>
+                  </div>
                   </div>
                 </div>
               )}
