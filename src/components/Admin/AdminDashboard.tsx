@@ -384,7 +384,12 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                               </div>
                               <p className="text-sand-700 font-light italic text-sm">"{t.text}"</p>
                               {t.createdAt && (
-                                <p className="text-[10px] text-sand-400">{new Date(t.createdAt.seconds * 1000).toLocaleDateString()} às {new Date(t.createdAt.seconds * 1000).toLocaleTimeString()}</p>
+                                <p className="text-[10px] text-sand-400">
+                                  {(() => {
+                                    const date = t.createdAt.toDate ? t.createdAt.toDate() : new Date(t.createdAt.seconds * 1000 || t.createdAt);
+                                    return `${date.toLocaleDateString()} às ${date.toLocaleTimeString()}`;
+                                  })()}
+                                </p>
                               )}
                             </div>
                             <div className="flex gap-2">

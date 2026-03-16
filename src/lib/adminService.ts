@@ -8,7 +8,8 @@ import {
   addDoc, 
   deleteDoc, 
   query, 
-  orderBy 
+  orderBy,
+  serverTimestamp
 } from 'firebase/firestore';
 
 export interface Tour {
@@ -44,7 +45,7 @@ export const adminService = {
 
   // Testimonials
   async getTestimonials(): Promise<Testimonial[]> {
-    const q = query(collection(db, 'testimonials'), orderBy('approved', 'desc'));
+    const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
   },
@@ -63,7 +64,7 @@ export const adminService = {
     await addDoc(collection(db, 'testimonials'), { 
       ...data, 
       approved: false, 
-      createdAt: new Date() 
+      createdAt: serverTimestamp() 
     });
   },
 
