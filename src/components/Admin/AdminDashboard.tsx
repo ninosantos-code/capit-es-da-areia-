@@ -65,8 +65,39 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   };
 
   const handleAddTour = async () => {
-    // Add logic to service if needed, or just alert for now
-    alert('Funcionalidade de adicionar passeio em desenvolvimento');
+    setLoading(true);
+    try {
+      const newTour: Omit<Tour, 'id'> = {
+        title: 'Nome do Novo Passeio',
+        description: 'Descrição do passeio aqui...',
+        duration: '2-3 horas',
+        price: 'A partir de R$ 0',
+        image: 'https://images.unsplash.com/photo-1544551763-47a0159f963f?q=80&w=2070&auto=format&fit=crop',
+        iconType: 'sun'
+      };
+      await adminService.addTour(newTour);
+      const updatedTours = await adminService.getTours();
+      setTours(updatedTours);
+      alert('Passeio criado! Agora você pode editá-lo abaixo.');
+    } catch (err) {
+      alert('Erro ao adicionar passeio');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteTour = async (id: string) => {
+    if (!confirm('Deseja realmente excluir este passeio permanentemente?')) return;
+    setLoading(true);
+    try {
+      await adminService.deleteTour(id);
+      const updatedTours = await adminService.getTours();
+      setTours(updatedTours);
+    } catch (err) {
+      alert('Erro ao excluir passeio');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleUpdateSettings = async (section: string, data: any) => {
@@ -292,8 +323,8 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                             className="w-full text-sm text-sand-600 font-light resize-none h-24 px-2 py-1 rounded bg-transparent hover:bg-sand-50 outline-none focus:ring-1 focus:ring-ocean-500"
                           />
                         </div>
-                        <div className="flex gap-4">
-                          <div className="space-y-1">
+                        <div className="flex justify-between items-end gap-4">
+                          <div className="space-y-1 flex-grow">
                             <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Duração</label>
                             <input 
                               defaultValue={tour.duration}
@@ -301,6 +332,27 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                               className="w-full text-xs uppercase tracking-wider font-medium text-sand-900 px-2 py-1 rounded bg-transparent hover:bg-sand-50 outline-none focus:ring-1 focus:ring-ocean-500"
                             />
                           </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Ícone</label>
+                            <select 
+                              defaultValue={tour.iconType}
+                              onChange={(e) => handleUpdateTour(tour.id!, { iconType: e.target.value })}
+                              className="w-full text-xs font-medium text-sand-900 px-2 py-1 rounded bg-transparent hover:bg-sand-50 outline-none focus:ring-1 focus:ring-ocean-500"
+                            >
+                              <option value="sun">Sol</option>
+                              <option value="camera">Câmera</option>
+                              <option value="star">Estrela</option>
+                              <option value="logo">Âncora</option>
+                              <option value="house">Casa</option>
+                            </select>
+                          </div>
+                          <button 
+                            onClick={() => handleDeleteTour(tour.id!)}
+                            className="p-2 text-sand-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                            title="Excluir Passeio"
+                          >
+                            <Trash2 className="w-5 h-5" />
+                          </button>
                         </div>
                       </div>
                     </div>

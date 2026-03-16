@@ -44,6 +44,16 @@ export const adminService = {
     await updateDoc(docRef, data);
   },
 
+  async addTour(tour: Omit<Tour, 'id'>) {
+    const docRef = await addDoc(collection(db, 'tours'), tour);
+    return { id: docRef.id, ...tour };
+  },
+
+  async deleteTour(id: string) {
+    const docRef = doc(db, 'tours', id);
+    await deleteDoc(docRef);
+  },
+
   // Testimonials
   async getTestimonials(): Promise<Testimonial[]> {
     const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'));
