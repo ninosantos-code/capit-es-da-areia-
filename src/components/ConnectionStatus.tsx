@@ -4,19 +4,6 @@ type ConnectionState = 'online' | 'offline' | 'slow';
 
 function getConnectionState(): ConnectionState {
   if (!navigator.onLine) return 'offline';
-
-  const conn = (navigator as any).connection;
-  if (conn) {
-    // effectiveType: 'slow-2g', '2g', '3g', '4g'
-    if (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g') {
-      return 'slow';
-    }
-    // downlink in Mbps — below 0.5 Mbps is very slow
-    if (conn.downlink !== undefined && conn.downlink < 0.5) {
-      return 'slow';
-    }
-  }
-
   return 'online';
 }
 
@@ -28,7 +15,7 @@ export default function ConnectionStatus() {
     const update = () => {
       const newStatus = getConnectionState();
       setStatus(newStatus);
-      setIsVisible(newStatus !== 'online');
+      setIsVisible(newStatus === 'offline');
     };
 
     window.addEventListener('online', update);
