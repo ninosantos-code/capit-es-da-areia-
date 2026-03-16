@@ -481,18 +481,21 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     e.preventDefault();
     try {
       await adminService.addTestimonial(commentForm);
+      
+      // Limpa os inputs imediatamente
+      setCommentForm({ name: '', text: '', rating: 5 });
+      
       setIsCommentSubmitted(true);
       
       if (analytics) {
         logEvent(analytics, 'submit_testimonial', { rating: commentForm.rating });
       }
-
-      setCommentForm({ name: '', text: '', rating: 5 });
     } catch (err) {
       alert('Erro ao enviar avaliação. Tente novamente mais tarde.');
     }
     
-    setTimeout(() => setIsCommentSubmitted(false), 5000);
+    // Volta a mostrar o formulário em 4 segundos
+    setTimeout(() => setIsCommentSubmitted(false), 4000);
   };
 
 
