@@ -266,6 +266,7 @@ function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
   const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string, permalink?: string}[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
@@ -299,16 +300,18 @@ export default function App() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [fetchedTours, fetchedGallery, fetchedSettings] = await Promise.all([
+        const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials] = await Promise.all([
           adminService.getTours(),
           adminService.getGallery(),
-          adminService.getSettings()
+          adminService.getSettings(),
+          adminService.getTestimonials()
         ]);
         
         if (fetchedTours.length === 0) setTours(INITIAL_TOURS[language]);
         else setTours(fetchedTours);
         
         setSettings(fetchedSettings);
+        setTestimonials(fetchedTestimonials.filter(t => t.approved));
 
         // Use provided behold URL as base or fall back to DB
         const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
@@ -474,16 +477,20 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     setIsMobileMenuOpen(false);
   };
 
-  const handleCommentSubmit = (e: FormEvent) => {
+  const handleCommentSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    // Em um cenário real, isso enviaria os dados para um banco de dados para aprovação
-    setIsCommentSubmitted(true);
-    
-    if (analytics) {
-      logEvent(analytics, 'submit_testimonial', { rating: commentForm.rating });
-    }
+    try {
+      await adminService.addTestimonial(commentForm);
+      setIsCommentSubmitted(true);
+      
+      if (analytics) {
+        logEvent(analytics, 'submit_testimonial', { rating: commentForm.rating });
+      }
 
-    setCommentForm({ name: '', text: '', rating: 5 });
+      setCommentForm({ name: '', text: '', rating: 5 });
+    } catch (err) {
+      alert('Erro ao enviar avaliação. Tente novamente mais tarde.');
+    }
     
     setTimeout(() => setIsCommentSubmitted(false), 5000);
   };
@@ -872,11 +879,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             </h2>
           </div>
 
-          {TESTIMONIALS.length > 0 ? (
+          {testimonials.length > 0 ? (
             <div className="grid md:grid-cols-3 gap-8 mb-20">
-              {TESTIMONIALS.map((testimonial, idx) => (
+              {testimonials.map((testimonial, idx) => (
                 <motion.div 
-                  key={idx}
+                  key={testimonial.id || idx}
                   initial={{ opacity: 0, scale: 0.95 }}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}

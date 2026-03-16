@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -16,7 +16,8 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'settings'>('tours');
+  const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'testimonials' | 'settings'>('tours');
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [newImageUrl, setNewImageUrl] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
@@ -33,14 +34,16 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const [toursData, galleryData, settingsData] = await Promise.all([
+      const [toursData, galleryData, settingsData, testimonialsData] = await Promise.all([
         adminService.getTours(),
         adminService.getGallery(),
-        adminService.getSettings()
+        adminService.getSettings(),
+        adminService.getTestimonials()
       ]);
       setTours(toursData);
       setGallery(galleryData);
       setSettings(settingsData);
+      setTestimonials(testimonialsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -117,6 +120,27 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       setLoading(false);
     }
   };
+  const handleApproveTestimonial = async (id: string) => {
+    try {
+      await adminService.approveTestimonial(id);
+      const updated = await adminService.getTestimonials();
+      setTestimonials(updated);
+    } catch (err) {
+      alert('Erro ao aprovar depoimento');
+    }
+  };
+
+  const handleDeleteTestimonial = async (id: string) => {
+    if (!confirm('Deseja realmente remover este depoimento?')) return;
+    try {
+      await adminService.deleteTestimonial(id);
+      const updated = await adminService.getTestimonials();
+      setTestimonials(updated);
+    } catch (err) {
+      alert('Erro ao remover depoimento');
+    }
+  };
+
 
   if (!isOpen) return null;
 
@@ -153,13 +177,13 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               <div className="flex items-center gap-6">
                 <h2 className="text-2xl font-serif text-sand-900">Painel de Controle</h2>
                 <nav className="flex gap-2">
-                  {(['tours', 'gallery', 'settings'] as const).map((tab) => (
+                  {(['tours', 'gallery', 'testimonials', 'settings'] as const).map((tab) => (
                     <button 
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`text-sm font-medium px-4 py-2 rounded-xl transition-all ${activeTab === tab ? 'bg-ocean-600 text-white shadow-md' : 'text-sand-600 hover:bg-sand-200'}`}
                     >
-                      {tab === 'tours' ? 'Passeios' : tab === 'gallery' ? 'Galeria / Instagram' : 'Links e Contato'}
+                      {tab === 'tours' ? 'Passeios' : tab === 'gallery' ? 'Galeria / Instagram' : tab === 'testimonials' ? 'Depoimentos' : 'Links e Contato'}
                     </button>
                   ))}
                 </nav>
@@ -320,6 +344,71 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                       </div>
                     ))}
                   </div>
+                </div>
+              ) : activeTab === 'testimonials' ? (
+                <div className="space-y-6">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-xl font-serif text-sand-900">Gerenciar Depoimentos</h3>
+                    <div className="flex gap-4 text-xs">
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                        <span className="text-sand-600 uppercase tracking-widest font-bold">Aprovados</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+                        <span className="text-sand-600 uppercase tracking-widest font-bold">Pendentes</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {testimonials.length === 0 ? (
+                    <div className="bg-white p-12 rounded-3xl border border-dashed border-sand-200 text-center text-sand-400">
+                      Nenhum depoimento encontrado.
+                    </div>
+                  ) : (
+                    <div className="grid gap-4">
+                      {testimonials.map((t) => (
+                        <div key={t.id} className={`bg-white p-6 rounded-2xl border ${t.approved ? 'border-green-100 shadow-sm' : 'border-amber-200 shadow-md transform scale-[1.01]'} transition-all`}>
+                          <div className="flex justify-between items-start gap-4">
+                            <div className="space-y-2 flex-grow">
+                              <div className="flex items-center gap-3">
+                                <span className="font-bold text-sand-900">{t.name}</span>
+                                <div className="flex gap-0.5 text-yellow-400">
+                                  {[...Array(t.rating)].map((_, i) => (
+                                    <Star key={i} className="w-3 h-3 fill-current" />
+                                  ))}
+                                </div>
+                                {!t.approved && (
+                                  <span className="bg-amber-100 text-amber-700 text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-tighter">Pendente de Aprovação</span>
+                                )}
+                              </div>
+                              <p className="text-sand-700 font-light italic text-sm">"{t.text}"</p>
+                              {t.createdAt && (
+                                <p className="text-[10px] text-sand-400">{new Date(t.createdAt.seconds * 1000).toLocaleDateString()} às {new Date(t.createdAt.seconds * 1000).toLocaleTimeString()}</p>
+                              )}
+                            </div>
+                            <div className="flex gap-2">
+                              {!t.approved && (
+                                <button 
+                                  onClick={() => handleApproveTestimonial(t.id)}
+                                  className="px-4 py-2 bg-green-600 text-white text-xs font-bold rounded-xl hover:bg-green-700 transition-colors shadow-sm"
+                                >
+                                  Aprovar
+                                </button>
+                              )}
+                              <button 
+                                onClick={() => handleDeleteTestimonial(t.id)}
+                                className="p-2 text-sand-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                                title="Remover Depoimento"
+                              >
+                                <Trash2 className="w-5 h-5" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="grid md:grid-cols-2 gap-8">

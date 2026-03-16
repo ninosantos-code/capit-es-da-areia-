@@ -59,6 +59,14 @@ export const adminService = {
     await deleteDoc(docRef);
   },
 
+  async addTestimonial(data: Omit<Testimonial, 'id' | 'approved'>) {
+    await addDoc(collection(db, 'testimonials'), { 
+      ...data, 
+      approved: false, 
+      createdAt: new Date() 
+    });
+  },
+
   // Settings (Links and Contact)
   async getSettings(): Promise<any> {
     const q = query(collection(db, 'settings'));
