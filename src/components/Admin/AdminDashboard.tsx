@@ -36,21 +36,32 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
 
   const fetchInitialData = async () => {
     setLoading(true);
+    console.log('Iniciando carregamento de dados do Painel Admin...');
     try {
-      const [toursData, galleryData, settingsData, testimonialsData, translationsData] = await Promise.all([
+      // Usar Promise.allSettled ou tratar individualmente para evitar que um erro trave tudo
+      const results = await Promise.allSettled([
         adminService.getTours(),
         adminService.getGallery(),
         adminService.getSettings(),
         adminService.getTestimonials(),
         adminService.getTranslations()
       ]);
-      setTours(toursData);
-      setGallery(galleryData);
-      setSettings(settingsData);
-      setTestimonials(testimonialsData);
-      setTranslations(translationsData);
+
+      if (results[0].status === 'fulfilled') setTours(results[0].value);
+      if (results[1].status === 'fulfilled') setGallery(results[1].value);
+      if (results[2].status === 'fulfilled') setSettings(results[2].value);
+      if (results[3].status === 'fulfilled') setTestimonials(results[3].value);
+      if (results[4].status === 'fulfilled') setTranslations(results[4].value);
+
+      results.forEach((result, idx) => {
+        if (result.status === 'rejected') {
+          console.error(`Falha ao carregar item ${idx} do painel:`, result.reason);
+        }
+      });
+
+      console.log('Carregamento de dados concluído.');
     } catch (err) {
-      console.error(err);
+      console.error('Erro geral no fetchInitialData:', err);
     } finally {
       setLoading(false);
     }
@@ -709,10 +720,22 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                     <p className="text-sm text-sand-600">Altere qualquer texto do site aqui. As mudanças são refletidas instantaneamente para todos os usuários.</p>
                   </div>
 
-                  {Object.keys(translations).length === 0 ? (
+                  {loading ? (
                     <div className="text-center py-20 bg-sand-100 rounded-3xl border border-dashed border-sand-200">
                       <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-ocean-500" />
                       <p className="text-sand-400">Carregando textos do banco de dados...</p>
+                    </div>
+                  ) : Object.keys(translations).length === 0 ? (
+                    <div className="text-center py-20 bg-sand-100 rounded-3xl border border-dashed border-sand-200 space-y-4">
+                      <Globe className="w-12 h-12 text-sand-300 mx-auto opacity-20" />
+                      <p className="text-sand-500 font-medium">Nenhuma tradução encontrada no banco de dados.</p>
+                      <button 
+                        onClick={handleSeedDatabase}
+                        className="px-6 py-3 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-all flex items-center gap-2 mx-auto"
+                      >
+                        <Database className="w-4 h-4" />
+                        Inicializar Textos Padrão
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-12">
