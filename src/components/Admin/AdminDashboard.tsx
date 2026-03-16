@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -16,8 +16,9 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'testimonials' | 'settings'>('tours');
+  const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'testimonials' | 'settings' | 'translations'>('tours');
   const [testimonials, setTestimonials] = useState<any[]>([]);
+  const [translations, setTranslations] = useState<Record<string, Record<string, string>>>({});
   const [newImageUrl, setNewImageUrl] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
@@ -34,16 +35,18 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const fetchInitialData = async () => {
     setLoading(true);
     try {
-      const [toursData, galleryData, settingsData, testimonialsData] = await Promise.all([
+      const [toursData, galleryData, settingsData, testimonialsData, translationsData] = await Promise.all([
         adminService.getTours(),
         adminService.getGallery(),
         adminService.getSettings(),
-        adminService.getTestimonials()
+        adminService.getTestimonials(),
+        adminService.getTranslations()
       ]);
       setTours(toursData);
       setGallery(galleryData);
       setSettings(settingsData);
       setTestimonials(testimonialsData);
+      setTranslations(translationsData);
     } catch (err) {
       console.error(err);
     } finally {
@@ -155,6 +158,16 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
     }
   };
 
+  const handleUpdateTranslation = async (lang: string, key: string, value: string) => {
+    try {
+      const updatedLangData = { ...translations[lang], [key]: value };
+      await adminService.updateTranslation(lang, updatedLangData);
+      setTranslations({ ...translations, [lang]: updatedLangData });
+    } catch (err) {
+      alert('Erro ao atualizar tradução');
+    }
+  };
+
 
   const handleSeedDatabase = async () => {
     if (!confirm('Deseja inicializar o banco de dados com as informações padrão? Isso não apagará seus dados atuais, apenas preencherá o que estiver vazio.')) return;
@@ -205,13 +218,17 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               <div className="flex items-center gap-6">
                 <h2 className="text-2xl font-serif text-sand-900">Painel de Controle</h2>
                 <nav className="flex gap-2">
-                  {(['tours', 'gallery', 'testimonials', 'settings'] as const).map((tab) => (
+                  {(['tours', 'gallery', 'testimonials', 'settings', 'translations'] as const).map((tab) => (
                     <button 
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`text-sm font-medium px-4 py-2 rounded-xl transition-all ${activeTab === tab ? 'bg-ocean-600 text-white shadow-md' : 'text-sand-600 hover:bg-sand-200'}`}
                     >
-                      {tab === 'tours' ? 'Passeios' : tab === 'gallery' ? 'Galeria / Instagram' : tab === 'testimonials' ? 'Depoimentos' : 'Links e Contato'}
+                      {tab === 'tours' ? 'Passeios' : 
+                       tab === 'gallery' ? 'Galeria' : 
+                       tab === 'testimonials' ? 'Depoimentos' : 
+                       tab === 'translations' ? 'Textos (i18n)' :
+                       'Links e Contato'}
                     </button>
                   ))}
                 </nav>
@@ -226,8 +243,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               </div>
             </div>
 
-            {/* Content */}
-            <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-sand-50/30">
+                        <div className="flex-grow overflow-y-auto p-8 space-y-8 bg-sand-50/30">
               {loading ? (
                 <div className="flex flex-col items-center justify-center py-20 text-sand-400">
                   <Loader2 className="w-10 h-10 animate-spin mb-4 text-ocean-500" />
@@ -326,7 +342,6 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                       <div key={item.id || idx} className="relative aspect-square rounded-2xl overflow-hidden bg-sand-100 group shadow-sm border border-sand-100">
                         <img src={item.url} alt="Galeria" className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                         
-                        {/* Video Indicator in Admin */}
                         {item.mediaType === 'VIDEO' && (
                           <div className="absolute top-2 right-2 w-6 h-6 bg-black/50 backdrop-blur-sm rounded-full flex items-center justify-center text-white">
                             <Play className="w-3 h-3 fill-current" />
@@ -361,7 +376,6 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                             <p className="text-[10px] text-white/80 font-medium bg-black/20 px-2 py-1 rounded">Foto Padrão</p>
                           )}
                         </div>
-                        {/* Source Tag */}
                         <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider ${
                           item.source === 'firestore' ? 'bg-green-500 text-white' : 
                           item.source === 'instagram' ? 'bg-ocean-500 text-white' : 
@@ -443,9 +457,8 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : activeTab === 'settings' ? (
                 <div className="space-y-8">
-                  {/* Site Media Settings */}
                   <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm">
                     <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4 mb-6">Imagens Principais do Site</h3>
                     <div className="grid md:grid-cols-3 gap-6">
@@ -484,7 +497,6 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                         const heroBg = (document.getElementById('hero-bg-input') as HTMLInputElement).value;
                         const aboutMain = (document.getElementById('about-main-input') as HTMLInputElement).value;
                         const aboutSecondary = (document.getElementById('about-secondary-input') as HTMLInputElement).value;
-                        
                         await handleUpdateSettings('media', { heroBg, aboutMain, aboutSecondary });
                         btn.disabled = false;
                         alert('Imagens do site atualizadas com sucesso!');
@@ -497,110 +509,175 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   </div>
 
                   <div className="grid md:grid-cols-2 gap-8">
-                    {/* WhatsApp Settings */}
                     <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6">
-                    <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">WhatsApp e Contatos</h3>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">WhatsApp Principal (Exibição)</label>
-                        <input 
-                          defaultValue={settings?.contact?.whatsapp1}
-                          onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, whatsapp1: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">WhatsApp Principal (Link - Apenas Números)</label>
-                        <input 
-                          defaultValue={settings?.contact?.whatsapp1Link}
-                          onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, whatsapp1Link: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
-                        />
-                      </div>
-                      <div className="pt-4 space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Instagram (Exibição)</label>
-                        <input 
-                          defaultValue={settings?.contact?.instagram}
-                          onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, instagram: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Instagram User (Link)</label>
-                        <input 
-                          defaultValue={settings?.contact?.instagramLink}
-                          onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, instagramLink: e.target.value })}
-                          className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
-                        />
-                      </div>
-                      
-                      <div className="pt-4 space-y-3 bg-ocean-600/10 p-6 rounded-2xl border border-ocean-600/20">
-                        <div className="flex items-center gap-2 mb-1">
-                          <Instagram className="w-4 h-4 text-ocean-600" />
-                          <label className="text-xs uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático (Behold.so)</label>
-                        </div>
-                        <p className="text-xs text-ocean-800 font-light mb-2">Cole o link da "JSON URL" gerada no Behold para que o site se atualize sozinho.</p>
-                        <div className="flex gap-2">
+                      <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">WhatsApp e Contatos</h3>
+                      <div className="space-y-4">
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">WhatsApp Principal (Exibição)</label>
                           <input 
-                            type="text"
-                            placeholder="https://feeds.behold.so/v1/..."
-                            key={settings?.instagram?.beholdUrl || 'empty'}
-                            defaultValue={settings?.instagram?.beholdUrl}
-                            id="behold-url-input"
-                            className="flex-grow px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm shadow-sm"
+                            defaultValue={settings?.contact?.whatsapp1}
+                            onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, whatsapp1: e.target.value })}
+                            className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
                           />
-                          <button 
-                            onClick={async (e) => {
-                              const btn = e.currentTarget;
-                              const input = document.getElementById('behold-url-input') as HTMLInputElement;
-                              btn.disabled = true;
-                              await handleUpdateSettings('instagram', { beholdUrl: input.value });
-                              btn.disabled = false;
-                              alert('Configuração do Instagram salva com sucesso!');
-                            }}
-                            className="px-6 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50"
-                          >
-                            <Save className="w-4 h-4" />
-                            Salvar
-                          </button>
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">WhatsApp Principal (Link - Apenas Números)</label>
+                          <input 
+                            defaultValue={settings?.contact?.whatsapp1Link}
+                            onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, whatsapp1Link: e.target.value })}
+                            className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
+                          />
+                        </div>
+                        <div className="pt-4 space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Instagram (Exibição)</label>
+                          <input 
+                            defaultValue={settings?.contact?.instagram}
+                            onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, instagram: e.target.value })}
+                            className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Instagram User (Link)</label>
+                          <input 
+                            defaultValue={settings?.contact?.instagramLink}
+                            onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, instagramLink: e.target.value })}
+                            className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500"
+                          />
+                        </div>
+                        
+                        <div className="pt-4 space-y-3 bg-ocean-600/10 p-6 rounded-2xl border border-ocean-600/20">
+                          <div className="flex items-center gap-2 mb-1">
+                            <Instagram className="w-4 h-4 text-ocean-600" />
+                            <label className="text-xs uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático</label>
+                          </div>
+                          <p className="text-xs text-ocean-800 font-light mb-2">Cole o link da "JSON URL" gerada no Behold para que o site se atualize sozinho.</p>
+                          <div className="flex gap-2">
+                            <input 
+                              type="text"
+                              placeholder="https://feeds.behold.so/v1/..."
+                              defaultValue={settings?.instagram?.beholdUrl}
+                              id="behold-url-input"
+                              className="flex-grow px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm shadow-sm"
+                            />
+                            <button 
+                              onClick={async (e) => {
+                                const btn = e.currentTarget;
+                                const input = document.getElementById('behold-url-input') as HTMLInputElement;
+                                btn.disabled = true;
+                                await handleUpdateSettings('instagram', { beholdUrl: input.value });
+                                btn.disabled = false;
+                                alert('Configuração do Instagram salva com sucesso!');
+                              }}
+                              className="px-6 bg-ocean-600 text-white rounded-xl font-medium hover:bg-ocean-700 transition-all flex items-center gap-2 shadow-md hover:shadow-lg active:scale-95 disabled:opacity-50"
+                            >
+                              <Save className="w-4 h-4" />
+                              Salvar
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Other Settings */}
-                  <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6 flex flex-col">
-                    <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">Endereço e Localização</h3>
-                    <div className="flex-grow space-y-4">
-                      <div className="space-y-1 flex-grow">
-                        <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Endereço Completo</label>
-                        <textarea 
-                          defaultValue={settings?.contact?.address}
-                          onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, address: e.target.value })}
-                          className="w-full h-32 px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 resize-none"
-                        />
+                    <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6 flex flex-col">
+                      <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">Endereço e Localização</h3>
+                      <div className="flex-grow space-y-4">
+                        <div className="space-y-1 flex-grow">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Endereço Completo</label>
+                          <textarea 
+                            defaultValue={settings?.contact?.address}
+                            onBlur={(e) => handleUpdateSettings('contact', { ...settings.contact, address: e.target.value })}
+                            className="w-full h-32 px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 resize-none"
+                          />
+                        </div>
+                      </div>
+                      <div className="p-4 bg-ocean-100/10 rounded-2xl text-xs text-ocean-700 italic font-light border border-ocean-600/10 text-center">
+                        <p>Dica: Alterar os links aqui atualizará automaticamente todos os botões "Reservar" e o rodapé do site.</p>
+                      </div>
+
+                      <div className="pt-8 border-t border-sand-100 flex flex-col gap-4">
+                        <h4 className="text-sm font-serif text-sand-900">Manutenção do Sistema</h4>
+                        <button 
+                          onClick={handleSeedDatabase}
+                          className="w-full py-4 border-2 border-dashed border-sand-300 rounded-2xl text-sand-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 font-medium"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                          Inicializar Banco de Dados com Padrões
+                        </button>
                       </div>
                     </div>
-                    <div className="p-4 bg-ocean-100/10 rounded-2xl text-xs text-ocean-700 italic font-light border border-ocean-600/10">
-                      Dica: Alterar os links aqui atualizará automaticamente todos os botões "Reservar" e o rodapé do site.
+                  </div>
+                </div>
+              ) : activeTab === 'translations' ? (
+                <div className="space-y-8 pb-12">
+                  <div className="bg-sand-100 p-6 rounded-2xl border border-sand-200">
+                    <div className="flex items-center gap-3 mb-2">
+                      <Globe className="w-5 h-5 text-ocean-600" />
+                      <h3 className="text-xl font-serif text-sand-900">Editor de Conteúdo e Textos</h3>
                     </div>
+                    <p className="text-sm text-sand-600">Altere qualquer texto do site aqui. As mudanças são refletidas instantaneamente para todos os usuários.</p>
+                  </div>
 
-                    <div className="pt-8 border-t border-sand-100 flex flex-col gap-4">
-                      <h4 className="text-sm font-serif text-sand-900">Manutenção do Sistema</h4>
-                      <button 
-                        onClick={handleSeedDatabase}
-                        className="w-full py-4 border-2 border-dashed border-sand-300 rounded-2xl text-sand-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 font-medium"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                        Inicializar Banco de Dados com Padrões
-                      </button>
-                      <p className="text-[10px] text-sand-400 text-center italic">
-                        Use esta opção se o seu banco de dados estiver vazio para carregar as informações iniciais (Passeios, Fotos e Contatos).
-                      </p>
+                  {Object.keys(translations).length === 0 ? (
+                    <div className="text-center py-20 bg-sand-100 rounded-3xl border border-dashed border-sand-200">
+                      <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-ocean-500" />
+                      <p className="text-sand-400">Carregando textos do banco de dados...</p>
                     </div>
-                  </div>
-                  </div>
+                  ) : (
+                    <div className="space-y-12">
+                      {(() => {
+                        const groups: Record<string, string[]> = {
+                          'Cabeçalho e Navegação': ['nav.'],
+                          'Página Inicial (Hero)': ['hero.'],
+                          'Seção Sobre': ['about.'],
+                          'Passeios': ['tours.'],
+                          'Galeria': ['gallery.'],
+                          'Depoimentos': ['testimonials.'],
+                          'Formulário de Reserva': ['booking.'],
+                          'Rodapé': ['footer.']
+                        };
+                        const allKeys = Object.keys(translations['pt'] || {});
+                        return Object.entries(groups).map(([groupName, prefixes]) => {
+                          const keysInGroup = allKeys.filter(k => prefixes.some(p => k.startsWith(p)));
+                          if (keysInGroup.length === 0) return null;
+                          return (
+                            <div key={groupName} className="space-y-4">
+                              <h4 className="text-sm font-bold uppercase tracking-widest text-sand-400 border-l-4 border-ocean-500 pl-3">{groupName}</h4>
+                              <div className="grid gap-3">
+                                {keysInGroup.map(key => (
+                                  <div key={key} className="bg-sand-100/50 p-6 rounded-2xl border border-sand-100 grid md:grid-cols-2 gap-6 group hover:border-ocean-300 transition-colors">
+                                    <div className="space-y-2">
+                                      <div className="flex justify-between">
+                                        <label className="text-[10px] font-bold text-ocean-600 uppercase tracking-tighter">Português (PT)</label>
+                                        <span className="text-[9px] text-sand-300 font-mono">{key}</span>
+                                      </div>
+                                      <textarea 
+                                        defaultValue={translations['pt'][key]}
+                                        onBlur={(e) => handleUpdateTranslation('pt', key, e.target.value)}
+                                        className="w-full h-20 px-4 py-3 rounded-xl bg-white border border-sand-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm resize-none shadow-sm"
+                                      />
+                                    </div>
+                                    <div className="space-y-2">
+                                      <label className="text-[10px] font-bold text-ocean-600 uppercase tracking-tighter">Inglês (EN)</label>
+                                      <textarea 
+                                        defaultValue={translations['en'][key]}
+                                        onBlur={(e) => handleUpdateTranslation('en', key, e.target.value)}
+                                        className="w-full h-20 px-4 py-3 rounded-xl bg-white border border-sand-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm resize-none shadow-sm"
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center py-20 bg-sand-100 rounded-3xl border border-dashed border-sand-200">
+                  <Loader2 className="w-8 h-8 animate-spin mx-auto mb-4 text-ocean-500" />
+                  <p className="text-sand-400">Selecione uma aba no menu acima.</p>
                 </div>
               )}
             </div>

@@ -139,6 +139,22 @@ export const adminService = {
     }
   },
 
+  // Translations (i18n)
+  async getTranslations(): Promise<Record<string, Record<string, string>>> {
+    const q = query(collection(db, 'translations'));
+    const snapshot = await getDocs(q);
+    const trans: Record<string, Record<string, string>> = {};
+    snapshot.docs.forEach(doc => {
+      trans[doc.id] = doc.data() as Record<string, string>;
+    });
+    return trans;
+  },
+
+  async updateTranslation(lang: string, data: Record<string, string>) {
+    const docRef = doc(db, 'translations', lang);
+    await setDoc(docRef, data);
+  },
+
   // Seeding
   async seedDatabase() {
     // 1. Seed Tours
@@ -217,7 +233,7 @@ export const adminService = {
         beholdUrl: 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo'
       });
       await setDoc(doc(db, 'settings', 'media'), {
-        heroBg: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg',
+        heroBg: 'https://i.postimg.cc/Nfpfp7D/ninocomrede.jpg',
         aboutMain: 'https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg',
         aboutSecondary: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg'
       });
@@ -243,6 +259,140 @@ export const adminService = {
           source: 'firestore'
         });
       }
+    }
+
+    // 4. Seed Translations
+    const transCollection = collection(db, 'translations');
+    const transSnapshot = await getDocs(transCollection);
+    if (transSnapshot.empty) {
+      const pt = {
+        'nav.about': 'Sobre Moreré',
+        'nav.tours': 'Nossos Passeios',
+        'nav.gallery': 'Galeria',
+        'nav.testimonials': 'Depoimentos',
+        'nav.reservation': 'Reservar Agora',
+        'hero.title': 'Capitães da Areia',
+        'hero.subtitle': 'Experiências autênticas nas águas cristalinas de Moreré.',
+        'hero.cta': 'Descobrir Experiências',
+        'tours.label': 'Nossos Roteiros',
+        'tours.title': 'Escolha sua próxima aventura',
+        'tours.subtitle': 'Passeios privativos ou em pequenos grupos para garantir a melhor experiência nas águas de Boipeba.',
+        'tours.duration': 'Duração',
+        'tours.price': 'Valor',
+        'tours.consult': 'Consultar Disponibilidade',
+        'gallery.title': 'Momentos que contam histórias',
+        'gallery.follow': 'Seguir no Instagram',
+        'gallery.view': 'Ver no Instagram',
+        'about.label': 'Nosso Paraíso',
+        'about.title1': 'Muito mais que um destino,',
+        'about.title2': 'uma experiência.',
+        'about.p1': 'Moreré é um pequeno vilarejo de pescadores na Ilha de Boipeba, conhecido por suas águas calmas, piscinas naturais repletas de vida marinha e um ritmo de vida que nos convida a desacelerar.',
+        'about.p2': 'Nossa missão é proporcionar a você os melhores passeios da região, com segurança, conforto e o caloroso acolhimento baiano. Conhecemos cada canto dessa ilha e queremos compartilhar seus segredos com você.',
+        'about.exp_label': 'Anos de Experiência',
+        'about.clients_label': 'Clientes Satisfeitos',
+        'testimonials.title': 'O que dizem nossos clientes',
+        'booking.title': 'Solicitar Reserva',
+        'booking.subtitle': 'Preencha os detalhes e entraremos em contato via WhatsApp.',
+        'booking.personal': 'Informações Pessoais',
+        'booking.name': 'Seu Nome Completo',
+        'booking.age': 'Idade',
+        'booking.people': 'Quantas pessoas?',
+        'booking.kids': 'Tem crianças?',
+        'booking.yes': 'Sim',
+        'booking.no': 'Não',
+        'booking.arrival': 'Previsão de Chegada na Ilha',
+        'booking.tour': 'Passeio Preferencial',
+        'booking.decide': 'Ainda não decidi',
+        'booking.safety': 'Saúde e Segurança',
+        'booking.safety_desc': 'Para garantirmos a melhor experiência, por favor, nos informe:',
+        'booking.health': 'Problemas de Saúde ou Alergias?',
+        'booking.health_ph': 'Ex: Asma, alergia a frutos do mar, problemas cardíacos. (Especifique)',
+        'booking.phobias': 'Possui alguma fobia?',
+        'booking.phobias_ph': 'Ex: Medo de mar aberto, insetos, lugares fechados.',
+        'booking.meds': 'Toma algum medicamento?',
+        'booking.meds_ph': 'Ex: Aspirina, remédio para pressão, etc.',
+        'booking.food': 'Restrições Alimentares?',
+        'booking.food_ph': 'Ex: Intolerância à lactose, vegano, alergia a camarão.',
+        'booking.exp': 'Nível de Experiência em Atividades ao Ar Livre',
+        'booking.exp_1': 'Iniciante (Pouca ou nenhuma experiência)',
+        'booking.exp_2': 'Intermediário (Pratica atividades ocasionalmente)',
+        'booking.exp_3': 'Avançado (Pratica frequentemente, bom preparo físico)',
+        'booking.obs': 'Observações Gerais (Opcional)',
+        'booking.obs_ph': 'Alguma dúvida ou pedido especial?',
+        'booking.disclaimer': 'Termo de Isenção de Responsabilidade',
+        'booking.disclaimer_text': 'Declaro estar ciente de que as atividades de ecoturismo envolvem riscos inerentes. Ao prosseguir, assumo total responsabilidade por minha segurança.',
+        'booking.submit': 'Enviar para o WhatsApp',
+        'footer.description': 'Experiências autênticas no mar de Moreré. Passeios de lancha, canoa e vivências únicas na Ilha de Boipeba.',
+        'footer.links': 'Links Rápidos',
+        'footer.contact': 'Contato',
+        'footer.rights': 'Todos os direitos reservados.'
+      };
+
+      const en = {
+        'nav.about': 'About Moreré',
+        'nav.tours': 'Our Tours',
+        'nav.gallery': 'Gallery',
+        'nav.testimonials': 'Reviews',
+        'nav.reservation': 'Book Now',
+        'hero.title': 'Sand Captains',
+        'hero.subtitle': 'Authentic experiences in the crystal clear waters of Moreré.',
+        'hero.cta': 'Discover Experiences',
+        'tours.label': 'Our Routes',
+        'tours.title': 'Choose your next adventure',
+        'tours.subtitle': 'Private or small group tours to ensure the best experience in Boipeba waters.',
+        'tours.duration': 'Duration',
+        'tours.price': 'Price',
+        'tours.consult': 'Check Availability',
+        'gallery.title': 'Moments that tell stories',
+        'gallery.follow': 'Follow on Instagram',
+        'gallery.view': 'View on Instagram',
+        'about.label': 'Our Paradise',
+        'about.title1': 'More than a destination,',
+        'about.title2': 'an experience.',
+        'about.p1': 'Moreré is a small fishing village on Boipeba Island, known for its calm waters, natural pools full of marine life and a pace of life that invites us to slow down.',
+        'about.p2': 'Our mission is to provide you with the best tours in the region, with safety, comfort and the warm Bahian welcome. We know every corner of this island and want to share its secrets with you.',
+        'about.exp_label': 'Years of Experience',
+        'about.clients_label': 'Happy Clients',
+        'testimonials.title': 'What our clients say',
+        'booking.title': 'Request Reservation',
+        'booking.subtitle': 'Fill in the details and we will contact you via WhatsApp.',
+        'booking.personal': 'Personal Information',
+        'booking.name': 'Your Full Name',
+        'booking.age': 'Age',
+        'booking.people': 'How many people?',
+        'booking.kids': 'Any kids?',
+        'booking.yes': 'Yes',
+        'booking.no': 'No',
+        'booking.arrival': 'Estimated Arrival on the Island',
+        'booking.tour': 'Preferred Tour',
+        'booking.decide': 'I haven\'t decided yet',
+        'booking.safety': 'Health and Safety',
+        'booking.safety_desc': 'To ensure the best experience, please let us know:',
+        'booking.health': 'Any Health Issues or Allergies?',
+        'booking.health_ph': 'Ex: Asthma, seafood allergy, heart issues. (Specify)',
+        'booking.phobias': 'Any phobias?',
+        'booking.phobias_ph': 'Ex: Fear of open sea, insects, enclosed spaces.',
+        'booking.meds': 'Taking any medication?',
+        'booking.meds_ph': 'Ex: Aspirin, blood pressure meds, etc.',
+        'booking.food': 'Dietary Restrictions?',
+        'booking.food_ph': 'Ex: Lactose intolerance, vegan, shrimp allergy.',
+        'booking.exp': 'Experience Level in Outdoor Activities',
+        'booking.exp_1': 'Beginner (Little or no experience)',
+        'booking.exp_2': 'Intermediate (Practices activities occasionally)',
+        'booking.exp_3': 'Advanced (Practices frequently, good physical condition)',
+        'booking.obs': 'General Observations (Optional)',
+        'booking.obs_ph': 'Any questions or special requests?',
+        'booking.disclaimer': 'Disclaimer',
+        'booking.disclaimer_text': 'I declare I am aware that ecotourism activities involve inherent risks. By proceeding, I assume full responsibility for my safety.',
+        'booking.submit': 'Send to WhatsApp',
+        'footer.description': 'Authentic experiences in the Moreré sea. Speedboat, canoe tours and unique experiences on Boipeba Island.',
+        'footer.links': 'Quick Links',
+        'footer.contact': 'Contact',
+        'footer.rights': 'All rights reserved.'
+      };
+
+      await setDoc(doc(transCollection, 'pt'), pt);
+      await setDoc(doc(transCollection, 'en'), en);
     }
   },
 

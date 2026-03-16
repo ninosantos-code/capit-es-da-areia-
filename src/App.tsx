@@ -174,8 +174,12 @@ export default function App() {
     return (saved as 'light' | 'dark') || 'light';
   });
   const [isLoadingData, setIsLoadingData] = useState(true);
+  const [dynamicTranslations, setDynamicTranslations] = useState<Record<string, Record<string, string>>>({});
   
-  const t = (key: string) => TRANSLATIONS[language][key] || key;
+  const t = (key: string) => 
+    dynamicTranslations[language]?.[key] || 
+    TRANSLATIONS[language]?.[key] || 
+    key;
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -211,14 +215,16 @@ export default function App() {
     const loadData = async () => {
       setIsLoadingData(true);
       try {
-        const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials] = await Promise.all([
+        const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = await Promise.all([
           adminService.getTours(),
           adminService.getGallery(),
           adminService.getSettings(),
-          adminService.getTestimonials()
+          adminService.getTestimonials(),
+          adminService.getTranslations()
         ]);
         
         setTours(fetchedTours);
+        setDynamicTranslations(fetchedTranslations);
         
         setSettings(fetchedSettings);
         setTestimonials(fetchedTestimonials.filter(t => t.approved));
