@@ -421,7 +421,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
     <div className="min-h-screen bg-sand-50 text-sand-900 font-sans selection:bg-ocean-200 selection:text-ocean-900">
       <ConnectionStatus />
       {/* Navigation */}
-      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/90 backdrop-blur-md shadow-sm py-3' : 'bg-transparent py-5'}`}>
+      <nav className={`fixed w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-sand-50/90 backdrop-blur-md shadow-sm py-3 border-b border-sand-100/50' : 'bg-transparent py-5'}`}>
         <div className="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
           <div className="flex items-center gap-2 cursor-pointer" onClick={() => scrollTo('home')}>
             <img src="/images/logo-novo.png" alt="Logo" className="w-8 h-8 object-contain rounded-full shadow-sm" />
@@ -463,7 +463,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
             <button 
               onClick={() => openReservationModal()}
-              className={`px-5 py-2.5 rounded-full flex items-center gap-2 transition-all ${isScrolled ? 'bg-ocean-600 text-white hover:bg-ocean-700' : 'bg-white text-sand-900 hover:bg-sand-50'}`}
+              className={`px-5 py-2.5 rounded-full flex items-center gap-2 transition-all ${isScrolled ? 'bg-ocean-600 text-white hover:bg-ocean-700' : 'bg-sand-900 text-sand-50 hover:bg-ocean-600'}`}
             >
               <MessageCircle className="w-4 h-4" />
               {t('nav.reservation')}
@@ -488,7 +488,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
       {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-40 bg-sand-50 pt-24 px-6 flex flex-col gap-6 md:hidden overflow-y-auto pb-12">
+        <div className="fixed inset-0 z-40 bg-sand-50 text-sand-900 pt-24 px-6 flex flex-col gap-6 md:hidden overflow-y-auto pb-12">
           <button onClick={() => scrollTo('sobre')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.about')}</button>
           <button onClick={() => scrollTo('passeios')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.tours')}</button>
           <button onClick={() => scrollTo('galeria')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.gallery')}</button>
@@ -612,7 +612,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       </section>
 
       {/* Tours Section */}
-      <section id="passeios" className="py-24 px-6 md:px-12 bg-white">
+      <section id="passeios" className="py-24 px-6 md:px-12 bg-sand-50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="text-ocean-600 uppercase tracking-widest text-sm font-semibold mb-4 block">{t('tours.label')}</span>
@@ -628,13 +628,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             {/* Carousel Controls */}
             <button 
               onClick={() => scrollCarousel('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-white shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button 
               onClick={() => scrollCarousel('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-white shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -666,7 +666,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       referrerPolicy="no-referrer"
                       priority={index < 2}
                     />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
+                    <div className="absolute top-4 right-4 bg-sand-50/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
                       {getIcon(tour.iconType)}
                     </div>
                   </div>
@@ -700,7 +700,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
       </section>
 
-      <section id="galeria" className="py-24 px-6 md:px-12 bg-white relative overflow-hidden">
+      <section id="galeria" className="py-24 px-6 md:px-12 bg-sand-50 relative overflow-hidden">
         {/* Decorative element */}
         <div className="absolute top-0 right-0 w-64 h-64 bg-ocean-50 rounded-full blur-3xl opacity-50 -mr-32 -mt-32" />
         
@@ -733,13 +733,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             {/* Carousel Controls */}
             <button 
               onClick={() => scrollGallery('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-white border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
             >
               <ChevronLeft className="w-6 h-6" />
             </button>
             <button 
               onClick={() => scrollGallery('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-white border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
             >
               <ChevronRight className="w-6 h-6" />
             </button>
@@ -828,9 +828,9 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="bg-white p-8 rounded-2xl shadow-sm"
+                  className="bg-sand-50 p-8 rounded-2xl shadow-sm border border-sand-100"
                 >
-                  <div className="flex gap-1 text-yellow-400 mb-6">
+                  <div className="flex gap-1 text-yellow-400 mb-6 font-bold">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 fill-current" />
                     ))}
@@ -850,7 +850,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           )}
 
           {/* Comment Form */}
-          <div className="max-w-2xl mx-auto bg-white p-8 md:p-10 rounded-3xl shadow-sm border border-sand-100">
+          <div className="max-w-2xl mx-auto bg-sand-50 p-8 md:p-10 rounded-3xl shadow-sm border border-sand-100">
             <div className="text-center mb-8">
               <h3 className="text-2xl font-serif text-sand-900 mb-2">Deixe sua avaliação</h3>
               <p className="text-sand-600 font-light text-sm">

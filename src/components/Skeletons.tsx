@@ -8,7 +8,7 @@ export const TourSkeleton = () => (
   <div className="min-w-[85vw] md:min-w-[350px] lg:min-w-[400px] snap-center rounded-2xl overflow-hidden bg-sand-50 border border-sand-100 flex flex-col">
     <div className="relative aspect-[4/3] overflow-hidden">
       <div className="w-full h-full shimmer bg-sand-200" />
-      <div className="absolute top-4 right-4 bg-white/90 p-3 rounded-full w-12 h-12 shimmer" />
+      <div className="absolute top-4 right-4 bg-sand-100/90 p-3 rounded-full w-12 h-12 shimmer" />
     </div>
     <div className="p-8 flex flex-col flex-grow space-y-4">
       <Shimmer className="h-8 w-3/4" />
@@ -38,7 +38,7 @@ export const GallerySkeleton = () => (
 );
 
 export const TestimonialSkeleton = () => (
-  <div className="bg-white p-8 rounded-2xl shadow-sm space-y-6">
+  <div className="bg-sand-50 p-8 rounded-2xl shadow-sm space-y-6">
     <div className="flex gap-1">
       {[...Array(5)].map((_, i) => (
         <Shimmer key={i} className="w-5 h-5" />

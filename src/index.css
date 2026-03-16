@@ -38,15 +38,16 @@ body {
 }
 
 .dark {
-  --color-sand-50: #050A0F;
-  --color-sand-100: #0A141D;
-  --color-sand-200: #15202B;
-  --color-sand-300: #1E2732;
-  --color-sand-800: #E1E8ED;
-  --color-sand-900: #F8F9FA;
+  --color-sand-50: #0B0F14;   /* Fundo Principal - Azul Petróleo Profundo */
+  --color-sand-100: #141B22;  /* Cards/Sessões alternas */
+  --color-sand-200: #1D2731;  /* Bordas e elementos secundários */
+  --color-sand-300: #2C3946;  /* Inputs e áreas de destaque */
+  --color-sand-800: #D1D9E0;  /* Texto secundário */
+  --color-sand-900: #FFFFFF;  /* Texto principal (Branco puro para contraste) */
   
-  --color-ocean-600: #4DD0E1;
-  --color-ocean-700: #80DEEA;
+  --color-ocean-600: #00D1FF;  /* Ciano vibrante para botões */
+  --color-ocean-700: #70E1FF;  /* Ciano mais claro para hover */
+  --color-ocean-500: #00B4DB;
 }
 
 h1, h2, h3, h4, h5, h6, .font-serif {
@@ -73,9 +74,9 @@ h1, h2, h3, h4, h5, h6, .font-serif {
 .dark .shimmer {
   background: linear-gradient(
     90deg,
-    #1E2732 25%,
-    #253341 50%,
-    #1E2732 75%
+    #141B22 25%,
+    #1D2731 50%,
+    #141B22 75%
   );
   background-size: 200% 100%;
 }

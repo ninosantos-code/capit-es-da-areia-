@@ -179,7 +179,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
       <motion.div 
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        className="relative w-full max-w-5xl bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-5xl bg-sand-50 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border border-sand-100/50"
       >
         {!isAuthenticated ? (
           <div className="p-12 text-center text-sand-900">
@@ -236,7 +236,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               ) : activeTab === 'tours' ? (
                 <div className="grid gap-6">
                   {tours.map(tour => (
-                    <div key={tour.id} className="bg-white p-6 rounded-2xl shadow-sm border border-sand-100 grid md:grid-cols-[180px_1fr] gap-6 group hover:shadow-md transition-shadow">
+                    <div key={tour.id} className="bg-sand-100 p-6 rounded-2xl shadow-sm border border-sand-100 grid md:grid-cols-[180px_1fr] gap-6 group hover:shadow-md transition-shadow">
                       <div className="space-y-3">
                         <div className="aspect-square rounded-xl overflow-hidden bg-sand-100 border border-sand-50">
                           <img src={tour.image} alt={tour.title} className="w-full h-full object-cover" />
@@ -390,13 +390,13 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   </div>
 
                   {testimonials.length === 0 ? (
-                    <div className="bg-white p-12 rounded-3xl border border-dashed border-sand-200 text-center text-sand-400">
+                    <div className="bg-sand-100 p-12 rounded-3xl border border-dashed border-sand-200 text-center text-sand-400">
                       Nenhum depoimento encontrado.
                     </div>
                   ) : (
                     <div className="grid gap-4">
                       {testimonials.map((t) => (
-                        <div key={t.id} className={`bg-white p-6 rounded-2xl border ${t.approved ? 'border-green-100 shadow-sm' : 'border-amber-200 shadow-md transform scale-[1.01]'} transition-all`}>
+                        <div key={t.id} className={`bg-sand-100 p-6 rounded-2xl border ${t.approved ? 'border-sand-200 shadow-sm' : 'border-amber-500/50 shadow-md transform scale-[1.01]'} transition-all`}>
                           <div className="flex justify-between items-start gap-4">
                             <div className="space-y-2 flex-grow">
                               <div className="flex items-center gap-3">
@@ -446,7 +446,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               ) : (
                 <div className="space-y-8">
                   {/* Site Media Settings */}
-                  <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm">
+                  <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm">
                     <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4 mb-6">Imagens Principais do Site</h3>
                     <div className="grid md:grid-cols-3 gap-6">
                       <div className="space-y-1">
@@ -498,7 +498,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
 
                   <div className="grid md:grid-cols-2 gap-8">
                     {/* WhatsApp Settings */}
-                    <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6">
+                    <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6">
                     <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">WhatsApp e Contatos</h3>
                     
                     <div className="space-y-4">
@@ -535,7 +535,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                         />
                       </div>
                       
-                      <div className="pt-4 space-y-3 bg-ocean-50/50 p-6 rounded-2xl border border-ocean-100">
+                      <div className="pt-4 space-y-3 bg-ocean-600/10 p-6 rounded-2xl border border-ocean-600/20">
                         <div className="flex items-center gap-2 mb-1">
                           <Instagram className="w-4 h-4 text-ocean-600" />
                           <label className="text-xs uppercase tracking-wider text-ocean-600 font-bold">Configuração do Feed Automático (Behold.so)</label>
@@ -548,7 +548,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                             key={settings?.instagram?.beholdUrl || 'empty'}
                             defaultValue={settings?.instagram?.beholdUrl}
                             id="behold-url-input"
-                            className="flex-grow px-4 py-3 rounded-xl bg-white border border-ocean-200 outline-none focus:ring-2 focus:ring-ocean-500 text-sm shadow-sm"
+                            className="flex-grow px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-2 focus:ring-ocean-500 text-sm shadow-sm"
                           />
                           <button 
                             onClick={async (e) => {
@@ -570,7 +570,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   </div>
 
                   {/* Other Settings */}
-                  <div className="bg-white p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6 flex flex-col">
+                  <div className="bg-sand-100 p-8 rounded-3xl border border-sand-100 shadow-sm space-y-6 flex flex-col">
                     <h3 className="text-xl font-serif text-sand-900 border-b border-sand-50 pb-4">Endereço e Localização</h3>
                     <div className="flex-grow space-y-4">
                       <div className="space-y-1 flex-grow">
@@ -582,7 +582,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                         />
                       </div>
                     </div>
-                    <div className="p-4 bg-ocean-50 rounded-2xl text-xs text-ocean-700 italic font-light">
+                    <div className="p-4 bg-ocean-100/10 rounded-2xl text-xs text-ocean-700 italic font-light border border-ocean-600/10">
                       Dica: Alterar os links aqui atualizará automaticamente todos os botões "Reservar" e o rodapé do site.
                     </div>
 
@@ -590,7 +590,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                       <h4 className="text-sm font-serif text-sand-900">Manutenção do Sistema</h4>
                       <button 
                         onClick={handleSeedDatabase}
-                        className="w-full py-4 border-2 border-dashed border-sand-200 rounded-2xl text-sand-400 hover:text-red-500 hover:border-red-200 hover:bg-red-50 transition-all flex items-center justify-center gap-2 font-medium"
+                        className="w-full py-4 border-2 border-dashed border-sand-300 rounded-2xl text-sand-400 hover:text-red-500 hover:border-red-500/50 hover:bg-red-500/10 transition-all flex items-center justify-center gap-2 font-medium"
                       >
                         <Trash2 className="w-5 h-5" />
                         Inicializar Banco de Dados com Padrões
