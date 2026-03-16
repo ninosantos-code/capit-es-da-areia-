@@ -13,7 +13,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
+  const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'settings'>('tours');
@@ -81,28 +81,40 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
 
   const handleAddToGallery = async () => {
     if (!newImageUrl) return;
+    setLoading(true);
     try {
       await adminService.addToGallery(newImageUrl);
       setNewImageUrl('');
       const updatedGallery = await adminService.getGallery();
       setGallery(updatedGallery);
+      alert('Foto adicionada com sucesso!');
     } catch (err) {
       alert('Erro ao adicionar à galeria');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleRemoveFromGallery = async (id: string) => {
-    if (id === '1' || id === '2' || id === '3' || id === '4' || id === '5' || id === '6' || id === '7') {
+  const handleRemoveFromGallery = async (id: string, source: string) => {
+    if (source === 'default') {
       alert('Esta é uma foto padrão e não pode ser removida do banco de dados.');
       return;
     }
+    if (source === 'instagram') {
+      alert('Fotos do Instagram devem ser removidas diretamente no Instagram.');
+      return;
+    }
     if (!confirm('Deseja realmente remover esta foto?')) return;
+    
+    setLoading(true);
     try {
       await adminService.removeFromGallery(id);
       const updatedGallery = await adminService.getGallery();
       setGallery(updatedGallery);
     } catch (err) {
       alert('Erro ao remover foto');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -236,7 +248,10 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
               ) : activeTab === 'gallery' ? (
                 <div className="space-y-8">
                   <div className="bg-white p-6 rounded-2xl border border-sand-100 shadow-sm">
-                    <h3 className="text-lg font-serif mb-4 text-sand-900">Adicionar Foto à Galeria</h3>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-lg font-serif text-sand-900">Adicionar Foto à Galeria</h3>
+                      <span className="text-[10px] text-sand-400 uppercase tracking-widest font-bold">Manual (Firestore)</span>
+                    </div>
                     <div className="flex gap-4">
                       <input 
                         type="text" 
@@ -266,25 +281,41 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                           </div>
                         )}
 
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                          <button 
-                            onClick={() => handleRemoveFromGallery(item.id)}
-                            className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110"
-                            title="Remover foto"
-                          >
-                            <Trash2 className="w-5 h-5" />
-                          </button>
-                          {item.permalink && (
-                            <a 
-                              href={item.permalink}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-3 bg-ocean-600 text-white rounded-full hover:bg-ocean-700 transition-transform hover:scale-110"
-                              title="Ver no Instagram"
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-3 p-4 text-center">
+                          {item.source === 'firestore' ? (
+                            <button 
+                              onClick={() => handleRemoveFromGallery(item.id, item.source)}
+                              className="p-3 bg-red-500 text-white rounded-full hover:bg-red-600 transition-transform hover:scale-110"
+                              title="Remover foto"
                             >
-                              <Instagram className="w-5 h-5" />
-                            </a>
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          ) : item.source === 'instagram' ? (
+                            <div className="space-y-2">
+                              {item.permalink && (
+                                <a 
+                                  href={item.permalink}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-3 bg-ocean-600 text-white rounded-full hover:bg-ocean-700 transition-transform hover:scale-110 inline-block"
+                                  title="Ver no Instagram"
+                                >
+                                  <Instagram className="w-5 h-5" />
+                                </a>
+                              )}
+                              <p className="text-[10px] text-white/80 font-medium">Foto do Instagram</p>
+                            </div>
+                          ) : (
+                            <p className="text-[10px] text-white/80 font-medium bg-black/20 px-2 py-1 rounded">Foto Padrão</p>
                           )}
+                        </div>
+                        {/* Source Tag */}
+                        <div className={`absolute top-2 left-2 px-2 py-0.5 rounded-md text-[8px] font-bold uppercase tracking-wider ${
+                          item.source === 'firestore' ? 'bg-green-500 text-white' : 
+                          item.source === 'instagram' ? 'bg-ocean-500 text-white' : 
+                          'bg-sand-400 text-white'
+                        }`}>
+                          {item.source}
                         </div>
                       </div>
                     ))}

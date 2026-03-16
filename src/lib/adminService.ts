@@ -90,23 +90,37 @@ export const adminService = {
   },
 
   // Gallery
-  async getGallery(): Promise<{id: string, url: string}[]> {
-    const q = query(collection(db, 'gallery'));
+  async getGallery(): Promise<{id: string, url: string, source: 'firestore' | 'instagram' | 'default'}[]> {
+    const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(q);
-    if (snapshot.empty) return [
-      { id: '1', url: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg' },
-      { id: '2', url: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg' },
-      { id: '3', url: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg' },
-      { id: '4', url: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg' },
-      { id: '5', url: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg' },
-      { id: '6', url: 'https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg' },
-      { id: '7', url: 'https://i.postimg.cc/xTtTty0X/ninodrip.jpg' }
-    ];
-    return snapshot.docs.map(doc => ({ id: doc.id, url: doc.data().url }));
+    
+    const firestoreItems = snapshot.docs.map(doc => ({ 
+      id: doc.id, 
+      url: doc.data().url,
+      source: 'firestore' as const
+    }));
+
+    if (firestoreItems.length === 0) {
+      return [
+        { id: '1', url: 'https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg', source: 'default' },
+        { id: '2', url: 'https://i.postimg.cc/HsJLx80T/0f4b3716-7319-4b50-af1e-75dff028038a.jpg', source: 'default' },
+        { id: '3', url: 'https://i.postimg.cc/GhZms3zv/448f988f-9bd6-41e8-90dd-d43d715f7532.jpg', source: 'default' },
+        { id: '4', url: 'https://i.postimg.cc/TYZ3W2QC/47288200-9dbc-460a-82f2-b03621056bfc.jpg', source: 'default' },
+        { id: '5', url: 'https://i.postimg.cc/y8cYhqrX/4d97432c-6d05-4102-8910-d1e54fd6db76.jpg', source: 'default' },
+        { id: '6', url: 'https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg', source: 'default' },
+        { id: '7', url: 'https://i.postimg.cc/xTtTty0X/ninodrip.jpg', source: 'default' }
+      ];
+    }
+    return firestoreItems;
   },
 
   async addToGallery(url: string) {
-    await addDoc(collection(db, 'gallery'), { url, createdAt: new Date() });
+    if (!url) throw new Error('URL é obrigatória');
+    await addDoc(collection(db, 'gallery'), { 
+      url, 
+      createdAt: new Date(),
+      source: 'firestore'
+    });
   },
 
   async removeFromGallery(id: string) {
@@ -131,7 +145,8 @@ export const adminService = {
         mediaUrl: item.mediaUrl,
         mediaType: item.mediaType, // IMAGE, VIDEO, CAROUSEL_ALBUM
         permalink: item.permalink,
-        caption: item.caption
+        caption: item.caption,
+        source: 'instagram' as const
       }));
     } catch (err) {
       console.error('Erro ao buscar feed do Instagram:', err);

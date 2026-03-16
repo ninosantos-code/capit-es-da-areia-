@@ -265,7 +265,7 @@ function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
 
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<{id: string, url: string}[]>([]);
+  const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string, permalink?: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
@@ -314,16 +314,28 @@ export default function App() {
         const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
         
         const instaFeed = await adminService.getInstagramFeed(beholdUrl);
+        
+        // Mesclar as fotos: Fotos do Firestore (manuais) primeiro, depois Instagram
+        // Filtrar fotos padrão se houver fotos no Instagram ou no Firestore
+        const manualPhotos = fetchedGallery.filter(item => item.source === 'firestore');
+        const defaultPhotos = fetchedGallery.filter(item => item.source === 'default');
+        
+        let finalGallery = [...manualPhotos];
+        
         if (instaFeed.length > 0) {
-          setGallery(instaFeed);
-          // Prefetch Instagram images
-          instaFeed.slice(0, 6).forEach(item => {
-            const img = new Image();
-            img.src = item.url;
-          });
-        } else {
-          setGallery(fetchedGallery);
+          finalGallery = [...finalGallery, ...instaFeed];
+        } else if (manualPhotos.length === 0) {
+          // Se não tem Instagram nem fotos manuais, usa as padrão
+          finalGallery = defaultPhotos;
         }
+
+        setGallery(finalGallery);
+
+        // Prefetch images
+        finalGallery.slice(0, 8).forEach(item => {
+          const img = new Image();
+          img.src = item.url;
+        });
       } catch (err) {
         setTours(INITIAL_TOURS[language]);
       }
