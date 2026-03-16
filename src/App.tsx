@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon, Anchor } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type, Anchor, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -20,6 +20,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [translations, setTranslations] = useState<Record<string, Record<string, string>>>({});
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,7 +66,7 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
   };
 
   const handleAddTour = async () => {
-    setLoading(true);
+    setIsSaving(true);
     try {
       const newTour: Omit<Tour, 'id'> = {
         title: 'Nome do Novo Passeio',
@@ -75,14 +76,18 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
         image: 'https://images.unsplash.com/photo-1544551763-47a0159f963f?q=80&w=2070&auto=format&fit=crop',
         iconType: 'sun'
       };
-      await adminService.addTour(newTour);
+      console.log('Iniciando criação de passeio no Firestore...');
+      const result = await adminService.addTour(newTour);
+      console.log('Passeio criado com sucesso:', result.id);
+      
       const updatedTours = await adminService.getTours();
       setTours(updatedTours);
-      alert('Passeio criado! Agora você pode editá-lo abaixo.');
+      alert('Passeio criado com sucesso! Ele aparecerá no topo da lista para edição.');
     } catch (err) {
-      alert('Erro ao adicionar passeio');
+      console.error('Erro detalhado ao adicionar passeio:', err);
+      alert('Erro ao adicionar passeio. Verifique sua conexão e se você tem permissão.');
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
@@ -359,10 +364,15 @@ export default function AdminDashboard({ isOpen, onClose }: AdminDashboardProps)
                   ))}
                   <button 
                     onClick={handleAddTour}
-                    className="py-10 border-2 border-dashed border-sand-200 rounded-3xl text-sand-400 hover:text-ocean-600 hover:border-ocean-300 hover:bg-ocean-50 transition-all flex flex-col items-center justify-center gap-2 font-medium"
+                    disabled={isSaving}
+                    className="py-10 border-2 border-dashed border-sand-200 rounded-3xl text-sand-400 hover:text-ocean-600 hover:border-ocean-300 hover:bg-ocean-50 transition-all flex flex-col items-center justify-center gap-2 font-medium disabled:opacity-50"
                   >
-                    <Plus className="w-8 h-8" />
-                    <span>Adicionar Novo Passeio</span>
+                    {isSaving ? (
+                      <Loader2 className="w-8 h-8 animate-spin" />
+                    ) : (
+                      <Plus className="w-8 h-8" />
+                    )}
+                    <span>{isSaving ? 'Criando Passeio...' : 'Adicionar Novo Passeio'}</span>
                   </button>
                 </div>
               ) : activeTab === 'gallery' ? (

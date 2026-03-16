@@ -34,7 +34,7 @@ export interface Testimonial {
 export const adminService = {
   // Tours
   async getTours(): Promise<Tour[]> {
-    const q = query(collection(db, 'tours'));
+    const q = query(collection(db, 'tours'), orderBy('createdAt', 'desc'));
     const snapshot = await getDocs(q);
     return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Tour));
   },
@@ -45,7 +45,10 @@ export const adminService = {
   },
 
   async addTour(tour: Omit<Tour, 'id'>) {
-    const docRef = await addDoc(collection(db, 'tours'), tour);
+    const docRef = await addDoc(collection(db, 'tours'), {
+      ...tour,
+      createdAt: serverTimestamp()
+    });
     return { id: docRef.id, ...tour };
   },
 

@@ -16,7 +16,8 @@ vi.mock('firebase/firestore', () => ({
   query: vi.fn(),
   orderBy: vi.fn(),
   updateDoc: vi.fn(),
-  setDoc: vi.fn()
+  setDoc: vi.fn(),
+  serverTimestamp: vi.fn(() => 'mock-timestamp')
 }));
 
 describe('● Tours Management System', () => {
