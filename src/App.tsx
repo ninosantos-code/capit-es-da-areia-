@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2 } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
@@ -175,6 +175,7 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [commentForm, setCommentForm] = useState({ name: '', text: '', rating: 5 });
   const [isCommentSubmitted, setIsCommentSubmitted] = useState(false);
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
   const carouselRef = useRef<HTMLDivElement>(null);
   const galleryRef = useRef<HTMLDivElement>(null);
   const [isReservationModalOpen, setIsReservationModalOpen] = useState(false);
@@ -376,23 +377,28 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
   const handleCommentSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (isSubmittingComment) return;
+
+    setIsSubmittingComment(true);
     try {
       await adminService.addTestimonial(commentForm);
       
-      // Limpa os inputs imediatamente
+      // Limpa os inputs imediatamente após o sucesso
       setCommentForm({ name: '', text: '', rating: 5 });
-      
       setIsCommentSubmitted(true);
       
       if (analytics) {
         logEvent(analytics, 'submit_testimonial', { rating: commentForm.rating });
       }
+      
+      // Volta a mostrar o formulário em 4 segundos
+      setTimeout(() => setIsCommentSubmitted(false), 4000);
     } catch (err) {
-      alert('Erro ao enviar avaliação. Tente novamente mais tarde.');
+      console.error('Erro ao enviar depoimento:', err);
+      alert('Erro ao enviar avaliação. Por favor, verifique sua conexão e tente novamente.');
+    } finally {
+      setIsSubmittingComment(false);
     }
-    
-    // Volta a mostrar o formulário em 4 segundos
-    setTimeout(() => setIsCommentSubmitted(false), 4000);
   };
 
 
@@ -876,9 +882,17 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
 
                 <button 
                   type="submit"
-                  className="w-full py-4 bg-sand-900 text-white rounded-xl font-medium hover:bg-sand-800 transition-colors flex justify-center items-center gap-2"
+                  disabled={isSubmittingComment}
+                  className="w-full py-4 bg-sand-900 text-white rounded-xl font-medium hover:bg-sand-800 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Enviar Avaliação
+                  {isSubmittingComment ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Enviando...
+                    </>
+                  ) : (
+                    'Enviar Avaliação'
+                  )}
                 </button>
               </form>
             )}
