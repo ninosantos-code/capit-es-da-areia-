@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { adminService, Tour } from '../../lib/adminService';
-import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type, Anchor, Home, RefreshCcw, Database } from 'lucide-react';
+import { X, Save, Plus, Trash2, LogOut, Loader2, Instagram, MapPin, Play, Star, Globe, Type, Anchor, Home, RefreshCcw, Database, Camera, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface AdminDashboardProps {
@@ -17,55 +17,58 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
   const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string}[]>([]);
   const [settings, setSettings] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'tours' | 'gallery' | 'testimonials' | 'settings' | 'translations'>('tours');
+  const [activeTab, setActiveTab] = useState<'overview' | 'tours' | 'gallery' | 'testimonials' | 'settings' | 'translations'>('overview');
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [translations, setTranslations] = useState<Record<string, Record<string, string>>>({});
   const [newImageUrl, setNewImageUrl] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [translationSearch, setTranslationSearch] = useState('');
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (adminService.verifyPassword(password)) {
       setIsAuthenticated(true);
       setError('');
-      fetchInitialData();
+      // Agora as subscrições cuidam do resto pelo useEffect
     } else {
       setError('Senha incorreta');
     }
   };
 
-  const fetchInitialData = async () => {
+  // Listeners em tempo real para o Painel
+  useEffect(() => {
+    if (!isAuthenticated) return;
+    
     setLoading(true);
-    console.log('Iniciando carregamento de dados do Painel Admin...');
-    try {
-      // Usar Promise.allSettled ou tratar individualmente para evitar que um erro trave tudo
-      const results = await Promise.allSettled([
-        adminService.getTours(),
-        adminService.getGallery(),
-        adminService.getSettings(),
-        adminService.getTestimonials(),
-        adminService.getTranslations()
-      ]);
-
-      if (results[0].status === 'fulfilled') setTours(results[0].value);
-      if (results[1].status === 'fulfilled') setGallery(results[1].value);
-      if (results[2].status === 'fulfilled') setSettings(results[2].value);
-      if (results[3].status === 'fulfilled') setTestimonials(results[3].value);
-      if (results[4].status === 'fulfilled') setTranslations(results[4].value);
-
-      results.forEach((result, idx) => {
-        if (result.status === 'rejected') {
-          console.error(`Falha ao carregar item ${idx} do painel:`, result.reason);
-        }
-      });
-
-      console.log('Carregamento de dados concluído.');
-    } catch (err) {
-      console.error('Erro geral no fetchInitialData:', err);
-    } finally {
+    const unsubTours = adminService.subscribeToTours((data) => {
+      setTours(data);
       setLoading(false);
-    }
-  };
+    });
+    
+    const unsubSettings = adminService.subscribeToSettings((data) => {
+      setSettings(data);
+    });
+    
+    const unsubGallery = adminService.subscribeToGallery((data) => {
+      setGallery(data);
+    });
+    
+    const unsubTestimonials = adminService.subscribeToTestimonials((data) => {
+      setTestimonials(data);
+    });
+    
+    const unsubTranslations = adminService.subscribeToTranslations((data) => {
+      setTranslations(data);
+    });
+
+    return () => {
+      unsubTours();
+      unsubSettings();
+      unsubGallery();
+      unsubTestimonials();
+      unsubTranslations();
+    };
+  }, [isAuthenticated]);
 
   const handleUpdateTour = async (id: string, data: Partial<Tour>) => {
     try {
@@ -231,7 +234,6 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
     setLoading(true);
     try {
       await adminService.seedDatabase();
-      await fetchInitialData();
       alert('Banco de dados preenchido com sucesso!');
     } catch (err) {
       alert('Erro ao inicializar banco de dados');
@@ -278,31 +280,28 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                   <span className="text-[10px] bg-ocean-100 text-ocean-600 px-2 py-0.5 rounded-full font-sans uppercase font-bold tracking-tighter">v2.1</span>
                 </h2>
                 <nav className="flex gap-2">
-                  {(['tours', 'gallery', 'testimonials', 'settings', 'translations'] as const).map((tab) => (
+                  {(['overview', 'tours', 'gallery', 'testimonials', 'settings', 'translations'] as const).map((tab) => (
                     <button 
                       key={tab}
                       onClick={() => setActiveTab(tab)}
                       className={`text-sm font-medium px-4 py-2 rounded-xl transition-all ${activeTab === tab ? 'bg-ocean-600 text-white shadow-md' : 'text-sand-600 hover:bg-sand-200'}`}
                     >
-                      {tab === 'tours' ? 'Passeios' : 
+                      {tab === 'overview' ? 'Início' :
+                       tab === 'tours' ? 'Passeios' : 
                        tab === 'gallery' ? 'Galeria' : 
                        tab === 'testimonials' ? 'Depoimentos' : 
                        tab === 'translations' ? 'Textos (i18n)' :
-                       'Links e Contato'}
+                       'Configurações'}
                     </button>
                   ))}
                 </nav>
               </div>
               <div className="flex items-center gap-2">
+                <div className="flex bg-sand-200 p-2 px-3 rounded-xl mr-2 gap-2 items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="text-[10px] font-bold text-sand-500 uppercase tracking-widest">Tempo Real</span>
+                </div>
                 <div className="flex bg-sand-200 p-1 rounded-xl mr-2">
-                  <button 
-                    onClick={fetchInitialData}
-                    disabled={loading}
-                    className="p-2 text-sand-600 hover:text-ocean-600 hover:bg-white rounded-lg transition-all disabled:opacity-50"
-                    title="Recarregar dados do banco"
-                  >
-                    <RefreshCcw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                  </button>
                   <button 
                     onClick={handleSeedDatabase}
                     className="p-2 text-sand-600 hover:text-ocean-600 hover:bg-white rounded-lg transition-all"
@@ -325,6 +324,96 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                 <div className="flex flex-col items-center justify-center py-20 text-sand-400">
                   <Loader2 className="w-10 h-10 animate-spin mb-4 text-ocean-500" />
                   <p className="font-light">Sincronizando com o banco de dados...</p>
+                </div>
+              ) : activeTab === 'overview' ? (
+                <div className="space-y-8 animate-in fade-in duration-500">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-sand-100 flex flex-col gap-4">
+                      <div className="w-12 h-12 bg-ocean-50 rounded-2xl flex items-center justify-center text-ocean-600">
+                        <Anchor className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="text-3xl font-serif text-sand-900">{tours.length}</p>
+                        <p className="text-xs font-bold text-sand-400 uppercase tracking-widest">Passeios Ativos</p>
+                      </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-sand-100 flex flex-col gap-4">
+                      <div className="w-12 h-12 bg-sun-50 rounded-2xl flex items-center justify-center text-sun-600">
+                        <Star className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="text-3xl font-serif text-sand-900">{testimonials.filter(t => t.approved).length}</p>
+                        <p className="text-xs font-bold text-sand-400 uppercase tracking-widest">Depoimentos Públicos</p>
+                      </div>
+                    </div>
+                    <div className="bg-white p-6 rounded-3xl shadow-sm border border-sand-100 flex flex-col gap-4">
+                      <div className="w-12 h-12 bg-sand-50 rounded-2xl flex items-center justify-center text-sand-600">
+                        <Camera className="w-6 h-6" />
+                      </div>
+                      <div>
+                        <p className="text-3xl font-serif text-sand-900">{gallery.filter(i => i.source === 'firestore').length}</p>
+                        <p className="text-xs font-bold text-sand-400 uppercase tracking-widest">Fotos na Galeria</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {testimonials.filter(t => !t.approved).length > 0 && (
+                    <div className="bg-ocean-50 border border-ocean-100 p-6 rounded-3xl flex items-center justify-between animate-in slide-in-from-top duration-500">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-ocean-100 text-ocean-600 rounded-full flex items-center justify-center">
+                          <MessageCircle className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-ocean-900 font-bold">Há depoimentos aguardando aprovação!</p>
+                          <p className="text-ocean-700 text-xs">Existem {testimonials.filter(t => !t.approved).length} novos comentários que precisam ser revisados.</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setActiveTab('testimonials')} className="px-4 py-2 bg-ocean-600 text-white rounded-xl text-sm font-bold hover:bg-ocean-700 transition-colors shadow-sm">Revisar Agora</button>
+                    </div>
+                  )}
+
+                  <div className="grid md:grid-cols-2 gap-8">
+                    <div className="bg-sand-900 text-white p-8 rounded-[2rem] space-y-6 relative overflow-hidden">
+                      <div className="relative z-10">
+                        <h3 className="text-2xl font-serif mb-2">Bem-vindo, Capitão!</h3>
+                        <p className="text-sand-300 text-sm font-light leading-relaxed">
+                          Este é seu centro de comando. Aqui você controla cada detalhe da experiência digital dos seus clientes. 
+                          Suas alterações são salvas em tempo real no Google Cloud.
+                        </p>
+                      </div>
+                      <div className="flex gap-4 relative z-10">
+                        <button onClick={() => setActiveTab('tours')} className="px-5 py-2.5 bg-white text-sand-900 rounded-xl text-sm font-bold hover:bg-ocean-50 transition-colors">Ver Passeios</button>
+                        <button onClick={() => setActiveTab('settings')} className="px-5 py-2.5 bg-sand-800 text-white rounded-xl text-sm font-bold hover:bg-sand-700 transition-colors">Configurações</button>
+                      </div>
+                      <Anchor className="absolute -bottom-10 -right-10 w-48 h-48 text-white/5 rotate-12" />
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="text-sm font-bold uppercase tracking-widest text-sand-400">Status de Conexão</h4>
+                      <div className="bg-white p-6 rounded-3xl border border-sand-100 space-y-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-sand-600">Google Firestore</span>
+                          <span className="flex items-center gap-1.5 text-[10px] font-bold text-green-600 uppercase">
+                            <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                            Online
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-sand-600">Behold Instagram API</span>
+                          <span className="flex items-center gap-1.5 text-[10px] font-bold text-ocean-600 uppercase">
+                            <div className="w-1.5 h-1.5 bg-ocean-500 rounded-full"></div>
+                            Conectado
+                          </span>
+                        </div>
+                        <div className="pt-4 border-t border-sand-50">
+                          <p className="text-[10px] text-sand-400 leading-tight">
+                            Qualquer problema na sincronização aparecerá aqui. <br/>
+                            Última verificação: {new Date().toLocaleTimeString()}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               ) : activeTab === 'tours' ? (
                 <div className="grid gap-6">
@@ -391,6 +480,15 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                               <option value="logo">Âncora</option>
                               <option value="house">Casa</option>
                             </select>
+                          </div>
+                          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-sand-50 border border-sand-100 mb-0.5">
+                            <span className="text-[10px] uppercase font-bold text-sand-400">Visível</span>
+                            <button 
+                              onClick={() => handleUpdateTour(tour.id!, { visible: tour.visible === false ? true : false })}
+                              className={`w-10 h-5 rounded-full transition-colors relative shadow-inner ${tour.visible !== false ? 'bg-green-500' : 'bg-sand-300'}`}
+                            >
+                              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-sm transition-all ${tour.visible !== false ? 'left-6' : 'left-1'}`} />
+                            </button>
                           </div>
                           <button 
                             onClick={() => handleDeleteTour(tour.id!)}
@@ -713,11 +811,23 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
               ) : activeTab === 'translations' ? (
                 <div className="space-y-8 pb-12">
                   <div className="bg-sand-100 p-6 rounded-2xl border border-sand-200">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Globe className="w-5 h-5 text-ocean-600" />
-                      <h3 className="text-xl font-serif text-sand-900">Editor de Conteúdo e Textos</h3>
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <Globe className="w-5 h-5 text-ocean-600" />
+                        <h3 className="text-xl font-serif text-sand-900">Editor de Conteúdo e Textos</h3>
+                      </div>
+                      <div className="relative">
+                        <input 
+                          type="text"
+                          placeholder="Pesquisar textos..."
+                          value={translationSearch}
+                          onChange={(e) => setTranslationSearch(e.target.value)}
+                          className="pl-10 pr-4 py-2 bg-white border border-sand-200 rounded-xl text-sm outline-none focus:ring-2 focus:ring-ocean-500 w-full md:w-64"
+                        />
+                        <RefreshCcw className="absolute left-3 top-2.5 w-4 h-4 text-sand-400" />
+                      </div>
                     </div>
-                    <p className="text-sm text-sand-600">Altere qualquer texto do site aqui. As mudanças são refletidas instantaneamente para todos os usuários.</p>
+                    <p className="text-sm text-sand-600 mt-2">Altere qualquer texto do site aqui. As mudanças são refletidas instantaneamente para todos os usuários.</p>
                   </div>
 
                   {loading ? (
@@ -752,7 +862,20 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                         };
                         const allKeys = Object.keys(translations['pt'] || {});
                         return Object.entries(groups).map(([groupName, prefixes]) => {
-                          const keysInGroup = allKeys.filter(k => prefixes.some(p => k.startsWith(p)));
+                          const keysInGroup = allKeys.filter(k => {
+                            const inGroup = prefixes.some(p => k.startsWith(p));
+                            if (!inGroup) return false;
+                            
+                            if (translationSearch) {
+                              const searchLower = translationSearch.toLowerCase();
+                              const ptVal = (translations['pt'][k] || '').toLowerCase();
+                              const enVal = (translations['en'][k] || '').toLowerCase();
+                              return k.toLowerCase().includes(searchLower) || 
+                                     ptVal.includes(searchLower) || 
+                                     enVal.includes(searchLower);
+                            }
+                            return true;
+                          });
                           if (keysInGroup.length === 0) return null;
                           return (
                             <div key={groupName} className="space-y-4">

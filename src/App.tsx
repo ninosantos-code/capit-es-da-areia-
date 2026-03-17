@@ -211,63 +211,73 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const loadData = async (showLoading = true, skipInstagram = false) => {
-    if (showLoading) setIsLoadingData(true);
+  const [instaFeed, setInstaFeed] = useState<any[]>([]);
+
+  // Carregamento inicial de dados externos (Instagram)
+  const loadInstagram = async () => {
     try {
-      const fetchList: Promise<any>[] = [
-        adminService.getTours(),
-        adminService.getGallery(),
-        adminService.getSettings(),
-        adminService.getTestimonials(),
-        adminService.getTranslations()
-      ];
-
-      const results = await Promise.all(fetchList);
-      
-      const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = results;
-      
-      setTours(fetchedTours);
-      setDynamicTranslations(fetchedTranslations);
-      setSettings(fetchedSettings);
-      setTestimonials(fetchedTestimonials.filter(t => t.approved));
-
-      // Processar fotos da galeria
-      const manualPhotos = fetchedGallery.filter(item => item.source === 'firestore');
-      const defaultPhotos = fetchedGallery.filter(item => item.source === 'default');
-      
-      let finalGallery = [...manualPhotos];
-      
-      if (!skipInstagram) {
-        // Use provided behold URL as base or fall back to DB
-        const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
-        const instaFeed = await adminService.getInstagramFeed(beholdUrl);
-        
-        if (instaFeed.length > 0) {
-          finalGallery = [...finalGallery, ...instaFeed];
-        } else if (manualPhotos.length === 0) {
-          finalGallery = defaultPhotos;
-        }
-      } else {
-        // Se pular Instagram, mantém o que já tinha ou os manuais
-        finalGallery = [...manualPhotos, ...gallery.filter(i => i.source === 'instagram')];
-      }
-
-      setGallery(finalGallery);
-
-      // Prefetch images
-      finalGallery.slice(0, 8).forEach(item => {
-        const img = new Image();
-        img.src = item.url;
-      });
+      const beholdUrl = settings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
+      const feed = await adminService.getInstagramFeed(beholdUrl);
+      setInstaFeed(feed);
     } catch (err) {
-      console.error('Erro ao carregar dados:', err);
-    } finally {
-      if (showLoading) setIsLoadingData(false);
+      console.error('Erro ao carregar Instagram:', err);
     }
   };
 
+  // Listeners em tempo real para o Firestore
   useEffect(() => {
-    loadData();
+    setIsLoadingData(true);
+    
+    const unsubTours = adminService.subscribeToTours((data) => {
+      setTours(data);
+      setIsLoadingData(false);
+    });
+    
+    const unsubSettings = adminService.subscribeToSettings((data) => {
+      setSettings(data);
+    });
+    
+    const unsubGallery = adminService.subscribeToGallery((data) => {
+      // Mesclar com o feed do instagram atual
+      const manualPhotos = data;
+      const defaultPhotos = data.filter(i => i.source === 'default');
+      
+      let finalGallery = [...manualPhotos];
+      if (instaFeed.length > 0) {
+        finalGallery = [...finalGallery, ...instaFeed];
+      } else if (manualPhotos.length === 0) {
+        finalGallery = defaultPhotos;
+      }
+      setGallery(finalGallery);
+    });
+    
+    const unsubTestimonials = adminService.subscribeToTestimonials((data) => {
+      setTestimonials(data.filter(t => t.approved));
+    });
+    
+    const unsubTranslations = adminService.subscribeToTranslations((data) => {
+      setDynamicTranslations(data);
+    });
+
+    return () => {
+      unsubTours();
+      unsubSettings();
+      unsubGallery();
+      unsubTestimonials();
+      unsubTranslations();
+    };
+  }, [instaFeed]); // Re-calcula galeria quando instaFeed carrega
+
+  // Carrega Instagram quando configurações mudarem
+  useEffect(() => {
+    if (settings?.instagram?.beholdUrl) {
+      loadInstagram();
+    }
+  }, [settings?.instagram?.beholdUrl]);
+
+  // Carrega inicial caso demore o settings
+  useEffect(() => {
+    loadInstagram();
   }, []);
 
   useEffect(() => {
@@ -679,7 +689,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                 // Tours Skeleton
                 [...Array(3)].map((_, i) => <TourSkeleton key={i} />)
               ) : (
-                tours.map((tour, index) => (
+                tours.filter(t => t.visible !== false).map((tour, index) => (
                 <motion.div 
                   key={tour.id || index}
                   initial={{ opacity: 0, y: 30 }}
@@ -1031,7 +1041,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <AdminDashboard 
         isOpen={isAdminOpen} 
         onClose={() => setIsAdminOpen(false)} 
-        onDataUpdate={() => loadData(false, true)}
+        onDataUpdate={() => {}} // Não precisa mais de data update manual
       />
 
 

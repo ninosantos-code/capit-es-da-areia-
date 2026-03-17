@@ -10,7 +10,8 @@ import {
   query, 
   orderBy,
   serverTimestamp,
-  writeBatch
+  writeBatch,
+  onSnapshot
 } from 'firebase/firestore';
 
 export interface Tour {
@@ -21,6 +22,8 @@ export interface Tour {
   price: string;
   image: string;
   iconType: string; // 'sun', 'camera', 'star', 'logo'
+  visible?: boolean;
+  createdAt?: any;
 }
 
 export interface Testimonial {
@@ -420,6 +423,55 @@ export const adminService = {
       batch.set(doc(transCollection, 'en'), en);
       await batch.commit();
     }
+  },
+
+  // Real-time Subscriptions
+  subscribeToTours(callback: (tours: Tour[]) => void) {
+    const q = query(collection(db, 'tours'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (snapshot) => {
+      const tours = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Tour));
+      callback(tours);
+    });
+  },
+
+  subscribeToGallery(callback: (items: any[]) => void) {
+    const q = query(collection(db, 'gallery'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (snapshot) => {
+      const items = snapshot.docs.map(doc => ({ 
+        id: doc.id, 
+        url: doc.data().url,
+        source: (doc.data().source || 'firestore') as 'firestore' | 'instagram' | 'default'
+      }));
+      callback(items);
+    });
+  },
+
+  subscribeToSettings(callback: (settings: any) => void) {
+    return onSnapshot(collection(db, 'settings'), (snapshot) => {
+      const settings: any = {};
+      snapshot.docs.forEach(doc => {
+        settings[doc.id] = doc.data();
+      });
+      callback(settings);
+    });
+  },
+
+  subscribeToTranslations(callback: (translations: any) => void) {
+    return onSnapshot(collection(db, 'translations'), (snapshot) => {
+      const trans: Record<string, Record<string, string>> = {};
+      snapshot.docs.forEach(doc => {
+        trans[doc.id] = doc.data() as Record<string, string>;
+      });
+      callback(trans);
+    });
+  },
+
+  subscribeToTestimonials(callback: (testimonials: Testimonial[]) => void) {
+    const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'));
+    return onSnapshot(q, (snapshot) => {
+      const testimonials = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+      callback(testimonials);
+    });
   },
 
   // Auth (Simple Password for now as requested)
