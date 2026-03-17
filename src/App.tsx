@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon, Anchor } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon, Anchor, Globe } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
@@ -211,39 +211,45 @@ export default function App() {
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  const loadData = async (showLoading = true) => {
+  const loadData = async (showLoading = true, skipInstagram = false) => {
     if (showLoading) setIsLoadingData(true);
     try {
-      const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = await Promise.all([
+      const fetchList: Promise<any>[] = [
         adminService.getTours(),
         adminService.getGallery(),
         adminService.getSettings(),
         adminService.getTestimonials(),
         adminService.getTranslations()
-      ]);
+      ];
+
+      const results = await Promise.all(fetchList);
+      
+      const [fetchedTours, fetchedGallery, fetchedSettings, fetchedTestimonials, fetchedTranslations] = results;
       
       setTours(fetchedTours);
       setDynamicTranslations(fetchedTranslations);
       setSettings(fetchedSettings);
       setTestimonials(fetchedTestimonials.filter(t => t.approved));
 
-      // Use provided behold URL as base or fall back to DB
-      const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
-      
-      const instaFeed = await adminService.getInstagramFeed(beholdUrl);
-      
-      // Mesclar as fotos: Fotos do Firestore (manuais) primeiro, depois Instagram
-      // Filtrar fotos padrão se houver fotos no Instagram ou no Firestore
+      // Processar fotos da galeria
       const manualPhotos = fetchedGallery.filter(item => item.source === 'firestore');
       const defaultPhotos = fetchedGallery.filter(item => item.source === 'default');
       
       let finalGallery = [...manualPhotos];
       
-      if (instaFeed.length > 0) {
-        finalGallery = [...finalGallery, ...instaFeed];
-      } else if (manualPhotos.length === 0) {
-        // Se não tem Instagram nem fotos manuais, usa as padrão
-        finalGallery = defaultPhotos;
+      if (!skipInstagram) {
+        // Use provided behold URL as base or fall back to DB
+        const beholdUrl = fetchedSettings?.instagram?.beholdUrl || 'https://feeds.behold.so/tNJoO9390vXCO8fbN5Wo';
+        const instaFeed = await adminService.getInstagramFeed(beholdUrl);
+        
+        if (instaFeed.length > 0) {
+          finalGallery = [...finalGallery, ...instaFeed];
+        } else if (manualPhotos.length === 0) {
+          finalGallery = defaultPhotos;
+        }
+      } else {
+        // Se pular Instagram, mantém o que já tinha ou os manuais
+        finalGallery = [...manualPhotos, ...gallery.filter(i => i.source === 'instagram')];
       }
 
       setGallery(finalGallery);
@@ -1008,7 +1014,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
         <div className="max-w-7xl mx-auto mt-12 pt-8 border-t border-sand-800 text-center text-sm font-light space-y-2">
           <p>&copy; {new Date().getFullYear()} Capitães da Areia. {t('footer.rights')}</p>
-          <p className="text-xs text-sand-500">Condutores: Nino, Joemersson, Diogo e Felipe.</p>
+          <p className="text-xs text-sand-500">{t('footer.conductors')}: Nino, Joemersson, Diogo e Felipe.</p>
+          <div className="flex items-center justify-center gap-2 text-[10px] text-ocean-600 font-medium uppercase tracking-widest opacity-80">
+            <Globe className="w-3 h-3" />
+            <span>{t('footer.languages')}: Português, English, Español</span>
+          </div>
           <button 
             onClick={() => setIsAdminOpen(true)}
             className="text-[10px] text-sand-300 uppercase tracking-widest hover:text-ocean-400 transition-colors mt-8 opacity-50 hover:opacity-100"
@@ -1021,7 +1031,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
       <AdminDashboard 
         isOpen={isAdminOpen} 
         onClose={() => setIsAdminOpen(false)} 
-        onDataUpdate={() => loadData(false)}
+        onDataUpdate={() => loadData(false, true)}
       />
 
 

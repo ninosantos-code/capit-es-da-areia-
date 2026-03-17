@@ -9,7 +9,8 @@ import {
   deleteDoc, 
   query, 
   orderBy,
-  serverTimestamp
+  serverTimestamp,
+  writeBatch
 } from 'firebase/firestore';
 
 export interface Tour {
@@ -224,9 +225,12 @@ export const adminService = {
           iconType: 'house'
         }
       ];
-      for (const tour of initialTours) {
-        await addDoc(toursCollection, tour);
-      }
+      const batch = writeBatch(db);
+      initialTours.forEach((tour) => {
+        const newDocRef = doc(collection(db, 'tours'));
+        batch.set(newDocRef, { ...tour, createdAt: serverTimestamp() });
+      });
+      await batch.commit();
     }
 
     // 2. Seed Settings
@@ -265,13 +269,16 @@ export const adminService = {
         'https://i.postimg.cc/Nfpfp7gb/ninodeitado.jpg',
         'https://i.postimg.cc/xTtTty0X/ninodrip.jpg'
       ];
-      for (const url of initialGallery) {
-        await addDoc(galleryCollection, {
+      const batch = writeBatch(db);
+      initialGallery.forEach((url) => {
+        const newDocRef = doc(collection(db, 'gallery'));
+        batch.set(newDocRef, {
           url,
           createdAt: serverTimestamp(),
           source: 'firestore'
         });
-      }
+      });
+      await batch.commit();
     }
 
     // 4. Seed Translations
@@ -338,7 +345,9 @@ export const adminService = {
         'footer.description': 'Experiências autênticas no mar de Moreré. Passeios de lancha, canoa e vivências únicas na Ilha de Boipeba.',
         'footer.links': 'Links Rápidos',
         'footer.contact': 'Contato',
-        'footer.rights': 'Todos os direitos reservados.'
+        'footer.rights': 'Todos os direitos reservados.',
+        'footer.conductors': 'Condutores',
+        'footer.languages': 'Idiomas falados'
       };
 
       const en = {
@@ -401,11 +410,15 @@ export const adminService = {
         'footer.description': 'Authentic experiences in the Moreré sea. Speedboat, canoe tours and unique experiences on Boipeba Island.',
         'footer.links': 'Quick Links',
         'footer.contact': 'Contact',
-        'footer.rights': 'All rights reserved.'
+        'footer.rights': 'All rights reserved.',
+        'footer.conductors': 'Conductors',
+        'footer.languages': 'Languages spoken'
       };
 
-      await setDoc(doc(transCollection, 'pt'), pt);
-      await setDoc(doc(transCollection, 'en'), en);
+      const batch = writeBatch(db);
+      batch.set(doc(transCollection, 'pt'), pt);
+      batch.set(doc(transCollection, 'en'), en);
+      await batch.commit();
     }
   },
 
