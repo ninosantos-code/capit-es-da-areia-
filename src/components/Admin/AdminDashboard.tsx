@@ -795,6 +795,96 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                         <p>Dica: Alterar os links aqui atualizará automaticamente todos os botões "Reservar" e o rodapé do site.</p>
                       </div>
 
+                      {/* Bioluminescência Settings */}
+                      <div className="pt-8 border-t border-sand-100 space-y-6">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-serif text-sand-900">Seção Bioluminescência</h3>
+                          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-sand-50 border border-sand-100 shadow-sm">
+                            <span className="text-[10px] uppercase font-bold text-sand-400">Visível</span>
+                            <button 
+                              onClick={() => handleUpdateSettings('bioluminescence', { ...settings.bioluminescence, visible: settings.bioluminescence?.visible === false ? true : false })}
+                              className={`w-10 h-5 rounded-full transition-colors relative shadow-inner ${settings.bioluminescence?.visible !== false ? 'bg-green-500' : 'bg-sand-300'}`}
+                            >
+                              <div className={`absolute top-1 w-3 h-3 bg-white rounded-full shadow-sm transition-all ${settings.bioluminescence?.visible !== false ? 'left-6' : 'left-1'}`} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Título Principal</label>
+                            <input 
+                              id="bio-title-input"
+                              defaultValue={settings?.bioluminescence?.title || 'O Fenômeno da Bioluminescência'}
+                              className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 text-sm"
+                            />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Subtítulo</label>
+                            <input 
+                              id="bio-subtitle-input"
+                              defaultValue={settings?.bioluminescence?.subtitle || 'Moreré é um dos raros lugares do mundo...'}
+                              className="w-full px-4 py-2 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 text-sm"
+                            />
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Descrição Completa</label>
+                          <textarea 
+                            id="bio-description-input"
+                            defaultValue={settings?.bioluminescence?.description}
+                            className="w-full h-32 px-4 py-3 rounded-xl bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 resize-none text-sm"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-3 gap-4">
+                          {[1, 2, 3].map(num => (
+                            <div key={num} className="bg-sand-50 p-4 rounded-2xl border border-sand-100 space-y-2">
+                              <label className="text-[10px] uppercase font-bold text-ocean-600">Destaque {num}</label>
+                              <input 
+                                id={`bio-card${num}-title-input`}
+                                placeholder="Título"
+                                defaultValue={settings?.bioluminescence?.[`card${num}Title`]}
+                                className="w-full px-3 py-2 rounded-lg bg-white border border-sand-100 text-xs outline-none focus:ring-1 focus:ring-ocean-500"
+                              />
+                              <textarea 
+                                id={`bio-card${num}-desc-input`}
+                                placeholder="Descrição"
+                                defaultValue={settings?.bioluminescence?.[`card${num}Desc`]}
+                                className="w-full h-20 px-3 py-2 rounded-lg bg-white border border-sand-100 text-xs outline-none focus:ring-1 focus:ring-ocean-500 resize-none"
+                              />
+                            </div>
+                          ))}
+                        </div>
+
+                        <button 
+                          onClick={async (e) => {
+                            const btn = e.currentTarget;
+                            btn.disabled = true;
+                            const data = {
+                              title: (document.getElementById('bio-title-input') as HTMLInputElement).value,
+                              subtitle: (document.getElementById('bio-subtitle-input') as HTMLInputElement).value,
+                              description: (document.getElementById('bio-description-input') as HTMLTextAreaElement).value,
+                              card1Title: (document.getElementById('bio-card1-title-input') as HTMLInputElement).value,
+                              card1Desc: (document.getElementById('bio-card1-desc-input') as HTMLTextAreaElement).value,
+                              card2Title: (document.getElementById('bio-card2-title-input') as HTMLInputElement).value,
+                              card2Desc: (document.getElementById('bio-card2-desc-input') as HTMLTextAreaElement).value,
+                              card3Title: (document.getElementById('bio-card3-title-input') as HTMLInputElement).value,
+                              card3Desc: (document.getElementById('bio-card3-desc-input') as HTMLTextAreaElement).value,
+                              visible: settings.bioluminescence?.visible !== false
+                            };
+                            await handleUpdateSettings('bioluminescence', data);
+                            btn.disabled = false;
+                            alert('Configurações de Bioluminescência salvas!');
+                          }}
+                          className="w-full py-3 bg-sand-900 text-white rounded-xl font-medium hover:bg-sand-800 transition-all flex items-center justify-center gap-2 shadow-md"
+                        >
+                          <Save className="w-4 h-4" />
+                          Salvar Configurações de Bioluminescência
+                        </button>
+                      </div>
+
                       <div className="pt-8 border-t border-sand-100 flex flex-col gap-4">
                         <h4 className="text-sm font-serif text-sand-900">Manutenção do Sistema</h4>
                         <button 

@@ -18,6 +18,7 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'nav.tours': 'Nossos Passeios',
     'nav.gallery': 'Galeria',
     'nav.testimonials': 'Depoimentos',
+    'nav.bioluminescence': 'Bioluminescência',
     'nav.reservation': 'Reservar Agora',
     'hero.title': 'Capitães da Areia',
     'hero.subtitle': 'Experiências autênticas nas águas cristalinas de Moreré.',
@@ -73,13 +74,27 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'footer.description': 'Experiências autênticas no mar de Moreré. Passeios de lancha, canoa e vivências únicas na Ilha de Boipeba.',
     'footer.links': 'Links Rápidos',
     'footer.contact': 'Contato',
-    'footer.rights': 'Todos os direitos reservados.'
+    'footer.rights': 'Todos os direitos reservados.',
+    
+    // Bioluminescência
+    'bio.label': 'Experiência Noturna',
+    'bio.title': 'O Fenômeno da Bioluminescência',
+    'bio.subtitle': 'Moreré é um dos raros lugares do mundo onde é possível presenciar o brilho das águas sob as estrelas.',
+    'bio.description': 'O brilho azulado é causado por organismos microscópicos (principalmente dinoflagelados) que emitem luz ao serem agitados. Em noites de lua nova, as águas de Moreré se transformam em um espelho do céu estrelado.',
+    'bio.card1.title': 'Melhor Época',
+    'bio.card1.desc': 'Noites de Lua Nova ou Crescente para máxima escuridão e visibilidade.',
+    'bio.card2.title': 'Como Funciona',
+    'bio.card2.desc': 'A agitação da água (com as mãos ou nadando) ativa a reação química dos plânctons.',
+    'bio.card3.title': 'Onde Ver',
+    'bio.card3.desc': 'Nas águas calmas e rasas de Moreré, longe das luzes artificiais do vilarejo.',
+    'bio.cta': 'Agendar Experiência Noturna'
   },
   en: {
     'nav.about': 'About Moreré',
     'nav.tours': 'Our Tours',
     'nav.gallery': 'Gallery',
     'nav.testimonials': 'Reviews',
+    'nav.bioluminescence': 'Bioluminescence',
     'nav.reservation': 'Book Now',
     'hero.title': 'Sand Captains',
     'hero.subtitle': 'Authentic experiences in the crystal clear waters of Moreré.',
@@ -135,7 +150,20 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'footer.description': 'Authentic sea experiences in Moreré. Speedboat tours, canoe trips and unique experiences in Boipeba Island.',
     'footer.links': 'Quick Links',
     'footer.contact': 'Contact',
-    'footer.rights': 'All rights reserved.'
+    'footer.rights': 'All rights reserved.',
+    
+    // Bioluminescence
+    'bio.label': 'Night Experience',
+    'bio.title': 'The Bioluminescence Phenomenon',
+    'bio.subtitle': 'Moreré\'s waters transform into a mirror of the starry sky under the stars.',
+    'bio.description': 'The bluish glow is caused by microscopic organisms (mainly dinoflagellates) that emit light when agitated. On new moon nights, it is truly magical.',
+    'bio.card1.title': 'Best Time',
+    'bio.card1.desc': 'New or waxing moon nights for maximum darkness and visibility.',
+    'bio.card2.title': 'How it Works',
+    'bio.card2.desc': 'Agitating the water (with your hands or swimming) activates the chemical reaction of the plankton.',
+    'bio.card3.title': 'Where to See',
+    'bio.card3.desc': 'In the calm, shallow waters of Moreré, away from the village\'s artificial lights.',
+    'bio.cta': 'Schedule Night Experience'
   }
 };
 
@@ -465,6 +493,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             <button onClick={() => scrollTo('sobre')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.about').split(' ')[0]}</button>
             <button onClick={() => scrollTo('passeios')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.tours').split(' ')[1] || t('nav.tours')}</button>
             <button onClick={() => scrollTo('galeria')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.gallery')}</button>
+            <button onClick={() => scrollTo('bioluminescencia')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.bioluminescence')}</button>
             <button onClick={() => scrollTo('depoimentos')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.testimonials')}</button>
             
             {/* Language Switcher */}
@@ -522,6 +551,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <button onClick={() => scrollTo('sobre')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.about')}</button>
           <button onClick={() => scrollTo('passeios')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.tours')}</button>
           <button onClick={() => scrollTo('galeria')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.gallery')}</button>
+          <button onClick={() => scrollTo('bioluminescencia')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.bioluminescence')}</button>
           <button onClick={() => scrollTo('depoimentos')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.testimonials')}</button>
           <button 
             onClick={() => openReservationModal()}
@@ -835,6 +865,91 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           </div>
         </div>
       </section>
+
+      {/* Bioluminescence Section */}
+      {settings?.bioluminescence?.visible !== false && (
+      <section id="bioluminescencia" className="relative py-32 px-6 md:px-12 bg-[#050A0F] overflow-hidden">
+        {/* Animated Particles & Glow Lights */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="bio-glow-circle w-[600px] h-[600px] -top-48 -left-48 opacity-20" />
+          <div className="bio-glow-circle w-[400px] h-[400px] bottom-0 -right-24 opacity-10" />
+          {[...Array(25)].map((_, i) => (
+            <div 
+              key={i} 
+              className="bio-particle"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `${Math.random() * 100}%`,
+                animationDelay: `${Math.random() * 8}s`,
+                opacity: Math.random() * 0.7 + 0.3
+              }}
+            />
+          ))}
+        </div>
+
+        <div className="max-w-7xl mx-auto relative z-10">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8 }}
+            >
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-400 text-xs font-bold uppercase tracking-widest mb-6">
+                <Star className="w-3 h-3 animate-pulse" />
+                {t('bio.label')}
+              </div>
+              <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight drop-shadow-[0_0_15px_rgba(0,212,255,0.3)]">
+                {settings?.bioluminescence?.title || t('bio.title')}
+              </h2>
+              <p className="text-lg text-ocean-100/80 mb-8 leading-relaxed font-light">
+                {settings?.bioluminescence?.subtitle || t('bio.subtitle')}
+              </p>
+              <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl mb-10">
+                <p className="text-sand-100/90 leading-relaxed italic font-light">
+                  "{settings?.bioluminescence?.description || t('bio.description')}"
+                </p>
+              </div>
+              
+              <button 
+                onClick={() => openReservationModal('Bioluminescência')}
+                className="group px-8 py-4 bg-ocean-500 hover:bg-ocean-400 text-white rounded-full font-bold tracking-wide transition-all shadow-[0_0_20px_rgba(0,212,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] flex items-center gap-3"
+              >
+                <Moon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+                {t('bio.cta')}
+              </button>
+            </motion.div>
+
+            <div className="grid gap-6">
+              {[1, 2, 3].map((num, i) => (
+                <motion.div
+                  key={num}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: i * 0.2 }}
+                  className="group bg-[#0D151F] border border-white/5 p-6 rounded-3xl hover:border-ocean-500/30 transition-all hover:bg-ocean-950/20"
+                >
+                  <div className="flex gap-6 items-start">
+                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-ocean-500/10 flex items-center justify-center text-ocean-400 group-hover:scale-110 group-hover:text-ocean-300 transition-all">
+                      {num === 1 ? <Sun className="w-6 h-6" /> : num === 2 ? <Play className="w-6 h-6" /> : <MapPin className="w-6 h-6" />}
+                    </div>
+                    <div>
+                      <h4 className="text-white font-serif text-xl mb-2 group-hover:text-ocean-400 transition-colors">
+                        {settings?.bioluminescence?.[`card${num}Title`] || t(`bio.card${num}.title`)}
+                      </h4>
+                      <p className="text-sand-400/80 text-sm font-light leading-relaxed">
+                        {settings?.bioluminescence?.[`card${num}Desc`] || t(`bio.card${num}.desc`)}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      )}
 
       {/* Testimonials */}
       <section id="depoimentos" className="py-24 px-6 md:px-12 bg-sand-100">

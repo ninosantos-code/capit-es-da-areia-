@@ -113,4 +113,10 @@ describe('App Component', () => {
     expect(screen.getAllByText(/Capitães/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Ilha de Boipeba/i).length).toBeGreaterThan(0);
   });
+
+  it('● deve renderizar a seção de Bioluminescência', () => {
+    render(<App />);
+    expect(screen.getByText(/O Fenômeno da Bioluminescência/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Experiência Noturna/i).length).toBeGreaterThan(0);
+  });
 });
