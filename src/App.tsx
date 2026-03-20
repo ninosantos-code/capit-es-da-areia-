@@ -895,7 +895,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
               viewport={{ once: true }}
               transition={{ duration: 0.8 }}
             >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-400 text-xs font-bold uppercase tracking-widest mb-6">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-300 text-xs font-bold uppercase tracking-widest mb-6">
                 <Star className="w-3 h-3 animate-pulse" />
                 {t('bio.label')}
               </div>
@@ -931,14 +931,14 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                   className="group bg-[#0D151F] border border-white/5 p-6 rounded-3xl hover:border-ocean-500/30 transition-all hover:bg-ocean-950/20"
                 >
                   <div className="flex gap-6 items-start">
-                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-ocean-500/10 flex items-center justify-center text-ocean-400 group-hover:scale-110 group-hover:text-ocean-300 transition-all">
+                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-ocean-500/10 flex items-center justify-center text-ocean-300 group-hover:scale-110 group-hover:text-ocean-200 transition-all">
                       {num === 1 ? <Sun className="w-6 h-6" /> : num === 2 ? <Play className="w-6 h-6" /> : <MapPin className="w-6 h-6" />}
                     </div>
                     <div>
-                      <h4 className="text-white font-serif text-xl mb-2 group-hover:text-ocean-400 transition-colors">
+                      <h4 className="text-white font-serif text-xl mb-2 group-hover:text-ocean-300 transition-colors">
                         {settings?.bioluminescence?.[`card${num}Title`] || t(`bio.card${num}.title`)}
                       </h4>
-                      <p className="text-sand-400/80 text-sm font-light leading-relaxed">
+                      <p className="text-sand-50/70 text-sm font-light leading-relaxed">
                         {settings?.bioluminescence?.[`card${num}Desc`] || t(`bio.card${num}.desc`)}
                       </p>
                     </div>
