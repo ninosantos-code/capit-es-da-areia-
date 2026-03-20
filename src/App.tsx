@@ -228,7 +228,14 @@ export default function App() {
   useEffect(() => {
     setIsLoadingData(true);
     
+    // Timeout para fallback: se Firestore não responder em 8s, 
+    // para de mostrar loading e usa dados hardcoded
+    const fallbackTimeout = setTimeout(() => {
+      setIsLoadingData(false);
+    }, 8000);
+    
     const unsubTours = adminService.subscribeToTours((data) => {
+      clearTimeout(fallbackTimeout);
       setTours(data);
       setIsLoadingData(false);
     });
@@ -260,6 +267,7 @@ export default function App() {
     });
 
     return () => {
+      clearTimeout(fallbackTimeout);
       unsubTours();
       unsubSettings();
       unsubGallery();
@@ -279,24 +287,6 @@ export default function App() {
   useEffect(() => {
     loadInstagram();
   }, []);
-
-  useEffect(() => {
-    // This useEffect now only handles language changes for dynamic translations
-    // and re-fetches data if isAdminOpen changes (though onDataUpdate handles this better)
-    // The initial load is handled by the empty dependency array useEffect.
-    // We can keep this for language-specific re-renders if needed, or remove if dynamicTranslations update is sufficient.
-    // For now, let's keep it to ensure language changes trigger a re-render of content that relies on `t`
-    // and potentially re-fetch if admin changes something that affects language keys.
-    // However, the instruction implies removing the `isAdminOpen, language` dependency for `loadData`.
-    // The `loadData` function itself now handles the loading state.
-    // The `onDataUpdate` prop on `AdminDashboard` will call `loadData(false)` when admin closes.
-    // Language change will automatically update `t` function output.
-    // So, this useEffect can be simplified or removed if `dynamicTranslations` is enough.
-    // For now, let's remove the `loadData()` call from here as it's handled by the empty dependency array useEffect and onDataUpdate.
-    // The instruction implies removing the old useEffect completely and replacing it with the new structure.
-    // The original `useEffect` with `[isAdminOpen, language]` is replaced by the new `useEffect` with `[]` and `onDataUpdate`.
-    // The `language` dependency is implicitly handled by `t` using `dynamicTranslations`.
-  }, [isAdminOpen, language]); // Refresh data when closing admin or changing language
 
   const getIcon = (type: string) => {
     switch(type) {

@@ -425,13 +425,42 @@ export const adminService = {
     }
   },
 
-  // Real-time Subscriptions
+  // ─── Estado de conexão do Firestore ───
+  _connectionListeners: [] as ((connected: boolean, error?: string) => void)[],
+
+  onConnectionChange(callback: (connected: boolean, error?: string) => void) {
+    this._connectionListeners.push(callback);
+    return () => {
+      this._connectionListeners = this._connectionListeners.filter(cb => cb !== callback);
+    };
+  },
+
+  _notifyConnection(connected: boolean, error?: string) {
+    this._connectionListeners.forEach(cb => cb(connected, error));
+  },
+
+  _handleSnapshotError(context: string) {
+    return (error: any) => {
+      console.error(`[Firestore] Erro no listener '${context}':`, error?.message || error);
+      const msg = error?.message || '';
+      if (msg.includes('PERMISSION_DENIED') || msg.includes('disabled')) {
+        this._notifyConnection(false, 'API do Firestore desabilitada. Ative no Console Firebase.');
+      } else if (msg.includes('unavailable') || msg.includes('UNAVAILABLE')) {
+        this._notifyConnection(false, 'Firestore indisponível. Verifique sua conexão.');
+      } else {
+        this._notifyConnection(false, `Erro de conexão: ${msg}`);
+      }
+    };
+  },
+
+  // Real-time Subscriptions (com tratamento de erros)
   subscribeToTours(callback: (tours: Tour[]) => void) {
     const q = query(collection(db, 'tours'), orderBy('createdAt', 'desc'));
     return onSnapshot(q, (snapshot) => {
       const tours = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Tour));
+      this._notifyConnection(true);
       callback(tours);
-    });
+    }, this._handleSnapshotError('tours'));
   },
 
   subscribeToGallery(callback: (items: any[]) => void) {
@@ -442,8 +471,9 @@ export const adminService = {
         url: doc.data().url,
         source: (doc.data().source || 'firestore') as 'firestore' | 'instagram' | 'default'
       }));
+      this._notifyConnection(true);
       callback(items);
-    });
+    }, this._handleSnapshotError('gallery'));
   },
 
   subscribeToSettings(callback: (settings: any) => void) {
@@ -452,8 +482,9 @@ export const adminService = {
       snapshot.docs.forEach(doc => {
         settings[doc.id] = doc.data();
       });
+      this._notifyConnection(true);
       callback(settings);
-    });
+    }, this._handleSnapshotError('settings'));
   },
 
   subscribeToTranslations(callback: (translations: any) => void) {
@@ -462,16 +493,18 @@ export const adminService = {
       snapshot.docs.forEach(doc => {
         trans[doc.id] = doc.data() as Record<string, string>;
       });
+      this._notifyConnection(true);
       callback(trans);
-    });
+    }, this._handleSnapshotError('translations'));
   },
 
   subscribeToTestimonials(callback: (testimonials: Testimonial[]) => void) {
     const q = query(collection(db, 'testimonials'), orderBy('createdAt', 'desc'));
     return onSnapshot(q, (snapshot) => {
       const testimonials = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Testimonial));
+      this._notifyConnection(true);
       callback(testimonials);
-    });
+    }, this._handleSnapshotError('testimonials'));
   },
 
   // Auth (Simple Password for now as requested)
@@ -479,3 +512,4 @@ export const adminService = {
     return password === 'Lagosta@7';
   }
 };
+
