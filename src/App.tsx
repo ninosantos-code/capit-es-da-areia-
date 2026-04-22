@@ -192,9 +192,9 @@ function VideoPreview({ src, isActive }: { src: string; isActive: boolean }) {
 
 export default function App() {
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string, permalink?: string}[]>([]);
-  const [testimonials, setTestimonials] = useState<any[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [settings, setSettings] = useState<any>({});
   const [isAdminOpen, setIsAdminOpen] = useState(false);
   const [language, setLanguage] = useState<'pt' | 'en'>('pt');
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -270,7 +270,28 @@ export default function App() {
     });
     
     const unsubSettings = adminService.subscribeToSettings((data) => {
-      setSettings(data);
+      // Transformar array de settings em objeto estruturado para compatibilidade
+      const settingsMap: any = { contact: {}, instagram: {}, media: {} };
+      data.forEach(s => {
+        // Mapeamento simples para manter compatibilidade com o JSX (dot notation)
+        if (s.key.includes('.')) {
+          const [section, subKey] = s.key.split('.');
+          if (!settingsMap[section]) settingsMap[section] = {};
+          settingsMap[section][subKey] = s.value;
+        } else {
+          // Fallback para chaves planas (como as do novo seed)
+          if (['whatsapp1', 'whatsapp2', 'instagram', 'address'].includes(s.key)) {
+            settingsMap.contact[s.key] = s.value;
+          } else if (['heroBg', 'aboutMain', 'aboutSecondary'].includes(s.key)) {
+            settingsMap.media[s.key] = s.value;
+          } else if (s.key === 'beholdUrl') {
+            settingsMap.instagram.beholdUrl = s.value;
+          } else {
+            settingsMap[s.key] = s.value;
+          }
+        }
+      });
+      setSettings(settingsMap);
     });
     
     const unsubGallery = adminService.subscribeToGallery((data) => {
@@ -292,7 +313,13 @@ export default function App() {
     });
     
     const unsubTranslations = adminService.subscribeToTranslations((data) => {
-      setDynamicTranslations(data);
+      // Transformar array de Translation[] em Record<string, Record<string, string>>
+      const transMap: Record<string, Record<string, string>> = {};
+      data.forEach(t => {
+        if (!transMap[t.language]) transMap[t.language] = {};
+        transMap[t.language][t.key] = t.value;
+      });
+      setDynamicTranslations(transMap);
     });
 
     return () => {
@@ -751,7 +778,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                       >
                         <div className="relative aspect-[4/3] overflow-hidden">
                           <LazyImage 
-                            src={tour.image} 
+                            src={tour.imageUrl} 
                             alt={tour.title} 
                             className="w-full h-full group-hover:scale-105 transition-transform duration-700"
                             referrerPolicy="no-referrer"
@@ -773,7 +800,11 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
                             </div>
                             <div className="flex justify-between text-sm">
                               <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.price')}</span>
-                              <span className="text-sand-900 font-medium">{tour.price}</span>
+                              <span className="text-sand-900 font-medium">
+                                {typeof tour.price === 'number' 
+                                  ? `R$ ${tour.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` 
+                                  : tour.price}
+                              </span>
                             </div>
                           </div>
                           <button 

@@ -14,8 +14,8 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [tours, setTours] = useState<Tour[]>([]);
-  const [gallery, setGallery] = useState<{id: string, url: string, source: string, mediaType?: string}[]>([]);
-  const [settings, setSettings] = useState<any>(null);
+  const [gallery, setGallery] = useState<GalleryImage[]>([]);
+  const [settings, setSettings] = useState<any>({});
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'tours' | 'gallery' | 'testimonials' | 'settings' | 'translations'>('overview');
   const [testimonials, setTestimonials] = useState<any[]>([]);
@@ -46,7 +46,26 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
     });
     
     const unsubSettings = adminService.subscribeToSettings((data) => {
-      setSettings(data);
+      // Transformação idêntica ao do App.tsx para manter consistência no painel
+      const settingsMap: any = { contact: {}, instagram: {}, media: {} };
+      data.forEach(s => {
+        if (s.key.includes('.')) {
+          const [section, subKey] = s.key.split('.');
+          if (!settingsMap[section]) settingsMap[section] = {};
+          settingsMap[section][subKey] = s.value;
+        } else {
+          if (['whatsapp1', 'whatsapp2', 'instagram', 'address'].includes(s.key)) {
+            settingsMap.contact[s.key] = s.value;
+          } else if (['heroBg', 'aboutMain', 'aboutSecondary'].includes(s.key)) {
+            settingsMap.media[s.key] = s.value;
+          } else if (s.key === 'beholdUrl') {
+            settingsMap.instagram.beholdUrl = s.value;
+          } else {
+            settingsMap[s.key] = s.value;
+          }
+        }
+      });
+      setSettings(settingsMap);
     });
     
     const unsubGallery = adminService.subscribeToGallery((data) => {
@@ -58,7 +77,12 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
     });
     
     const unsubTranslations = adminService.subscribeToTranslations((data) => {
-      setTranslations(data);
+      const transMap: Record<string, Record<string, string>> = {};
+      data.forEach(t => {
+        if (!transMap[t.language]) transMap[t.language] = {};
+        transMap[t.language][t.key] = t.value;
+      });
+      setTranslations(transMap);
     });
 
     return () => {
@@ -84,13 +108,14 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
   const handleAddTour = async () => {
     setIsSaving(true);
     try {
-      const newTour: Omit<Tour, 'id'> = {
+      const newTour: Omit<Tour, 'id' | 'createdAt' | 'updatedAt'> = {
         title: 'Nome do Novo Passeio',
         description: 'Descrição do passeio aqui...',
         duration: '2-3 horas',
-        price: 'A partir de R$ 0',
-        image: 'https://images.unsplash.com/photo-1544551763-47a0159f963f?q=80&w=2070&auto=format&fit=crop',
-        iconType: 'sun'
+        price: 0,
+        imageUrl: 'https://images.unsplash.com/photo-1544551763-47a0159f963f?q=80&w=2070&auto=format&fit=crop',
+        iconType: 'sun',
+        visible: true
       };
       console.log('Iniciando criação de passeio no Firestore...');
       const result = await adminService.addTour(newTour);
@@ -125,15 +150,13 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
 
   const handleUpdateSettings = async (section: string, data: any) => {
     try {
-      await adminService.updateSettings(section, data);
-      const updatedSettings = await adminService.getSettings();
-      setSettings(updatedSettings);
+      // Como o novo serviço salva chave a chave, precisamos iterar o objeto
+      const promises = Object.entries(data).map(([subKey, value]) => {
+        const fullKey = `${section}.${subKey}`;
+        return adminService.updateSetting(fullKey, value as string);
+      });
       
-      // If we update instagram settings, refresh the gallery feed
-      if (section === 'instagram' && data.beholdUrl) {
-        const instaFeed = await adminService.getInstagramFeed(data.beholdUrl);
-        if (instaFeed.length > 0) setGallery(instaFeed);
-      }
+      await Promise.all(promises);
       if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao atualizar configurações');
@@ -144,7 +167,11 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
     if (!newImageUrl) return;
     setLoading(true);
     try {
-      await adminService.addToGallery(newImageUrl);
+      await adminService.addToGallery({ 
+        url: newImageUrl, 
+        source: 'firestore',
+        caption: 'Nova foto' 
+      });
       setNewImageUrl('');
       const updatedGallery = await adminService.getGallery();
       setGallery(updatedGallery);
@@ -219,9 +246,7 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
 
   const handleUpdateTranslation = async (lang: string, key: string, value: string) => {
     try {
-      const updatedLangData = { ...translations[lang], [key]: value };
-      await adminService.updateTranslation(lang, updatedLangData);
-      setTranslations({ ...translations, [lang]: updatedLangData });
+      await adminService.updateTranslation(key, lang, value);
       if (onDataUpdate) onDataUpdate();
     } catch (err) {
       alert('Erro ao atualizar tradução');
@@ -421,13 +446,13 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                     <div key={tour.id} className="bg-sand-100 p-6 rounded-2xl shadow-sm border border-sand-100 grid md:grid-cols-[180px_1fr] gap-6 group hover:shadow-md transition-shadow">
                       <div className="space-y-3">
                         <div className="aspect-square rounded-xl overflow-hidden bg-sand-100 border border-sand-50">
-                          <img src={tour.image} alt={tour.title} className="w-full h-full object-cover" />
+                          <img src={tour.imageUrl} alt={tour.title} className="w-full h-full object-cover" />
                         </div>
                         <input 
                           type="text"
                           placeholder="URL da Imagem"
-                          defaultValue={tour.image}
-                          onBlur={(e) => handleUpdateTour(tour.id!, { image: e.target.value })}
+                          defaultValue={tour.imageUrl}
+                          onBlur={(e) => handleUpdateTour(tour.id!, { imageUrl: e.target.value })}
                           className="w-full text-[10px] px-2 py-1 rounded bg-sand-50 border border-sand-100 outline-none focus:ring-1 focus:ring-ocean-500 truncate"
                         />
                       </div>
@@ -442,10 +467,12 @@ export default function AdminDashboard({ isOpen, onClose, onDataUpdate }: AdminD
                             />
                           </div>
                           <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Preço Sugerido</label>
+                            <label className="text-[10px] uppercase tracking-wider text-sand-400 font-bold">Preço Sugerido (Número)</label>
                             <input 
+                              type="number"
+                              step="0.01"
                               defaultValue={tour.price}
-                              onBlur={(e) => handleUpdateTour(tour.id!, { price: e.target.value })}
+                              onBlur={(e) => handleUpdateTour(tour.id!, { price: parseFloat(e.target.value) || 0 })}
                               className="w-full text-ocean-700 font-medium px-2 py-1 rounded bg-transparent hover:bg-sand-50 outline-none focus:ring-1 focus:ring-ocean-500"
                             />
                           </div>
