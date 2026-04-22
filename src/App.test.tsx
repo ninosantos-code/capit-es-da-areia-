@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import App from './App';
 import { logEvent } from 'firebase/analytics';
@@ -114,9 +114,42 @@ describe('App Component', () => {
     expect(screen.getAllByText(/Ilha de Boipeba/i).length).toBeGreaterThan(0);
   });
 
-  it('● deve renderizar a seção de Bioluminescência', () => {
+  it('● deve renderizar a prévia da Bioluminescência na Home', () => {
     render(<App />);
     expect(screen.getByText(/O Fenômeno da Bioluminescência/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Experiência Noturna/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Ver Detalhes da Experiência/i)).toBeInTheDocument();
+  });
+
+  it('● deve navegar para a página detalhada de Passeios Noturnos', async () => {
+    render(<App />);
+    const detailButton = screen.getByText(/Ver Detalhes da Experiência/i);
+    
+    await act(async () => {
+      fireEvent.click(detailButton);
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/O que esperar da experiência/i)).toBeInTheDocument();
+      expect(screen.getByText(/Voltar para o Início/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
+  });
+
+  it('● deve voltar para a Home ao clicar em Voltar na página de Passeios Noturnos', async () => {
+    render(<App />);
+    // Vai para a página detalhada
+    await act(async () => {
+      fireEvent.click(screen.getByText(/Ver Detalhes da Experiência/i));
+    });
+    
+    // Clica em voltar
+    const backButton = await screen.findByText(/Voltar para o Início/i);
+    await act(async () => {
+      fireEvent.click(backButton);
+    });
+
+    await waitFor(() => {
+      // "Ilha de Boipeba, Bahia" é o texto no Hero da Home
+      expect(screen.getByText(/Ilha de Boipeba, Bahia/i)).toBeInTheDocument();
+    }, { timeout: 3000 });
   });
 });

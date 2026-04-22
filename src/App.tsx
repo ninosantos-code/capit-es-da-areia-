@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon, Anchor, Globe } from 'lucide-react';
+import { MapPin, Sun, Camera, Instagram, MessageCircle, ChevronRight, ChevronLeft, Star, Menu, X, Play, Home, Loader2, Moon, Anchor, Globe, Calendar, Info, ShieldCheck, ArrowLeft, Waves } from 'lucide-react';
 import { logEvent } from 'firebase/analytics';
 import { analytics } from './lib/firebase';
 import LazyImage from './components/LazyImage';
@@ -203,6 +203,7 @@ export default function App() {
   });
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [dynamicTranslations, setDynamicTranslations] = useState<Record<string, Record<string, string>>>({});
+  const [currentView, setCurrentView] = useState<'home' | 'night-tours'>('home');
   
   const t = (key: string) => 
     dynamicTranslations[language]?.[key] || 
@@ -235,9 +236,9 @@ export default function App() {
   const [aceitaTermos, setAceitaTermos] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('dark', theme === 'dark' || currentView === 'night-tours');
     localStorage.setItem('theme', theme);
-  }, [theme]);
+  }, [theme, currentView]);
 
   const [instaFeed, setInstaFeed] = useState<any[]>([]);
 
@@ -440,10 +441,23 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
   }, [isMobileMenuOpen]);
 
   const scrollTo = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+    if (currentView !== 'home') {
+      setCurrentView('home');
+      // Espera o render para fazer scroll
+      setTimeout(() => {
+        const element = document.getElementById(id);
+        if (element) element.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    } else {
+      const element = document.getElementById(id);
+      if (element) element.scrollIntoView({ behavior: 'smooth' });
     }
+    setIsMobileMenuOpen(false);
+  };
+
+  const navigateToView = (view: 'home' | 'night-tours') => {
+    setCurrentView(view);
+    window.scrollTo({ top: 0, behavior: 'instant' });
     setIsMobileMenuOpen(false);
   };
 
@@ -474,6 +488,13 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
   };
 
 
+  if (isLoadingData) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center bg-sand-50">
+        <Loader2 className="w-10 h-10 text-ocean-600 animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-sand-50 text-sand-900 font-sans selection:bg-ocean-200 selection:text-ocean-900">
@@ -493,7 +514,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
             <button onClick={() => scrollTo('sobre')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.about').split(' ')[0]}</button>
             <button onClick={() => scrollTo('passeios')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.tours').split(' ')[1] || t('nav.tours')}</button>
             <button onClick={() => scrollTo('galeria')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.gallery')}</button>
-            <button onClick={() => scrollTo('bioluminescencia')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.bioluminescence')}</button>
+            <button onClick={() => navigateToView('night-tours')} className={`hover:text-ocean-500 transition-colors uppercase tracking-widest ${currentView === 'night-tours' ? 'text-ocean-500' : ''}`}>{t('nav.bioluminescence')}</button>
             <button onClick={() => scrollTo('depoimentos')} className="hover:text-ocean-500 transition-colors uppercase tracking-widest">{t('nav.testimonials')}</button>
             
             {/* Language Switcher */}
@@ -551,7 +572,7 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
           <button onClick={() => scrollTo('sobre')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.about')}</button>
           <button onClick={() => scrollTo('passeios')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.tours')}</button>
           <button onClick={() => scrollTo('galeria')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.gallery')}</button>
-          <button onClick={() => scrollTo('bioluminescencia')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.bioluminescence')}</button>
+          <button onClick={() => navigateToView('night-tours')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.bioluminescence')}</button>
           <button onClick={() => scrollTo('depoimentos')} className="text-2xl font-serif text-left border-b border-sand-200 pb-4">{t('nav.testimonials')}</button>
           <button 
             onClick={() => openReservationModal()}
@@ -563,535 +584,695 @@ ${observacoes ? `\n*Observações:* ${observacoes}` : ''}
         </div>
       )}
 
-      {/* Hero Section */}
-      <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <LazyImage 
-            src={settings?.media?.heroBg || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
-            alt="Praia de Moreré" 
-            className="w-full h-full brightness-[0.9] contrast-[1.05] saturate-[1.1]"
-            referrerPolicy="no-referrer"
-            priority={true}
-          />
-          <div className="absolute inset-0 bg-black/40" />
-          <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-transparent to-transparent" />
-        </div>
-        
-        <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
+      {/* Page Content */}
+      <AnimatePresence mode="wait">
+        {currentView === 'home' ? (
+          <motion.main
+            key="home"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.5 }}
           >
-            <span className="text-sand-100 uppercase tracking-[0.3em] text-sm md:text-base font-medium mb-6 block">
-              Ilha de Boipeba, Bahia
-            </span>
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 leading-tight">
-              {t('hero.title')} <br className="hidden md:block" />
-              <span className="italic font-light">de Moreré</span>
-            </h1>
-            <p className="text-lg md:text-xl text-sand-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
-              {t('hero.subtitle')}
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button 
-                onClick={() => openReservationModal()}
-                className="w-full sm:w-auto px-8 py-4 bg-ocean-600 text-white rounded-full font-medium tracking-wide hover:bg-ocean-700 transition-colors flex items-center justify-center gap-2"
-              >
-                <MessageCircle className="w-5 h-5" />
-                {t('hero.cta')}
-              </button>
-              <button 
-                onClick={() => scrollTo('passeios')}
-                className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-medium tracking-wide hover:bg-white/20 transition-colors border border-white/30"
-              >
-                {t('tours.label')}
-              </button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* About Section */}
-      <section id="sobre" className="py-24 px-6 md:px-12 bg-sand-50">
-        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
-          <motion.div 
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative"
-          >
-            <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
-              <LazyImage 
-                src={settings?.media?.aboutMain || "https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"}
-                alt="Barco em Moreré" 
-                className="w-full h-full"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
-              <LazyImage 
-                src={settings?.media?.aboutSecondary || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
-                alt="Coqueiros" 
-                className="w-full h-full"
-                referrerPolicy="no-referrer"
-              />
-            </div>
-            <div className="absolute top-12 -left-6 w-24 h-24 bg-ocean-100 rounded-full -z-10" />
-          </motion.div>
-          
-          <motion.div
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-          >
-            <div className="flex items-center gap-3 text-ocean-600 mb-6 uppercase tracking-widest text-sm font-semibold">
-              <MapPin className="w-5 h-5" />
-              <span>{t('about.label')}</span>
-            </div>
-            <h2 className="text-4xl md:text-5xl font-serif mb-6 text-sand-900 leading-tight">
-              {t('about.title1')} <span className="italic text-ocean-800">{t('about.title2')}</span>
-            </h2>
-            <p className="text-lg text-sand-800 mb-6 leading-relaxed font-light">
-              {t('about.p1')}
-            </p>
-            <p className="text-lg text-sand-800 mb-10 leading-relaxed font-light">
-              {t('about.p2')}
-            </p>
-            
-            <div className="flex gap-8">
-              <div>
-                <h4 className="text-3xl font-serif text-ocean-600 mb-2">10+</h4>
-                <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.exp_label')}</p>
+            {/* Hero Section */}
+            <section id="home" className="relative h-screen flex items-center justify-center overflow-hidden">
+              <div className="absolute inset-0 z-0">
+                <LazyImage 
+                  src={settings?.media?.heroBg || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
+                  alt="Praia de Moreré" 
+                  className="w-full h-full brightness-[0.9] contrast-[1.05] saturate-[1.1]"
+                  referrerPolicy="no-referrer"
+                  priority={true}
+                />
+                <div className="absolute inset-0 bg-black/40" />
+                <div className="absolute inset-0 bg-gradient-to-t from-sand-50 via-transparent to-transparent" />
               </div>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Tours Section */}
-      <section id="passeios" className="py-24 px-6 md:px-12 bg-sand-50">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="text-ocean-600 uppercase tracking-widest text-sm font-semibold mb-4 block">{t('tours.label')}</span>
-            <h2 className="text-4xl md:text-5xl font-serif text-sand-900 mb-6">
-              {t('tours.title').split(' ')[0]} {t('tours.title').split(' ')[1]} <span className="italic">{t('tours.title').split(' ').slice(2).join(' ')}</span>
-            </h2>
-            <p className="text-lg text-sand-800 font-light">
-              {t('tours.subtitle')}
-            </p>
-          </div>
-
-          <div className="relative">
-            {/* Carousel Controls */}
-            <button 
-              onClick={() => scrollCarousel('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button 
-              onClick={() => scrollCarousel('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Carousel Container */}
-            <div 
-              ref={carouselRef}
-              className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {isLoadingData ? (
-                // Tours Skeleton
-                [...Array(3)].map((_, i) => <TourSkeleton key={i} />)
-              ) : (
-                tours.filter(t => t.visible !== false).map((tour, index) => (
-                <motion.div 
-                  key={tour.id || index}
+              
+              <div className="relative z-10 text-center px-6 max-w-4xl mx-auto mt-16">
+                <motion.div
                   initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="min-w-[85vw] md:min-w-[350px] lg:min-w-[400px] snap-center group rounded-2xl overflow-hidden bg-sand-50 border border-sand-100 hover:shadow-xl transition-all duration-300 flex flex-col"
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8 }}
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden">
-                    <LazyImage 
-                      src={tour.image} 
-                      alt={tour.title} 
-                      className="w-full h-full group-hover:scale-105 transition-transform duration-700"
-                      referrerPolicy="no-referrer"
-                      priority={index < 2}
-                    />
-                    <div className="absolute top-4 right-4 bg-sand-50/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
-                      {getIcon(tour.iconType)}
-                    </div>
-                  </div>
-                  <div className="p-8 flex flex-col flex-grow">
-                    <h3 className="text-2xl font-serif text-sand-900 mb-3">{tour.title}</h3>
-                    <p className="text-sand-800 font-light mb-6 flex-grow">{tour.description}</p>
-                    
-                    <div className="space-y-3 mb-8 pt-6 border-t border-sand-200">
-                      <div className="flex justify-between text-sm">
-                        <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.duration')}</span>
-                        <span className="text-sand-900 font-medium">{tour.duration}</span>
-                      </div>
-                      <div className="flex justify-between text-sm">
-                        <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.price')}</span>
-                        <span className="text-sand-900 font-medium">{tour.price}</span>
-                      </div>
-                    </div>
+                  <span className="text-sand-100 uppercase tracking-[0.3em] text-sm md:text-base font-medium mb-6 block">
+                    Ilha de Boipeba, Bahia
+                  </span>
+                  <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif text-white mb-6 leading-tight">
+                    {t('hero.title')} <br className="hidden md:block" />
+                    <span className="italic font-light">de Moreré</span>
+                  </h1>
+                  <p className="text-lg md:text-xl text-sand-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed">
+                    {t('hero.subtitle')}
+                  </p>
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
                     <button 
-                      onClick={() => openReservationModal(tour.title)}
-                      className="w-full py-3.5 rounded-xl border border-ocean-600 text-ocean-600 font-medium text-center hover:bg-ocean-600 hover:text-white transition-colors flex items-center justify-center gap-2"
+                      onClick={() => openReservationModal()}
+                      className="w-full sm:w-auto px-8 py-4 bg-ocean-600 text-white rounded-full font-medium tracking-wide hover:bg-ocean-700 transition-colors flex items-center justify-center gap-2"
                     >
-                      {t('tours.consult')}
-                      <ChevronRight className="w-4 h-4" />
+                      <MessageCircle className="w-5 h-5" />
+                      {t('hero.cta')}
+                    </button>
+                    <button 
+                      onClick={() => scrollTo('passeios')}
+                      className="w-full sm:w-auto px-8 py-4 bg-white/10 backdrop-blur-sm text-white rounded-full font-medium tracking-wide hover:bg-white/20 transition-colors border border-white/30"
+                    >
+                      {t('tours.label')}
                     </button>
                   </div>
                 </motion.div>
-              ))
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="galeria" className="py-24 px-6 md:px-12 bg-sand-50 relative overflow-hidden">
-        {/* Decorative element */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-ocean-50 rounded-full blur-3xl opacity-50 -mr-32 -mt-32" />
-        
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
-            <div className="max-w-2xl">
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] rounded-xl flex items-center justify-center text-white shadow-lg">
-                  <Instagram className="w-6 h-6" />
-                </div>
-                <span className="text-sand-600 uppercase tracking-[0.2em] text-sm font-bold">@capitaesdaareiamorere</span>
               </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sand-900 leading-tight">
-                {t('gallery.title').split(' ').slice(0, -2).join(' ')} <br />
-                <span className="italic text-ocean-600">{t('gallery.title').split(' ').slice(-2).join(' ')}</span>
-              </h2>
-            </div>
-            <a 
-              href={`https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`} 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="group flex items-center gap-3 px-8 py-4 bg-sand-900 text-white rounded-full hover:bg-ocean-600 transition-all shadow-xl hover:shadow-ocean-200 hover:-translate-y-1"
-            >
-              <Instagram className="w-5 h-5 transition-transform group-hover:scale-110" />
-              <span className="font-medium">{t('gallery.follow')}</span>
-            </a>
-          </div>
+            </section>
 
-          <div className="relative">
-            {/* Carousel Controls */}
-            <button 
-              onClick={() => scrollGallery('left')}
-              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
-            <button 
-              onClick={() => scrollGallery('right')}
-              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
-
-            {/* Carousel Container */}
-            <div 
-              ref={galleryRef}
-              className="flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar group/carousel"
-              style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-            >
-              {isLoadingData ? (
-                // Gallery Skeleton
-                [...Array(4)].map((_, i) => <GallerySkeleton key={i} />)
-              ) : (
-                gallery.map((item, index) => (
-                <a 
-                  key={item.id || index}
-                  href={item.permalink || `https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onMouseEnter={() => item.mediaType === 'VIDEO' && setHoveredVideoId(item.id)}
-                  onMouseLeave={() => setHoveredVideoId(null)}
-                  className="min-w-[80vw] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden aspect-[9/11] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
-                >
-                  <LazyImage 
-                    src={item.url} 
-                    alt={item.caption || `Galeria ${index + 1}`} 
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
-                    referrerPolicy="no-referrer"
-                  />
-                  
-                  {/* Video Preview on Hover */}
-                  {(item as any).mediaType === 'VIDEO' && (item as any).mediaUrl && (
-                    <VideoPreview 
-                      src={(item as any).mediaUrl} 
-                      isActive={hoveredVideoId === item.id} 
-                    />
-                  )}
-                  
-                  {/* Video Indicator */}
-                  {item.mediaType === 'VIDEO' && (
-                    <div className="absolute top-6 right-6 w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 z-20">
-                      <Play className="w-6 h-6 fill-current" />
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8 z-30">
-                    <div className="text-white w-full">
-                      <div className="flex items-center gap-2 mb-2">
-                        <Instagram className="w-5 h-5" />
-                        <span className="text-xs font-bold uppercase tracking-wider">Ver no Instagram</span>
-                      </div>
-                      {item.caption && (
-                        <p className="text-sm line-clamp-2 text-sand-200 font-light leading-relaxed">
-                          {item.caption}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </a>
-              ))
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Bioluminescence Section */}
-      {settings?.bioluminescence?.visible !== false && (
-      <section id="bioluminescencia" className="relative py-32 px-6 md:px-12 bg-[#050A0F] overflow-hidden">
-        {/* Animated Particles & Glow Lights */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="bio-glow-circle w-[600px] h-[600px] -top-48 -left-48 opacity-20" />
-          <div className="bio-glow-circle w-[400px] h-[400px] bottom-0 -right-24 opacity-10" />
-          {[...Array(25)].map((_, i) => (
-            <div 
-              key={i} 
-              className="bio-particle"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 8}s`,
-                opacity: Math.random() * 0.7 + 0.3
-              }}
-            />
-          ))}
-        </div>
-
-        <div className="max-w-7xl mx-auto relative z-10">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, x: -30 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-300 text-xs font-bold uppercase tracking-widest mb-6">
-                <Star className="w-3 h-3 animate-pulse" />
-                {t('bio.label')}
-              </div>
-              <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight drop-shadow-[0_0_15px_rgba(0,212,255,0.3)]">
-                {settings?.bioluminescence?.title || t('bio.title')}
-              </h2>
-              <p className="text-lg text-ocean-100/80 mb-8 leading-relaxed font-light">
-                {settings?.bioluminescence?.subtitle || t('bio.subtitle')}
-              </p>
-              <div className="bg-white/5 backdrop-blur-sm border border-white/10 p-6 rounded-2xl mb-10">
-                <p className="text-sand-100/90 leading-relaxed italic font-light">
-                  "{settings?.bioluminescence?.description || t('bio.description')}"
-                </p>
-              </div>
-              
-              <button 
-                onClick={() => openReservationModal('Bioluminescência')}
-                className="group px-8 py-4 bg-ocean-500 hover:bg-ocean-400 text-white rounded-full font-bold tracking-wide transition-all shadow-[0_0_20px_rgba(0,212,255,0.4)] hover:shadow-[0_0_30px_rgba(0,212,255,0.6)] flex items-center gap-3"
-              >
-                <Moon className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-                {t('bio.cta')}
-              </button>
-            </motion.div>
-
-            <div className="grid gap-6">
-              {[1, 2, 3].map((num, i) => (
-                <motion.div
-                  key={num}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.2 }}
-                  className="group bg-[#0D151F] border border-white/5 p-6 rounded-3xl hover:border-ocean-500/30 transition-all hover:bg-ocean-950/20"
-                >
-                  <div className="flex gap-6 items-start">
-                    <div className="w-12 h-12 shrink-0 rounded-2xl bg-ocean-500/10 flex items-center justify-center text-ocean-300 group-hover:scale-110 group-hover:text-ocean-200 transition-all">
-                      {num === 1 ? <Sun className="w-6 h-6" /> : num === 2 ? <Play className="w-6 h-6" /> : <MapPin className="w-6 h-6" />}
-                    </div>
-                    <div>
-                      <h4 className="text-white font-serif text-xl mb-2 group-hover:text-ocean-300 transition-colors">
-                        {settings?.bioluminescence?.[`card${num}Title`] || t(`bio.card${num}.title`)}
-                      </h4>
-                      <p className="text-sand-50/70 text-sm font-light leading-relaxed">
-                        {settings?.bioluminescence?.[`card${num}Desc`] || t(`bio.card${num}.desc`)}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      )}
-
-      {/* Testimonials */}
-      <section id="depoimentos" className="py-24 px-6 md:px-12 bg-sand-100">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-serif text-sand-900 mb-4">
-              O que dizem <span className="italic">nossos clientes</span>
-            </h2>
-          </div>
-
-          {isLoadingData ? (
-            <div className="grid md:grid-cols-3 gap-8 mb-20">
-              {[...Array(3)].map((_, i) => <TestimonialSkeleton key={i} />)}
-            </div>
-          ) : testimonials.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-8 mb-20">
-              {testimonials.map((testimonial, idx) => (
+            {/* About Section */}
+            <section id="sobre" className="py-24 px-6 md:px-12 bg-sand-50">
+              <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-16 items-center">
                 <motion.div 
-                  key={testimonial.id || idx}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
+                  initial={{ opacity: 0, x: -30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: idx * 0.1 }}
-                  className="bg-sand-50 p-8 rounded-2xl shadow-sm border border-sand-100"
+                  transition={{ duration: 0.8 }}
+                  className="relative"
                 >
-                  <div className="flex gap-1 text-yellow-400 mb-6 font-bold">
-                    {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-current" />
-                    ))}
+                  <div className="aspect-[3/4] rounded-t-full overflow-hidden relative z-10">
+                    <LazyImage 
+                      src={settings?.media?.aboutMain || "https://i.postimg.cc/bNKw2YLZ/005ee50d-13e6-4229-9fd6-4db34ae4d335.jpg"}
+                      alt="Barco em Moreré" 
+                      className="w-full h-full"
+                      referrerPolicy="no-referrer"
+                    />
                   </div>
-                  <p className="text-sand-800 font-light italic mb-6 leading-relaxed">"{testimonial.text}"</p>
-                  <p className="font-medium text-sand-900 uppercase tracking-wide text-sm">{testimonial.name}</p>
+                  <div className="absolute -bottom-8 -right-8 w-2/3 aspect-square rounded-full overflow-hidden border-8 border-sand-50 z-20">
+                    <LazyImage 
+                      src={settings?.media?.aboutSecondary || "https://i.postimg.cc/Nfpfp7gD/ninocomrede.jpg"} 
+                      alt="Coqueiros" 
+                      className="w-full h-full"
+                      referrerPolicy="no-referrer"
+                    />
+                  </div>
+                  <div className="absolute top-12 -left-6 w-24 h-24 bg-ocean-100 rounded-full -z-10" />
                 </motion.div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center mb-20 bg-white/50 p-12 rounded-3xl border border-dashed border-sand-300">
-              <Star className="w-12 h-12 text-sand-300 mx-auto mb-4 opacity-50" />
-              <p className="text-sand-600 font-light italic text-lg">
-                Seja o primeiro a compartilhar sua experiência conosco!
-              </p>
-            </div>
-          )}
-
-          {/* Comment Form */}
-          <div className="max-w-2xl mx-auto bg-sand-50 p-8 md:p-10 rounded-3xl shadow-sm border border-sand-100">
-            <div className="text-center mb-8">
-              <h3 className="text-2xl font-serif text-sand-900 mb-2">Deixe sua avaliação</h3>
-              <p className="text-sand-600 font-light text-sm">
-                Compartilhe sua experiência conosco. Seu comentário será publicado após nossa aprovação.
-              </p>
-            </div>
-
-            {isCommentSubmitted ? (
-              <motion.div 
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="bg-ocean-50 text-ocean-800 p-6 rounded-xl text-center border border-ocean-100"
-              >
-                <Star className="w-8 h-8 text-ocean-500 mx-auto mb-3" />
-                <p className="font-medium">Obrigado pela sua avaliação!</p>
-                <p className="text-sm mt-1 opacity-80">Seu comentário foi enviado com sucesso e está aguardando aprovação.</p>
-              </motion.div>
-            ) : (
-              <form onSubmit={handleCommentSubmit} className="space-y-6">
-                <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-sand-800 mb-2">Seu Nome</label>
-                  <input 
-                    type="text" 
-                    id="name"
-                    required
-                    value={commentForm.name}
-                    onChange={(e) => setCommentForm({...commentForm, name: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent transition-all bg-sand-50"
-                    placeholder="Como você quer ser chamado?"
-                  />
-                </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-sand-800 mb-2">Sua Nota</label>
-                  <div className="flex gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setCommentForm({...commentForm, rating: star})}
-                        className="focus:outline-none transition-transform hover:scale-110"
+                <motion.div
+                  initial={{ opacity: 0, x: 30 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <div className="flex items-center gap-3 text-ocean-600 mb-6 uppercase tracking-widest text-sm font-semibold">
+                    <MapPin className="w-5 h-5" />
+                    <span>{t('about.label')}</span>
+                  </div>
+                  <h2 className="text-4xl md:text-5xl font-serif mb-6 text-sand-900 leading-tight">
+                    {t('about.title1')} <span className="italic text-ocean-800">{t('about.title2')}</span>
+                  </h2>
+                  <p className="text-lg text-sand-800 mb-6 leading-relaxed font-light">
+                    {t('about.p1')}
+                  </p>
+                  <p className="text-lg text-sand-800 mb-10 leading-relaxed font-light">
+                    {t('about.p2')}
+                  </p>
+                  
+                  <div className="flex gap-8">
+                    <div>
+                      <h4 className="text-3xl font-serif text-ocean-600 mb-2">10+</h4>
+                      <p className="text-sm text-sand-800 uppercase tracking-wider font-medium">{t('about.exp_label')}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </section>
+
+            {/* Tours Section */}
+            <section id="passeios" className="py-24 px-6 md:px-12 bg-sand-50">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                  <span className="text-ocean-600 uppercase tracking-widest text-sm font-semibold mb-4 block">{t('tours.label')}</span>
+                  <h2 className="text-4xl md:text-5xl font-serif text-sand-900 mb-6">
+                    {t('tours.title').split(' ')[0]} {t('tours.title').split(' ')[1]} <span className="italic">{t('tours.title').split(' ').slice(2).join(' ')}</span>
+                  </h2>
+                  <p className="text-lg text-sand-800 font-light">
+                    {t('tours.subtitle')}
+                  </p>
+                </div>
+
+                <div className="relative">
+                  {/* Carousel Controls */}
+                  <button 
+                    onClick={() => scrollCarousel('left')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button 
+                    onClick={() => scrollCarousel('right')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 shadow-lg rounded-full p-3 text-ocean-600 hover:bg-ocean-50 transition-colors hidden md:block border border-sand-100"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
+
+                  {/* Carousel Container */}
+                  <div 
+                    ref={carouselRef}
+                    className="flex overflow-x-auto gap-6 pb-8 snap-x snap-mandatory hide-scrollbar"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {isLoadingData ? (
+                      // Tours Skeleton
+                      [...Array(3)].map((_, i) => <TourSkeleton key={i} />)
+                    ) : (
+                      tours.filter(t => t.visible !== false).map((tour, index) => (
+                      <motion.div 
+                        key={tour.id || index}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: index * 0.1 }}
+                        className="min-w-[85vw] md:min-w-[350px] lg:min-w-[400px] snap-center group rounded-2xl overflow-hidden bg-sand-50 border border-sand-100 hover:shadow-xl transition-all duration-300 flex flex-col"
                       >
-                        <Star 
-                          className={`w-8 h-8 ${star <= commentForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-sand-300'}`} 
-                        />
-                      </button>
-                    ))}
+                        <div className="relative aspect-[4/3] overflow-hidden">
+                          <LazyImage 
+                            src={tour.image} 
+                            alt={tour.title} 
+                            className="w-full h-full group-hover:scale-105 transition-transform duration-700"
+                            referrerPolicy="no-referrer"
+                            status="loaded"
+                            priority={index < 2}
+                          />
+                          <div className="absolute top-4 right-4 bg-sand-50/90 backdrop-blur-sm p-3 rounded-full text-ocean-600 shadow-sm">
+                            {getIcon(tour.iconType)}
+                          </div>
+                        </div>
+                        <div className="p-8 flex flex-col flex-grow">
+                          <h3 className="text-2xl font-serif text-sand-900 mb-3">{tour.title}</h3>
+                          <p className="text-sand-800 font-light mb-6 flex-grow">{tour.description}</p>
+                          
+                          <div className="space-y-3 mb-8 pt-6 border-t border-sand-200">
+                            <div className="flex justify-between text-sm">
+                              <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.duration')}</span>
+                              <span className="text-sand-900 font-medium">{tour.duration}</span>
+                            </div>
+                            <div className="flex justify-between text-sm">
+                              <span className="text-sand-600 uppercase tracking-wider font-medium">{t('tours.price')}</span>
+                              <span className="text-sand-900 font-medium">{tour.price}</span>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => openReservationModal(tour.title)}
+                            className="w-full py-3.5 rounded-xl border border-ocean-600 text-ocean-600 font-medium text-center hover:bg-ocean-600 hover:text-white transition-colors flex items-center justify-center gap-2"
+                          >
+                            {t('tours.consult')}
+                            <ChevronRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))
+                    )}
                   </div>
                 </div>
+              </div>
+            </section>
 
-                <div>
-                  <label htmlFor="text" className="block text-sm font-medium text-sand-800 mb-2">Seu Comentário</label>
-                  <textarea 
-                    id="text"
-                    required
-                    rows={4}
-                    value={commentForm.text}
-                    onChange={(e) => setCommentForm({...commentForm, text: e.target.value})}
-                    className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent transition-all bg-sand-50 resize-none"
-                    placeholder="Conte-nos como foi o seu passeio..."
-                  />
+            <section id="galeria" className="py-24 px-6 md:px-12 bg-sand-50 relative overflow-hidden">
+              {/* Decorative element */}
+              <div className="absolute top-0 right-0 w-64 h-64 bg-ocean-50 rounded-full blur-3xl opacity-50 -mr-32 -mt-32" />
+              
+              <div className="max-w-7xl mx-auto relative z-10">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-16 gap-8 text-center md:text-left">
+                  <div className="max-w-2xl">
+                    <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                      <div className="w-10 h-10 bg-gradient-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] rounded-xl flex items-center justify-center text-white shadow-lg">
+                        <Instagram className="w-6 h-6" />
+                      </div>
+                      <span className="text-sand-600 uppercase tracking-[0.2em] text-sm font-bold">@capitaesdaareiamorere</span>
+                    </div>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-sand-900 leading-tight">
+                      {t('gallery.title').split(' ').slice(0, -2).join(' ')} <br />
+                      <span className="italic text-ocean-600">{t('gallery.title').split(' ').slice(-2).join(' ')}</span>
+                    </h2>
+                  </div>
+                  <a 
+                    href={`https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-3 px-8 py-4 bg-sand-900 text-white rounded-full hover:bg-ocean-600 transition-all shadow-xl hover:shadow-ocean-200 hover:-translate-y-1"
+                  >
+                    <Instagram className="w-5 h-5 transition-transform group-hover:scale-110" />
+                    <span className="font-medium">{t('gallery.follow')}</span>
+                  </a>
                 </div>
 
-                <button 
-                  type="submit"
-                  disabled={isSubmittingComment}
-                  className="w-full py-4 bg-sand-900 text-white rounded-xl font-medium hover:bg-sand-800 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isSubmittingComment ? (
-                    <>
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Enviando...
-                    </>
-                  ) : (
-                    'Enviar Avaliação'
-                  )}
-                </button>
-              </form>
-            )}
-          </div>
-        </div>
-      </section>
+                <div className="relative">
+                  {/* Carousel Controls */}
+                  <button 
+                    onClick={() => scrollGallery('left')}
+                    className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
+                  >
+                    <ChevronLeft className="w-6 h-6" />
+                  </button>
+                  <button 
+                    onClick={() => scrollGallery('right')}
+                    className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 z-10 bg-sand-100 border border-sand-100 shadow-xl rounded-full p-4 text-sand-900 hover:text-ocean-600 hover:scale-110 transition-all hidden md:block"
+                  >
+                    <ChevronRight className="w-6 h-6" />
+                  </button>
 
-      {/* CTA Section */}
-      <section className="py-24 px-6 md:px-12 bg-ocean-600 text-white text-center">
-        <div className="max-w-3xl mx-auto">
-          <h2 className="text-4xl md:text-6xl font-serif mb-8">Pronto para viver essa experiência?</h2>
-          <p className="text-xl text-ocean-100 font-light mb-10">
-            Entre em contato agora mesmo e garanta sua vaga nos melhores passeios de Moreré.
-          </p>
-          <a href={`https://wa.me/${settings?.contact?.whatsapp1Link || '5521988643166'}`} className="inline-flex items-center gap-2 px-6 py-2.5 bg-ocean-600 text-white rounded-full font-medium hover:bg-ocean-700 transition-colors shadow-lg">
-            <MessageCircle className="w-5 h-5" />
-            {t('nav.reservation')}
-          </a>
-        </div>
-      </section>
+                  {/* Carousel Container */}
+                  <div 
+                    ref={galleryRef}
+                    className="flex overflow-x-auto gap-6 pb-12 snap-x snap-mandatory hide-scrollbar group/carousel"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                  >
+                    {isLoadingData ? (
+                      // Gallery Skeleton
+                      [...Array(4)].map((_, i) => <GallerySkeleton key={i} />)
+                    ) : (
+                      gallery.map((item, index) => (
+                      <a 
+                        key={item.id || index}
+                        href={item.permalink || `https://instagram.com/${settings?.contact?.instagramLink || 'capitaesdaareiamorere'}/`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onMouseEnter={() => item.mediaType === 'VIDEO' && setHoveredVideoId(item.id)}
+                        onMouseLeave={() => setHoveredVideoId(null)}
+                        className="min-w-[80vw] md:min-w-[400px] snap-center rounded-[2rem] overflow-hidden aspect-[9/11] bg-sand-100 relative group/card shadow-lg hover:shadow-2xl transition-all duration-500"
+                      >
+                        <LazyImage 
+                          src={item.url} 
+                          alt={item.caption || `Galeria ${index + 1}`} 
+                          className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
+                          referrerPolicy="no-referrer"
+                        />
+                        
+                        {/* Video Preview on Hover */}
+                        {(item as any).mediaType === 'VIDEO' && (item as any).mediaUrl && (
+                          <VideoPreview 
+                            src={(item as any).mediaUrl} 
+                            isActive={hoveredVideoId === item.id} 
+                          />
+                        )}
+                        
+                        {/* Video Indicator */}
+                        {item.mediaType === 'VIDEO' && (
+                          <div className="absolute top-6 right-6 w-12 h-12 bg-black/30 backdrop-blur-md rounded-full flex items-center justify-center text-white border border-white/20 z-20">
+                            <Play className="w-6 h-6 fill-current" />
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover/card:opacity-100 transition-opacity duration-300 flex items-end p-8 z-30">
+                          <div className="text-white w-full">
+                            <div className="flex items-center gap-2 mb-2">
+                              <Instagram className="w-5 h-5" />
+                              <span className="text-xs font-bold uppercase tracking-wider">Ver no Instagram</span>
+                            </div>
+                            {item.caption && (
+                              <p className="text-sm line-clamp-2 text-sand-200 font-light leading-relaxed">
+                                {item.caption}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                      </a>
+                    ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Bioluminescence Section - Home Preview */}
+            {settings?.bioluminescence?.visible !== false && (
+            <section id="bioluminescencia" className="relative py-32 px-6 md:px-12 bg-[#050A0F] overflow-hidden">
+              <div className="absolute inset-0 z-0 pointer-events-none">
+                <div className="bio-glow-circle w-[600px] h-[600px] -top-48 -left-48 opacity-20" />
+                <div className="bio-glow-circle w-[400px] h-[400px] bottom-0 -right-24 opacity-10" />
+                {[...Array(15)].map((_, i) => (
+                  <div key={i} className="bio-particle" style={{ left: `${Math.random() * 100}%`, top: `${Math.random() * 100}%`, animationDelay: `${Math.random() * 8}s`, opacity: Math.random() * 0.5 + 0.2 }} />
+                ))}
+              </div>
+
+              <div className="max-w-7xl mx-auto relative z-10">
+                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                  <motion.div
+                    initial={{ opacity: 0, x: -30 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true }}
+                  >
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-ocean-500/10 border border-ocean-500/20 text-ocean-300 text-xs font-bold uppercase tracking-widest mb-6">
+                      <Star className="w-3 h-3 animate-pulse" />
+                      {t('bio.label')}
+                    </div>
+                    <h2 className="text-4xl md:text-5xl lg:text-6xl font-serif text-white mb-6 leading-tight">
+                      {settings?.bioluminescence?.title || t('bio.title')}
+                    </h2>
+                    <p className="text-lg text-ocean-100/80 mb-10 leading-relaxed font-light">
+                      {settings?.bioluminescence?.subtitle || t('bio.subtitle')}
+                    </p>
+                    
+                    <button 
+                      onClick={() => navigateToView('night-tours')}
+                      className="group px-8 py-4 bg-white/5 backdrop-blur-md border border-white/20 text-white rounded-full font-bold tracking-wide transition-all hover:bg-white/10 flex items-center gap-3"
+                    >
+                      Ver Detalhes da Experiência
+                      <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </button>
+                  </motion.div>
+
+                  <div className="relative aspect-video rounded-[2rem] overflow-hidden border border-white/10 shadow-2xl">
+                    <LazyImage 
+                      src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2073" 
+                      alt="Bioluminescência"
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#050A0F] via-transparent to-transparent" />
+                  </div>
+                </div>
+              </div>
+            </section>
+            )}
+
+            {/* Testimonials */}
+            <section id="depoimentos" className="py-24 px-6 md:px-12 bg-sand-100">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-16">
+                  <h2 className="text-4xl md:text-5xl font-serif text-sand-900 mb-4">
+                    O que dizem <span className="italic">nossos clientes</span>
+                  </h2>
+                </div>
+
+                {isLoadingData ? (
+                  <div className="grid md:grid-cols-3 gap-8 mb-20">
+                    {[...Array(3)].map((_, i) => <TestimonialSkeleton key={i} />)}
+                  </div>
+                ) : testimonials.length > 0 ? (
+                  <div className="grid md:grid-cols-3 gap-8 mb-20">
+                    {testimonials.map((testimonial, idx) => (
+                      <motion.div 
+                        key={testimonial.id || idx}
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5, delay: idx * 0.1 }}
+                        className="bg-sand-50 p-8 rounded-2xl shadow-sm border border-sand-100"
+                      >
+                        <div className="flex gap-1 text-yellow-400 mb-6 font-bold">
+                          {[...Array(testimonial.rating)].map((_, i) => (
+                            <Star key={i} className="w-5 h-5 fill-current" />
+                          ))}
+                        </div>
+                        <p className="text-sand-800 font-light italic mb-6 leading-relaxed">"{testimonial.text}"</p>
+                        <p className="font-medium text-sand-900 uppercase tracking-wide text-sm">{testimonial.name}</p>
+                      </motion.div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center mb-20 bg-white/50 p-12 rounded-3xl border border-dashed border-sand-300">
+                    <Star className="w-12 h-12 text-sand-300 mx-auto mb-4 opacity-50" />
+                    <p className="text-sand-600 font-light italic text-lg">
+                      Seja o primeiro a compartilhar sua experiência conosco!
+                    </p>
+                  </div>
+                )}
+
+                {/* Comment Form */}
+                <div className="max-w-2xl mx-auto bg-sand-50 p-8 md:p-10 rounded-3xl shadow-sm border border-sand-100">
+                  <div className="text-center mb-8">
+                    <h3 className="text-2xl font-serif text-sand-900 mb-2">Deixe sua avaliação</h3>
+                    <p className="text-sand-600 font-light text-sm">
+                      Compartilhe sua experiência conosco. Seu comentário será publicado após nossa aprovação.
+                    </p>
+                  </div>
+
+                  {isCommentSubmitted ? (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="bg-ocean-50 text-ocean-800 p-6 rounded-xl text-center border border-ocean-100"
+                    >
+                      <Star className="w-8 h-8 text-ocean-500 mx-auto mb-3" />
+                      <p className="font-medium">Obrigado pela sua avaliação!</p>
+                      <p className="text-sm mt-1 opacity-80">Seu comentário foi enviado com sucesso e está aguardando aprovação.</p>
+                    </motion.div>
+                  ) : (
+                    <form onSubmit={handleCommentSubmit} className="space-y-6">
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-sand-800 mb-2">Seu Nome</label>
+                        <input 
+                          type="text" 
+                          id="name"
+                          required
+                          value={commentForm.name}
+                          onChange={(e) => setCommentForm({...commentForm, name: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent transition-all bg-sand-50"
+                          placeholder="Como você quer ser chamado?"
+                        />
+                      </div>
+                      
+                      <div>
+                        <label className="block text-sm font-medium text-sand-800 mb-2">Sua Nota</label>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setCommentForm({...commentForm, rating: star})}
+                              className="focus:outline-none transition-transform hover:scale-110"
+                            >
+                              <Star 
+                                className={`w-8 h-8 ${star <= commentForm.rating ? 'fill-yellow-400 text-yellow-400' : 'text-sand-300'}`} 
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div>
+                        <label htmlFor="text" className="block text-sm font-medium text-sand-800 mb-2">Seu Comentário</label>
+                        <textarea 
+                          id="text"
+                          required
+                          rows={4}
+                          value={commentForm.text}
+                          onChange={(e) => setCommentForm({...commentForm, text: e.target.value})}
+                          className="w-full px-4 py-3 rounded-xl border border-sand-200 focus:outline-none focus:ring-2 focus:ring-ocean-500 focus:border-transparent transition-all bg-sand-50 resize-none"
+                          placeholder="Conte-nos como foi o seu passeio..."
+                        />
+                      </div>
+
+                      <button 
+                        type="submit"
+                        disabled={isSubmittingComment}
+                        className="w-full py-4 bg-sand-900 text-white rounded-xl font-medium hover:bg-sand-800 transition-colors flex justify-center items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {isSubmittingComment ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                            Enviando...
+                          </>
+                        ) : (
+                          'Enviar Avaliação'
+                        )}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            {/* CTA Section */}
+            <section className="py-24 px-6 md:px-12 bg-ocean-600 text-white text-center">
+              <div className="max-w-3xl mx-auto">
+                <h2 className="text-4xl md:text-6xl font-serif mb-8">Pronto para viver essa experiência?</h2>
+                <p className="text-xl text-ocean-100 font-light mb-10">
+                  Entre em contato agora mesmo e garanta sua vaga nos melhores passeios de Moreré.
+                </p>
+                <button onClick={() => openReservationModal()} className="inline-flex items-center gap-2 px-8 py-4 bg-white text-ocean-600 rounded-full font-bold hover:bg-sand-50 transition-colors shadow-xl">
+                  <MessageCircle className="w-5 h-5" />
+                  {t('nav.reservation')}
+                </button>
+              </div>
+            </section>
+          </motion.main>
+        ) : (
+          <motion.main
+            key="night-tours"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.5 }}
+            className="pt-24 bg-[#050A0F] min-h-screen text-white"
+          >
+            {/* Night Tours Detailed Header */}
+            <section className="relative py-20 px-6 md:px-12 overflow-hidden">
+               {/* Background Elements */}
+               <div className="absolute inset-0 z-0">
+                 <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534067783941-51c9c23ecefd?auto=format&fit=crop&q=80&w=2000')] bg-fixed bg-cover opacity-20 brightness-50" />
+                 <div className="absolute inset-0 bg-gradient-to-b from-[#050A0F] via-transparent to-[#050A0F]" />
+               </div>
+
+               <div className="max-w-7xl mx-auto relative z-10">
+                 <button 
+                   onClick={() => navigateToView('home')}
+                   className="flex items-center gap-2 text-ocean-300 hover:text-white transition-colors mb-12 group"
+                 >
+                   <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
+                   <span className="uppercase tracking-widest text-xs font-bold">Voltar para o Início</span>
+                 </button>
+
+                 <div className="grid lg:grid-cols-2 gap-16 items-center">
+                   <div>
+                     <span className="inline-block px-4 py-1.5 rounded-full bg-ocean-500/20 border border-ocean-500/30 text-ocean-300 text-[10px] font-bold uppercase tracking-[0.2em] mb-6">
+                       Experiência Exclusiva
+                     </span>
+                     <h1 className="text-5xl md:text-7xl font-serif mb-8 leading-tight">
+                       Passeios <br />
+                       <span className="italic text-ocean-400">Noturnos em Moreré</span>
+                     </h1>
+                     <p className="text-xl text-sand-100/70 font-light mb-10 leading-relaxed max-w-xl">
+                       Descubra a magia que acontece quando o sol se põe. 
+                       Das águas fluorescentes ao céu estrelado mais nítido da Bahia.
+                     </p>
+                     
+                     <div className="flex flex-wrap gap-4">
+                       <button 
+                         onClick={() => openReservationModal('Bioluminescência')}
+                         className="px-8 py-4 bg-ocean-500 text-white rounded-full font-bold hover:bg-ocean-400 transition-all shadow-[0_0_20px_rgba(0,212,255,0.3)] flex items-center gap-3"
+                       >
+                         <Moon className="w-5 h-5" />
+                         Agendar Agora
+                       </button>
+                       <div className="flex items-center gap-3 px-6 py-4 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm">
+                         <Star className="w-5 h-5 text-yellow-400 fill-current" />
+                         <span className="text-sm font-medium">4.9/5 (120+ avaliações)</span>
+                       </div>
+                     </div>
+                   </div>
+
+                   <div className="relative">
+                     <div className="aspect-square rounded-[3rem] overflow-hidden border border-white/10 shadow-2xl relative z-10">
+                       <LazyImage 
+                         src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&q=80&w=2073"
+                         alt="Bioluminescência em Moreré"
+                         className="w-full h-full object-cover"
+                         referrerPolicy="no-referrer"
+                       />
+                       <div className="absolute inset-0 bg-gradient-to-t from-[#050A0F]/80 via-transparent to-transparent" />
+                     </div>
+                     {/* Decorative glow */}
+                     <div className="absolute -top-10 -right-10 w-64 h-64 bg-ocean-500/20 rounded-full blur-[100px] -z-10" />
+                     <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-purple-500/10 rounded-full blur-[80px] -z-10" />
+                   </div>
+                 </div>
+               </div>
+            </section>
+
+            {/* Details Grid */}
+            <section className="py-24 px-6 md:px-12 bg-[#080E15]">
+              <div className="max-w-7xl mx-auto">
+                <div className="text-center mb-20">
+                  <h2 className="text-3xl md:text-5xl font-serif mb-6">O que esperar da experiência</h2>
+                  <div className="w-24 h-1 bg-ocean-500 mx-auto rounded-full" />
+                </div>
+
+                <div className="grid md:grid-cols-3 gap-8">
+                  <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-ocean-500/50 transition-all group">
+                    <div className="w-14 h-14 bg-ocean-500/10 rounded-2xl flex items-center justify-center text-ocean-400 mb-8 group-hover:scale-110 transition-transform">
+                      <Waves className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-serif mb-4">A Bioluminescência</h3>
+                    <p className="text-sand-100/60 font-light leading-relaxed">
+                      Navegamos até áreas de águas calmas onde o fitoplâncton reage ao movimento, criando um rastro de luz azul neon sob o barco ou ao seu redor enquanto você nada.
+                    </p>
+                  </div>
+
+                  <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-ocean-500/50 transition-all group">
+                    <div className="w-14 h-14 bg-ocean-500/10 rounded-2xl flex items-center justify-center text-ocean-400 mb-8 group-hover:scale-110 transition-transform">
+                      <Calendar className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-serif mb-4">Melhor Época</h3>
+                    <p className="text-sand-100/60 font-light leading-relaxed">
+                      O fenômeno é visível o ano todo, mas atinge seu ápice em noites de <strong>Lua Nova</strong> e céu limpo, quando a escuridão total permite ver cada detalhe do brilho.
+                    </p>
+                  </div>
+
+                  <div className="p-8 rounded-3xl bg-white/5 border border-white/10 hover:border-ocean-500/50 transition-all group">
+                    <div className="w-14 h-14 bg-ocean-500/10 rounded-2xl flex items-center justify-center text-ocean-400 mb-8 group-hover:scale-110 transition-transform">
+                      <ShieldCheck className="w-8 h-8" />
+                    </div>
+                    <h3 className="text-2xl font-serif mb-4">Segurança Total</h3>
+                    <p className="text-sand-100/60 font-light leading-relaxed">
+                      Nossos condutores são experientes na navegação noturna e equipados com todos os itens de segurança necessários para uma vivência tranquila e mágica.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            {/* Practical Info Section */}
+            <section className="py-24 px-6 md:px-12">
+               <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-16">
+                 <div className="lg:w-1/2 space-y-12">
+                   <h2 className="text-4xl font-serif">Informações <br/><span className="text-ocean-400 italic">Importantes</span></h2>
+                   
+                   <div className="space-y-8">
+                     <div className="flex gap-6">
+                       <div className="shrink-0 w-8 h-8 rounded-full bg-ocean-500 flex items-center justify-center text-[10px] font-bold">1</div>
+                       <div>
+                         <h4 className="text-lg font-medium mb-2">Ponto de Encontro</h4>
+                         <p className="text-sand-100/60 font-light text-sm">Saída da Praia de Moreré, em frente ao restaurante do Capitão.</p>
+                       </div>
+                     </div>
+                     <div className="flex gap-6">
+                       <div className="shrink-0 w-8 h-8 rounded-full bg-ocean-500 flex items-center justify-center text-[10px] font-bold">2</div>
+                       <div>
+                         <h4 className="text-lg font-medium mb-2">O que levar</h4>
+                         <p className="text-sand-100/60 font-light text-sm">Roupa de banho, toalha e um casaco leve (pode refrescar no mar aberto).</p>
+                       </div>
+                     </div>
+                     <div className="flex gap-6">
+                       <div className="shrink-0 w-8 h-8 rounded-full bg-ocean-500 flex items-center justify-center text-[10px] font-bold">3</div>
+                       <div>
+                         <h4 className="text-lg font-medium mb-2">Duração média</h4>
+                         <p className="text-sand-100/60 font-light text-sm">Aproximadamente 1h30m de pura imersão na natureza.</p>
+                       </div>
+                     </div>
+                   </div>
+
+                   <div className="p-6 rounded-2xl bg-ocean-500/10 border border-ocean-500/20 flex gap-4 items-start">
+                     <Info className="w-6 h-6 text-ocean-400 shrink-0" />
+                     <p className="text-sm font-light text-ocean-100/80">
+                       <strong>Atenção:</strong> A visibilidade do fenômeno pode variar de acordo com as condições climáticas e turbidez da água.
+                     </p>
+                   </div>
+                 </div>
+
+                 <div className="lg:w-1/2">
+                   <div className="p-8 md:p-12 rounded-[3rem] bg-gradient-to-br from-ocean-900 to-black border border-white/5 shadow-2xl relative overflow-hidden">
+                     <div className="relative z-10">
+                       <h3 className="text-3xl font-serif mb-8 text-center text-white">Solicitar Orçamento</h3>
+                       <p className="text-center text-sand-100/60 mb-10 text-sm">Preencha abaixo e entraremos em contato para confirmar a disponibilidade baseada na fase da lua.</p>
+                       
+                       <div className="space-y-4">
+                         <button 
+                           onClick={() => openReservationModal('Bioluminescência')}
+                           className="w-full py-4 bg-white text-sand-900 rounded-2xl font-bold hover:bg-ocean-50 transition-colors flex items-center justify-center gap-2"
+                         >
+                           <MessageCircle className="w-5 h-5" />
+                           Falar com Nino no WhatsApp
+                         </button>
+                         <p className="text-[10px] text-center text-sand-100/40 uppercase tracking-widest mt-6">
+                           Resposta rápida em até 30 minutos
+                         </p>
+                       </div>
+                     </div>
+                     {/* Decorative background glow */}
+                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-ocean-500/5 blur-[120px] -z-10" />
+                   </div>
+                 </div>
+               </div>
+            </section>
+          </motion.main>
+        )}
+      </AnimatePresence>
 
       {/* Footer */}
       <footer className="bg-sand-900 text-sand-300 py-12 px-6 md:px-12 border-t border-sand-800">
