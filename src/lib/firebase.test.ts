@@ -21,14 +21,14 @@ import { firebaseConfig } from './firebase';
 
 describe('Firebase Configuration', () => {
   it('● deve ter a configuração correta do projeto', () => {
-    expect(firebaseConfig.projectId).toBe('capitaes-48bab');
-    expect(firebaseConfig.appId).toBe('1:535964867514:web:6fd22b7f612d550732db83');
-    expect(firebaseConfig.measurementId).toBe('G-7CX4YQEBXQ');
+    expect(firebaseConfig.projectId).toBe('capitaesdaareia-8cd73');
+    expect(firebaseConfig.appId).toBe('1:849754146663:web:be53ff7af02a84692c11c2');
+    expect(firebaseConfig.measurementId).toBe('G-WPQSJ6L32H');
   });
 
   it('● deve exportar as credenciais completas', () => {
-    expect(firebaseConfig.apiKey).toBeDefined();
-    expect(firebaseConfig.authDomain).toBe('capitaes-48bab.firebaseapp.com');
-    expect(firebaseConfig.storageBucket).toBe('capitaes-48bab.firebasestorage.app');
+    expect(firebaseConfig.apiKey).toBe('AIzaSyAVWPV39_jYk3ZQgPatl3KZK0SyybtYFEs');
+    expect(firebaseConfig.authDomain).toBe('capitaesdaareia-8cd73.firebaseapp.com');
+    expect(firebaseConfig.storageBucket).toBe('capitaesdaareia-8cd73.firebasestorage.app');
   });
 });
